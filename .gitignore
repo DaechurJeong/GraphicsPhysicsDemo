@@ -1,0 +1,14 @@
+Graphics_Physics_TechDemo/.vs/
+*.db
+*.user
+*.suo
+*.exe
+*.ilk
+*.pdb
+*.opendb
+*.tlog
+*.lib
+*.pdb
+*.DS_Store
+*.TMP
+*.
