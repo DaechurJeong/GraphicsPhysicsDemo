@@ -10,4 +10,7 @@ Graphics_Physics_TechDemo/.vs/
 *.pdb
 *.DS_Store
 *.TMP
+*.obj
+*.log
+*.idb
 *.
