@@ -20,6 +20,7 @@ public:
 	enum ShaderType {
 		N_NONE,
 		S_PH_SHADING,
+		S_PBR,
 		S_SKYBOX,
 	};
 	void CreateShader(const char* vertex_file_path, const char* fragment_file_path,

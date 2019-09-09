@@ -21,7 +21,10 @@ Shader::Shader(GLboolean geometryUse, ShaderType type)
 	:m_programId(0), m_vertexId(0), m_fragmentId(0), m_geometryId(0),
 	m_infoLogLength(0), m_result(GL_FALSE), UseGeometry(geometryUse), m_type(type)
 {
-	//CreateShader("","",nullptr);
+	if (type == S_PBR)
+	{
+		CreateShader("ShaderCodes\\pbr.vs", "ShaderCodes\\pbr.fs", nullptr);
+	}
 }
 Shader::~Shader() { glDeleteProgram(m_programId); }
 

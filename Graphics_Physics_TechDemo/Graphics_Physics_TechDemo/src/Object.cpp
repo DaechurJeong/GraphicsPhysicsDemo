@@ -26,10 +26,11 @@ End Header --------------------------------------------------------*/
 #include <fstream>
 #include <iostream>
 
-Object::Object() : position(glm::vec3()), scale(glm::vec3(1,1,1)), color(glm::vec3(1.0f, 1.0f, 1.0f)), rotation(0.f),
-                 xMax(0), xMin(0), yMax(0), yMin(0), width(512), height(512)
+Object::Object()
+	: position(glm::vec3(0,0,0)), scale(glm::vec3(1.f,1.f,1.f)), color(glm::vec3(1.0f, 1.0f, 1.0f)), rotation(0.f),
+      xMax(0), xMin(0), yMax(0), yMin(0), width(512), height(512)
 {
-
+	
 }
 Object::~Object()
 {
@@ -38,7 +39,15 @@ Object::~Object()
 	glDeleteBuffers(1, &m_ebo);
 	glDeleteBuffers(1, &normalBuffer);
 }
-
+void Object::CreateObject(const char* path, glm::vec3 initial_position, glm::vec3 initial_scale)
+{
+	if (!loadOBJ(path, middlePoint))
+	{
+		std::cout << "Failed to read object_center OBJ file!" << std::endl;
+		return;
+	}
+	Describe(obj_vertices, obj_indices, textureUV);
+}
 void Object::Describe(std::vector<glm::vec3> vertices, std::vector<unsigned> indices, std::vector<glm::vec2> textures)
 {
 	glGenVertexArrays(1, &m_vao);
@@ -46,8 +55,8 @@ void Object::Describe(std::vector<glm::vec3> vertices, std::vector<unsigned> ind
 	glGenBuffers(1, &m_vbo);
 
 	glGenBuffers(1, &m_ebo);
-
 	glGenBuffers(1, &normalBuffer);
+	glGenBuffers(1, &textureBuffer);
 
 	glBindVertexArray(m_vao);
 
@@ -57,6 +66,9 @@ void Object::Describe(std::vector<glm::vec3> vertices, std::vector<unsigned> ind
 	glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
 	glBufferData(GL_ARRAY_BUFFER, vertexNormals.size() * sizeof(glm::vec3), &vertexNormals[0], GL_STATIC_DRAW);
 
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, textureBuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, textures.size() * sizeof(glm::vec2), &textures[0], GL_STATIC_DRAW);
+
 	const GLsizei vertex_size_stride = 0;
 	constexpr GLint three_components_in_vertex_position = 3;
 	constexpr GLint two_components_in_vertex_normal = 3;
@@ -65,6 +77,7 @@ void Object::Describe(std::vector<glm::vec3> vertices, std::vector<unsigned> ind
 	constexpr GLboolean not_fixedpoint = GL_FALSE;
 	const void* position_offset_in_vertex = reinterpret_cast<void*>(0);
 	const void* normal_offset_in_vertex = reinterpret_cast<void*>(0);
+	const void* texture_coordinates_offset_in_vertex = reinterpret_cast<void*>(0);
 
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
@@ -73,6 +86,9 @@ void Object::Describe(std::vector<glm::vec3> vertices, std::vector<unsigned> ind
 	glEnableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
 	glVertexAttribPointer(1, two_components_in_vertex_normal, float_element_type, not_fixedpoint, vertex_size_stride, normal_offset_in_vertex);
+
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, three_components_in_vertex_texture_coordinates, float_element_type, not_fixedpoint, vertex_size_stride, texture_coordinates_offset_in_vertex);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
 
@@ -168,15 +184,13 @@ bool Object::loadOBJ(const char* path, glm::vec3& middlePoint)
 				obj_vertices[i].y /= (0.5f * abs_max);
 				obj_vertices[i].z /= (0.5f * abs_max);
 				obj_vertices[i] -= (2.f * middlePoint);
-				/*if (isUseTexture)
-				{
-					glm::vec3 normalized = glm::normalize(obj_vertices[i]);
 
-					float theta = glm::atan(normalized.y / normalized.x);
-					glm::vec2 textUV = glm::vec2(theta / TWOPI, (normalized.z + 1) * 0.5f);
+				glm::vec3 normalized = glm::normalize(obj_vertices[i]);
 
-					textureUV.push_back(textUV);
-				}*/
+				float theta = glm::atan(normalized.y / normalized.x);
+				glm::vec2 textUV = glm::vec2(theta / TWOPI, (normalized.z + 1) * 0.5f);
+
+				textureUV.push_back(textUV);
 			}
 			break;
 		}
@@ -218,4 +232,62 @@ bool Object::loadOBJ(const char* path, glm::vec3& middlePoint)
 		}
 	}
 	return true;
+}
+
+void Object::Rendering(Camera* camera, Shader* shader, float aspect, GLenum mode, glm::vec3 pos)
+{
+	const static glm::vec3 up(0, 1, 0);
+
+	glm::mat4 identity_translate(1.0);
+	glm::mat4 identity_scale(1.0);
+	glm::mat4 identity_rotation(1.0);
+
+	//glm::mat4 model = glm::translate(identity_translate, pos) * glm::scale(identity_scale, scale) * glm::rotate(identity_rotation, rotation, up);
+	glm::mat4 projection = glm::perspective(glm::radians(camera->zoom), aspect, 0.1f, 100.0f); // zoom = fov;
+	glm::mat4 view = camera->GetViewMatrix();
+
+	shader->SetMat4("projection", projection);
+	//shader->SetMat4("model", model);
+	shader->SetMat4("view", view);
+
+	glBindVertexArray(m_vao);
+	glDrawElements(mode, m_elementSize, GL_UNSIGNED_INT, nullptr);
+	glBindVertexArray(0);
+}
+
+unsigned int Object::loadTexture(const char* path)
+{
+	unsigned int textureID;
+	glGenTextures(1, &textureID);
+
+	int width, height, nrComponents;
+	unsigned char* data = stbi_load(path, &width, &height, &nrComponents, 0);
+	if (data)
+	{
+		GLenum format;
+		if (nrComponents == 1)
+			format = GL_RED;
+		else if (nrComponents == 3)
+			format = GL_RGB;
+		else if (nrComponents == 4)
+			format = GL_RGBA;
+
+		glBindTexture(GL_TEXTURE_2D, textureID);
+		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		stbi_image_free(data);
+	}
+	else
+	{
+		std::cout << "Texture failed to load at path: " << path << std::endl;
+		stbi_image_free(data);
+	}
+
+	return textureID;
 }

@@ -21,11 +21,25 @@ class Shader;
 
 class Object {
 private:
-	unsigned m_vao, m_vbo, m_ebo, normalBuffer;
+	unsigned m_vao, m_vbo, m_ebo, normalBuffer, textureBuffer;
 	unsigned m_elementSize;
 	int width, height;
 	float xMax, xMin, yMax, yMin, zMax, zMin;
 	float rotation;
+	
+public:
+	Object();
+	~Object();
+
+	void CreateObject(const char* path, glm::vec3 initial_position, glm::vec3 initial_scale);
+	void Rendering(Camera* camera, Shader* shader, float aspect, GLenum mode, glm::vec3 pos);
+	void Describe(std::vector<glm::vec3> vertices, std::vector<unsigned> indices, std::vector<glm::vec2> textures);
+	bool loadOBJ(const char* path, glm::vec3& middlePoint);
+	unsigned int loadTexture(const char* path);
+
+	bool loadPPM(const char* path, std::vector<glm::vec3>& values_);
+	void SendTextureInfo(Shader* shader, unsigned int& textureBuffer);
+	void LoadTGAFile(std::vector<std::string> faces); // not using
 
 	std::vector<glm::vec3> obj_vertices;
 	std::vector<unsigned> obj_indices;
@@ -33,16 +47,5 @@ private:
 	glm::vec3 position, scale, color;
 	std::multimap<int, glm::vec3> faceNormals;
 	std::vector<glm::vec3> vertexNormals;
-public:
-	Object();
-	~Object();
-
-	void Rendering(Camera* camera, Shader* shader, float aspect, GLenum mode, glm::vec3 pos);
-	void Describe(std::vector<glm::vec3> vertices, std::vector<unsigned> indices, std::vector<glm::vec2> textures);
-	bool loadOBJ(const char* path, glm::vec3& middlePoint);
-	bool loadPPM(const char* path, std::vector<glm::vec3>& values_);
-	void SendTextureInfo(Shader* shader, unsigned int& textureBuffer);
-	unsigned int loadTexture(char const* path);
-
-	void LoadTGAFile(std::vector<std::string> faces); // not using
+	glm::vec3 middlePoint;
 };

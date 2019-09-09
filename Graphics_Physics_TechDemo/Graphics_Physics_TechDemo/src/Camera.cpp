@@ -32,7 +32,7 @@ glm::mat4 Camera::GetViewMatrix()
 
 void Camera::Update(Shader* _shader)
 {
-	//_shader->SetVec3("viewPos", position);
+	_shader->SetVec3("view", position);
 	updateCameraVectors();
 }
 
