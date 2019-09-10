@@ -166,8 +166,8 @@ int main(void)
 	}
 
 	Object main_obj;
-	main_obj.CreateObject("models\\sphere_high_poly.obj", glm::vec3(0, 0, 0), glm::vec3(1.f, 1.f, 1.f));
-
+	main_obj.CreateObject("models\\sphere_mid_poly.obj", glm::vec3(0, 0, 0), glm::vec3(1.f, 1.f, 1.f));
+	
 	int nrRows = 5;
 	int nrColumns = 5;
 	float spacing = 2.f;
@@ -233,35 +233,18 @@ int main(void)
 		glActiveTexture(GL_TEXTURE4);
 		glBindTexture(GL_TEXTURE_2D, ao);
 
-		// render rows*column number of spheres
-		glm::mat4 model = glm::mat4(1.0f);
-		for (int row = 0; row < nrRows; ++row)
-		{
-			for (int col = 0; col < nrColumns; ++col)
-			{
-				model = glm::mat4(1.0f);
-				model = glm::translate(model, glm::vec3(
-					(float)(col - (nrColumns / 2)) * spacing,
-					(float)(row - (nrRows / 2)) * spacing,
-					0.0f
-				));
-				shader.SetMat4("model", model);
-				main_obj.Rendering(&camera, &shader, aspect, GL_TRIANGLE_STRIP, main_obj.position);
-			}
-		}
+		// render rows*column number of spheres, for now, only one
+		main_obj.Rendering(&camera, &shader, aspect, GL_TRIANGLE_STRIP, main_obj.position);
 
+		// lighting
 		for (unsigned int i = 0; i < sizeof(light) / sizeof(light[0]); ++i)
 		{
 			glm::vec3 newPos = light[i].position + glm::vec3(sin(glfwGetTime() * 5.0) * 5.0, 0.0, 0.0);
 			newPos = light[i].position;
 			shader.SetVec3("lightPositions[" + std::to_string(i) + "]", newPos);
 			shader.SetVec3("lightColors[" + std::to_string(i) + "]", light[i].color);
-
-			model = glm::mat4(1.0f);
-			model = glm::translate(model, newPos);
-			model = glm::scale(model, glm::vec3(0.5f));
-			shader.SetMat4("model", model);
-			main_obj.Rendering(&camera, &shader, aspect, GL_TRIANGLE_STRIP, main_obj.position);
+			//main_obj.position = newPos;
+			//main_obj.Rendering(&camera, &shader, aspect, GL_TRIANGLE_STRIP, main_obj.position);
 		}
 
 		glfwMakeContextCurrent(window);

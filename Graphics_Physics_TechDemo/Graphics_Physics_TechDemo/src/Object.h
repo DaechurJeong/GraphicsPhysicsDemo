@@ -35,6 +35,7 @@ public:
 	void Rendering(Camera* camera, Shader* shader, float aspect, GLenum mode, glm::vec3 pos);
 	void Describe(std::vector<glm::vec3> vertices, std::vector<unsigned> indices, std::vector<glm::vec2> textures);
 	bool loadOBJ(const char* path, glm::vec3& middlePoint);
+	void makeSphere();
 	unsigned int loadTexture(const char* path);
 
 	bool loadPPM(const char* path, std::vector<glm::vec3>& values_);
@@ -44,6 +45,7 @@ public:
 	std::vector<glm::vec3> obj_vertices;
 	std::vector<unsigned> obj_indices;
 	std::vector<glm::vec2> textureUV;
+	std::vector<float> data;
 	glm::vec3 position, scale, color;
 	std::multimap<int, glm::vec3> faceNormals;
 	std::vector<glm::vec3> vertexNormals;

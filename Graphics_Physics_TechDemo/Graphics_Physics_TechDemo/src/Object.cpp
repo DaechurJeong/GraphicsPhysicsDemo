@@ -66,8 +66,8 @@ void Object::Describe(std::vector<glm::vec3> vertices, std::vector<unsigned> ind
 	glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
 	glBufferData(GL_ARRAY_BUFFER, vertexNormals.size() * sizeof(glm::vec3), &vertexNormals[0], GL_STATIC_DRAW);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, textureBuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, textures.size() * sizeof(glm::vec2), &textures[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, textureBuffer);
+	glBufferData(GL_ARRAY_BUFFER, textures.size() * sizeof(glm::vec2), &textures[0], GL_STATIC_DRAW);
 
 	const GLsizei vertex_size_stride = 0;
 	constexpr GLint three_components_in_vertex_position = 3;
@@ -88,10 +88,10 @@ void Object::Describe(std::vector<glm::vec3> vertices, std::vector<unsigned> ind
 	glVertexAttribPointer(1, two_components_in_vertex_normal, float_element_type, not_fixedpoint, vertex_size_stride, normal_offset_in_vertex);
 
 	glEnableVertexAttribArray(2);
+	glBindBuffer(GL_ARRAY_BUFFER, textureBuffer);
 	glVertexAttribPointer(2, three_components_in_vertex_texture_coordinates, float_element_type, not_fixedpoint, vertex_size_stride, texture_coordinates_offset_in_vertex);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
-
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned), &indices[0], GL_STATIC_DRAW);
 
 	glBindVertexArray(0);
@@ -234,6 +234,72 @@ bool Object::loadOBJ(const char* path, glm::vec3& middlePoint)
 	return true;
 }
 
+void Object::makeSphere()
+{
+	obj_vertices.clear();
+	obj_indices.clear();
+	textureUV.clear();
+	vertexNormals.clear();
+	const unsigned int X_SEGMENTS = 64;
+	const unsigned int Y_SEGMENTS = 64;
+	for (unsigned int y = 0; y <= Y_SEGMENTS; ++y)
+	{
+		for (unsigned int x = 0; x <= X_SEGMENTS; ++x)
+		{
+			float xSegment = (float)x / (float)X_SEGMENTS;
+			float ySegment = (float)y / (float)Y_SEGMENTS;
+			float xPos = std::cos(xSegment * 2.0f * PI) * std::sin(ySegment * PI);
+			float yPos = std::cos(ySegment * PI);
+			float zPos = std::sin(xSegment * 2.0f * PI) * std::sin(ySegment * PI);
+
+			obj_vertices.push_back(glm::vec3(xPos, yPos, zPos));
+			textureUV.push_back(glm::vec2(xSegment, ySegment));
+			vertexNormals.push_back(glm::vec3(xPos, yPos, zPos));
+		}
+	}
+	bool oddRow = false;
+	for (int y = 0; y < Y_SEGMENTS; ++y)
+	{
+		if (!oddRow) // even rows: y == 0, y == 2; and so on
+		{
+			for (int x = 0; x <= X_SEGMENTS; ++x)
+			{
+				obj_indices.push_back(y * (X_SEGMENTS + 1) + x);
+				obj_indices.push_back((y + 1) * (X_SEGMENTS + 1) + x);
+			}
+		}
+		else
+		{
+			for (int x = X_SEGMENTS; x >= 0; --x)
+			{
+				obj_indices.push_back((y + 1) * (X_SEGMENTS + 1) + x);
+				obj_indices.push_back(y * (X_SEGMENTS + 1) + x);
+			}
+		}
+		oddRow = !oddRow;
+	}
+	m_elementSize = obj_indices.size();
+
+	for (int i = 0; i < obj_vertices.size(); ++i)
+	{
+		data.push_back(obj_vertices[i].x);
+		data.push_back(obj_vertices[i].y);
+		data.push_back(obj_vertices[i].z);
+		if (textureUV.size() > 0)
+		{
+			data.push_back(textureUV[i].x);
+			data.push_back(textureUV[i].y);
+		}
+		if (vertexNormals.size() > 0)
+		{
+			data.push_back(vertexNormals[i].x);
+			data.push_back(vertexNormals[i].y);
+			data.push_back(vertexNormals[i].z);
+		}
+	}
+	m_elementSize = (unsigned)obj_indices.size();
+}
+
 void Object::Rendering(Camera* camera, Shader* shader, float aspect, GLenum mode, glm::vec3 pos)
 {
 	const static glm::vec3 up(0, 1, 0);
@@ -242,16 +308,16 @@ void Object::Rendering(Camera* camera, Shader* shader, float aspect, GLenum mode
 	glm::mat4 identity_scale(1.0);
 	glm::mat4 identity_rotation(1.0);
 
-	//glm::mat4 model = glm::translate(identity_translate, pos) * glm::scale(identity_scale, scale) * glm::rotate(identity_rotation, rotation, up);
+	glm::mat4 model = glm::translate(identity_translate, pos) * glm::scale(identity_scale, scale) * glm::rotate(identity_rotation, rotation, up);
 	glm::mat4 projection = glm::perspective(glm::radians(camera->zoom), aspect, 0.1f, 100.0f); // zoom = fov;
 	glm::mat4 view = camera->GetViewMatrix();
 
 	shader->SetMat4("projection", projection);
-	//shader->SetMat4("model", model);
+	shader->SetMat4("model", model);
 	shader->SetMat4("view", view);
 
 	glBindVertexArray(m_vao);
-	glDrawElements(mode, m_elementSize, GL_UNSIGNED_INT, nullptr);
+	glDrawElements(mode, static_cast<GLsizei>(textureUV.size() * sizeof(glm::vec2)), GL_UNSIGNED_INT, nullptr);
 	glBindVertexArray(0);
 }
 
@@ -260,26 +326,27 @@ unsigned int Object::loadTexture(const char* path)
 	unsigned int textureID;
 	glGenTextures(1, &textureID);
 
-	int width, height, nrComponents;
-	unsigned char* data = stbi_load(path, &width, &height, &nrComponents, 0);
+	int width, height, nrChannels;
+	unsigned char* data = stbi_load(path, &width, &height, &nrChannels, 0);
 	if (data)
 	{
 		GLenum format;
-		if (nrComponents == 1)
+		if (nrChannels == 1)
 			format = GL_RED;
-		else if (nrComponents == 3)
+		else if (nrChannels == 3)
 			format = GL_RGB;
-		else if (nrComponents == 4)
+		else if (nrChannels == 4)
 			format = GL_RGBA;
-
+		glActiveTexture(GL_TEXTURE0 + textureID - 1);
 		glBindTexture(GL_TEXTURE_2D, textureID);
-		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
 
 		stbi_image_free(data);
 	}
