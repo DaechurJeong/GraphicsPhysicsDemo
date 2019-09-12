@@ -25,7 +25,6 @@ private:
 	unsigned m_elementSize;
 	int width, height;
 	float xMax, xMin, yMax, yMin, zMax, zMin;
-	float rotation;
 	
 public:
 	Object();
@@ -36,6 +35,8 @@ public:
 	void Describe(std::vector<glm::vec3> vertices, std::vector<unsigned> indices, std::vector<glm::vec2> textures);
 	bool loadOBJ(const char* path, glm::vec3& middlePoint);
 	void makeSphere();
+	void makePlain();
+	void render_custom(Camera* camera, Shader* shader, glm::vec3 pos, float aspect);
 	unsigned int loadTexture(const char* path);
 
 	bool loadPPM(const char* path, std::vector<glm::vec3>& values_);
@@ -50,4 +51,9 @@ public:
 	std::multimap<int, glm::vec3> faceNormals;
 	std::vector<glm::vec3> vertexNormals;
 	glm::vec3 middlePoint;
+	float rotation;
 };
+
+unsigned int loadTexture_Environment(const char* path);
+unsigned int loadTexture_Cubemap();
+unsigned int loadTexture_irradianceMap(unsigned int& captureFBO, unsigned int& captureRBO);

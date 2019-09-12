@@ -21,6 +21,9 @@ public:
 		N_NONE,
 		S_PH_SHADING,
 		S_PBR,
+		S_EQUIRECTANGULAR,
+		S_IRRADIANCE,
+		S_BACKGROUND,
 		S_SKYBOX,
 	};
 	void CreateShader(const char* vertex_file_path, const char* fragment_file_path,

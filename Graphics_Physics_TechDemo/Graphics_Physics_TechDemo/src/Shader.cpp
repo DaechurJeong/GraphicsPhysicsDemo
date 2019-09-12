@@ -25,6 +25,12 @@ Shader::Shader(GLboolean geometryUse, ShaderType type)
 	{
 		CreateShader("ShaderCodes\\pbr.vs", "ShaderCodes\\pbr.fs", nullptr);
 	}
+	else if (type == S_EQUIRECTANGULAR)
+		CreateShader("ShaderCodes\\cubemap.vs", "ShaderCodes\\equirectangular_to_cubemap.fs", nullptr);
+	else if (type == S_IRRADIANCE)
+		CreateShader("ShaderCodes\\cubemap.vs", "ShaderCodes\\irradiance_convolution.fs", nullptr);
+	else if (type == S_BACKGROUND)
+		CreateShader("ShaderCodes\\background.vs", "ShaderCodes\\background.fs", nullptr);
 }
 Shader::~Shader() { glDeleteProgram(m_programId); }
 
