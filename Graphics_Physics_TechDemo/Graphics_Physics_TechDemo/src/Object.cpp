@@ -28,7 +28,7 @@ End Header --------------------------------------------------------*/
 
 Object::Object()
 	: position(glm::vec3(0,0,0)), scale(glm::vec3(1.f,1.f,1.f)), color(glm::vec3(1.0f, 1.0f, 1.0f)), rotation(0.f),
-      xMax(0), xMin(0), yMax(0), yMin(0), width(512), height(512)
+      xMax(0), xMin(0), yMax(0), yMin(0), zMax(0), zMin(0), width(512), height(512)
 {
 	
 }
@@ -271,9 +271,9 @@ void Object::makeSphere()
 		{
 			float xSegment = (float)x / (float)X_SEGMENTS;
 			float ySegment = (float)y / (float)Y_SEGMENTS;
-			float xPos = std::cos(xSegment * 2.0f * PI) * std::sin(ySegment * PI);
-			float yPos = std::cos(ySegment * PI);
-			float zPos = std::sin(xSegment * 2.0f * PI) * std::sin(ySegment * PI);
+			float xPos = static_cast<float>(std::cos(xSegment * 2.0f * PI) * std::sin(ySegment * PI));
+			float yPos = static_cast<float>(std::cos(ySegment * PI));
+			float zPos = static_cast<float>(std::sin(xSegment * 2.0f * PI) * std::sin(ySegment * PI));
 
 			obj_vertices.push_back(glm::vec3(xPos, yPos, zPos));
 			textureUV.push_back(glm::vec2(xSegment, ySegment));
@@ -301,7 +301,7 @@ void Object::makeSphere()
 		}
 		oddRow = !oddRow;
 	}
-	m_elementSize = obj_indices.size();
+	m_elementSize = static_cast<unsigned int>(obj_indices.size());
 
 	for (int i = 0; i < obj_vertices.size(); ++i)
 	{
@@ -328,11 +328,11 @@ void Object::makeSphere()
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, obj_indices.size() * sizeof(unsigned int), &obj_indices[0], GL_STATIC_DRAW);
 	float stride = (3 + 2 + 3) * sizeof(float);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (GLsizei)stride, (void*)0);
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, (GLsizei)stride, (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)(5 * sizeof(float)));
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, (GLsizei)stride, (void*)(5 * sizeof(float)));
 	m_elementSize = (unsigned)obj_indices.size();
 }
 void Object::makePlain()
@@ -405,11 +405,11 @@ void Object::makePlain()
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, obj_indices.size() * sizeof(unsigned int), &obj_indices[0], GL_STATIC_DRAW);
 	float stride = (3 + 2 + 3) * sizeof(float);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (GLsizei)stride, (void*)0);
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, (GLsizei)stride, (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)(5 * sizeof(float)));
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, (GLsizei)stride, (void*)(5 * sizeof(float)));
 	m_elementSize = (unsigned)obj_indices.size();
 }
 void Object::render_custom(Camera* camera, Shader* shader, glm::vec3 pos, float aspect)

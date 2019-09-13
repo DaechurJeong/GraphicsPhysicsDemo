@@ -21,8 +21,8 @@ class Shader;
 
 class Object {
 private:
-	unsigned m_vao, m_vbo, m_ebo, normalBuffer, textureBuffer;
-	unsigned m_elementSize;
+	unsigned m_vao = 0, m_vbo = 0, m_ebo = 0, normalBuffer = 0, textureBuffer = 0;
+	unsigned m_elementSize = 0;
 	int width, height;
 	float xMax, xMin, yMax, yMin, zMax, zMin;
 	
