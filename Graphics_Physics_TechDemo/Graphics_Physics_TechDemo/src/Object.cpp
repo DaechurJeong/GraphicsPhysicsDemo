@@ -37,7 +37,6 @@ Object::~Object()
 	glDeleteVertexArrays(1, &m_vao);
 	glDeleteBuffers(1, &m_vbo);
 	glDeleteBuffers(1, &m_ebo);
-	glDeleteBuffers(1, &normalBuffer);
 }
 void Object::CreateObject(const char* path, glm::vec3 initial_position, glm::vec3 initial_scale)
 {
@@ -259,12 +258,11 @@ void Object::makeSphere()
 {
 	glGenVertexArrays(1, &m_vao);
 
-	unsigned int vbo, ebo;
-	glGenBuffers(1, &vbo);
-	glGenBuffers(1, &ebo);
+	glGenBuffers(1, &m_vbo);
+	glGenBuffers(1, &m_ebo);
 
-	const unsigned int X_SEGMENTS = 128;
-	const unsigned int Y_SEGMENTS = 128;
+	const unsigned int X_SEGMENTS = 64;
+	const unsigned int Y_SEGMENTS = 64;
 	for (unsigned int y = 0; y <= Y_SEGMENTS; ++y)
 	{
 		for (unsigned int x = 0; x <= X_SEGMENTS; ++x)
@@ -322,10 +320,10 @@ void Object::makeSphere()
 	}
 
 	glBindVertexArray(m_vao);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), &data[0], GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, obj_indices.size() * sizeof(unsigned int), &obj_indices[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+	glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), &data[0], GL_STATIC_DRAW); // normals
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, obj_indices.size() * sizeof(unsigned int), &obj_indices[0], GL_STATIC_DRAW); // indices for texture
 	float stride = (3 + 2 + 3) * sizeof(float);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (GLsizei)stride, (void*)0);
@@ -339,9 +337,8 @@ void Object::makePlain()
 {
 	glGenVertexArrays(1, &m_vao);
 
-	unsigned int vbo, ebo;
-	glGenBuffers(1, &vbo);
-	glGenBuffers(1, &ebo);
+	glGenBuffers(1, &m_vbo);
+	glGenBuffers(1, &m_ebo);
 
 	const unsigned int X_SEGMENTS = 64;
 	const unsigned int Y_SEGMENTS = 64;
@@ -399,9 +396,9 @@ void Object::makePlain()
 		}
 	}
 	glBindVertexArray(m_vao);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 	glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), &data[0], GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, obj_indices.size() * sizeof(unsigned int), &obj_indices[0], GL_STATIC_DRAW);
 	float stride = (3 + 2 + 3) * sizeof(float);
 	glEnableVertexAttribArray(0);
@@ -420,12 +417,12 @@ void Object::render_custom(Camera* camera, Shader* shader, glm::vec3 pos, float 
 	glm::mat4 identity_scale(1.0);
 	glm::mat4 identity_rotation(1.0);
 
-	//glm::mat4 model = glm::translate(identity_translate, pos) * glm::scale(identity_scale, scale) * glm::rotate(identity_rotation, rotation, up);
+	glm::mat4 model = glm::translate(identity_translate, pos) * glm::scale(identity_scale, scale) * glm::rotate(identity_rotation, rotation, up);
 	glm::mat4 projection = glm::perspective(glm::radians(camera->zoom), aspect, 0.1f, 100.0f); // zoom = fov;
 	glm::mat4 view = camera->GetViewMatrix();
 
 	shader->SetMat4("projection", projection);
-	//shader->SetMat4("model", model);
+	shader->SetMat4("model", model);
 	shader->SetMat4("view", view);
 
 	glBindVertexArray(m_vao);
@@ -481,7 +478,7 @@ unsigned int loadTexture_Environment(const char* path)
 	{
 		glGenTextures(1, &hdrTexture);
 		glBindTexture(GL_TEXTURE_2D, hdrTexture);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, data); // note how we specify the texture's data value to be float
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, data);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);

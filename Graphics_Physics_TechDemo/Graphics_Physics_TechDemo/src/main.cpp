@@ -34,6 +34,8 @@ glm::vec3 middlePoint = glm::vec3(0, 0, 0);
 // Set camera's position
 Camera camera(glm::vec3(0.0f, .7f, 4.0f));
 
+unsigned num_obj = 6;
+
 void FrameBufferSizeCallback(GLFWwindow* window, int _width, int _height)
 {
 	UNREFERENCED_PARAMETER(window);
@@ -240,18 +242,17 @@ int main(void)
 		return -1;
 	}
 
-	Object main_obj;
-	main_obj.makeSphere();
-	main_obj.position = glm::vec3(0.f, 0.f, 0.f);
+	Object main_obj[6];
+	for (unsigned i = 0; i < num_obj; ++i)
+	{
+		main_obj[i].makeSphere();
+		main_obj[i].position = glm::vec3(-5.f + 3 * i, 0.f, 0.f);
+	}
 	//main_obj.CreateObject("models\\sphere_mid_poly.obj", glm::vec3(0, 0, 0), glm::vec3(1.f, 1.f, 1.f));
 	
 	Object plain;
 	plain.makePlain();
 	plain.position = glm::vec3(0, 2.f, 0.f);
-
-	int nrRows = 5;
-	int nrColumns = 5;
-	float spacing = 3.f;
 
 	Shader pbrshader(GL_FALSE, Shader::S_PBR);
 	Shader equirectangularToCubmapShader(GL_FALSE, Shader::S_EQUIRECTANGULAR);
@@ -273,11 +274,19 @@ int main(void)
 	shader.SetInt("aoMap", 4);*/
 
 	// load PBR material textures
-	unsigned int albedo    = main_obj.loadTexture("models\\pbr\\grass\\albedo.png");
-	unsigned int normal    = main_obj.loadTexture("models\\pbr\\grass\\normal.png");
-	unsigned int metallic  = main_obj.loadTexture("models\\pbr\\grass\\metallic.png");
-	unsigned int roughness = main_obj.loadTexture("models\\pbr\\grass\\roughness.png");
-	unsigned int ao        = main_obj.loadTexture("models\\pbr\\grass\\ao.png");
+	/*unsigned int albedo[5]    = { 0 };
+	unsigned int normal[5]    = { 0 };
+	unsigned int metallic[5]  = { 0 };
+	unsigned int roughness[5] = { 0 };
+	unsigned int ao[5]        = { 0 };
+	for (unsigned i = 0; i < num_obj; ++i)
+	{
+		albedo[i] = main_obj[i].loadTexture("models\\pbr\\grass\\albedo.png");
+		normal[i] = main_obj[i].loadTexture("models\\pbr\\grass\\normal.png");
+		metallic[i] = main_obj[i].loadTexture("models\\pbr\\grass\\metallic.png");
+		roughness[i] = main_obj[i].loadTexture("models\\pbr\\grass\\roughness.png");
+		ao[i] = main_obj[i].loadTexture("models\\pbr\\grass\\ao.png");
+	}*/
 
 	Light light[4];
 	light[0].position = glm::vec3(10.f, 10.f, 10.f);
@@ -402,23 +411,11 @@ int main(void)
 		glBindTexture(GL_TEXTURE_2D, ao);*/
 
 		// render rows*column number of spheres, for now, only one
-		glm::mat4 model = glm::mat4(1.0f);
-		for (int row = 0; row < nrRows; ++row)
+		for (unsigned i = 0; i < num_obj; ++i)
 		{
-			pbrshader.SetFloat("metallic", (float)row / (float)nrRows);
-			for (int col = 0; col < nrColumns; ++col)
-			{
-				pbrshader.SetFloat("roughness", glm::clamp((float)col / (float)nrColumns, 0.05f, 1.0f));
-				model = glm::mat4(1.0f);
-				model = glm::translate(model, glm::vec3(
-					(float)(col - (nrColumns / 2)) * spacing,
-					(float)(row - (nrRows / 2)) * spacing,
-					-2.0f
-				));
-				pbrshader.SetMat4("model", model);
-				main_obj.render_custom(&camera, &pbrshader, main_obj.position, aspect);
-				//main_obj.Rendering(&camera, &pbrshader, aspect, GL_TRIANGLE_STRIP, main_obj.position);
-			}
+			pbrshader.SetFloat("metallic", (float)i / (float)num_obj);
+			pbrshader.SetFloat("roughness", glm::clamp((float)i / (float)num_obj, 0.05f, 1.0f));
+			main_obj[i].render_custom(&camera, &pbrshader, main_obj[i].position, aspect);
 		}
 		plain.render_custom(&camera, &pbrshader, plain.position, aspect);
 
@@ -429,13 +426,6 @@ int main(void)
 			newPos = light[i].position;
 			pbrshader.SetVec3("lightPositions[" + std::to_string(i) + "]", newPos);
 			pbrshader.SetVec3("lightColors[" + std::to_string(i) + "]", light[i].color);
-
-			/*model = glm::mat4(1.0f);
-			model = glm::translate(model, newPos);
-			model = glm::scale(model, glm::vec3(0.5f));
-			pbrshader.SetMat4("model", model);
-			main_obj.position = newPos;
-			main_obj.Rendering(&camera, &pbrshader, aspect, GL_TRIANGLE_STRIP, main_obj.position);*/
 		}
 
 		// render skybox (render as last to prevent overdraw)
