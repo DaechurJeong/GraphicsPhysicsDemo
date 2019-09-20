@@ -1,7 +1,6 @@
 #pragma once
 
 
-
 struct vector2 {
 	float getX() { return x; }
 	float getY() { return y; }
@@ -30,10 +29,7 @@ struct vector2 {
 	void operator-=(const float& val);
 	void operator*=(const float& val);
 	void operator/=(const float& val);
-
-
-
-
+	bool operator==(const vector2& _rhs);
 
 
 	//data

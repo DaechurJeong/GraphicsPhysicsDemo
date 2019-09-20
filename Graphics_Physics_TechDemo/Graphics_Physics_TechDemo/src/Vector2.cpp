@@ -1,5 +1,5 @@
 #include "Vector2.h"
-#include <math.h>
+#include <cmath>
 
 
 void vector2::operator=(const vector2& _rhs)
@@ -42,6 +42,11 @@ void vector2::operator/=(const float& val)
 {
 	x /= val;
 	y /= val;
+}
+
+bool vector2::operator==(const vector2& _rhs)
+{
+	return ((x == _rhs.x && y == _rhs.y) ? true : false);
 }
 
 float vector2::getDistance()

@@ -30,7 +30,7 @@ Object::Object()
 	: position(glm::vec3(0,0,0)), scale(glm::vec3(1.f,1.f,1.f)), color(glm::vec3(1.0f, 1.0f, 1.0f)), rotation(0.f),
       xMax(0), xMin(0), yMax(0), yMin(0), zMax(0), zMin(0), width(512), height(512)
 {
-	
+
 }
 Object::~Object()
 {

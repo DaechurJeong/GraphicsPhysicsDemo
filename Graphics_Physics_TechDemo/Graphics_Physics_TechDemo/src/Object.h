@@ -11,21 +11,26 @@ Author: Charlie Jung, jungdae.chur
 Creation date: 9/6/2018
 End Header --------------------------------------------------------*/
 #pragma once
-#include "glm/glm.hpp"
+//#include "glm/glm.hpp"
+
+#include "Base.h"
 #include <vector>
 #include <map>
 #include <string>
 
+
 class Camera;
 class Shader;
 
-class Object {
+class Object 
+{
 private:
 	unsigned m_vao = 0, m_vbo = 0, m_ebo = 0, normalBuffer = 0, textureBuffer = 0;
 	unsigned m_elementSize = 0;
 	int width, height;
 	float xMax, xMin, yMax, yMin, zMax, zMin;
-	
+	SoftBodyPhysics sb;
+
 public:
 	Object();
 	~Object();
