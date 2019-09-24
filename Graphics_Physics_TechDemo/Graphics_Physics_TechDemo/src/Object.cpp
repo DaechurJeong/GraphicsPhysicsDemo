@@ -446,7 +446,7 @@ unsigned int Object::loadTexture(const char* path)
 			format = GL_RGB;
 		else if (nrChannels == 4)
 			format = GL_RGBA;
-		glActiveTexture(GL_TEXTURE0 + textureID - 1);
+		glActiveTexture(GL_TEXTURE1 + textureID - 1);
 		glBindTexture(GL_TEXTURE_2D, textureID);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
