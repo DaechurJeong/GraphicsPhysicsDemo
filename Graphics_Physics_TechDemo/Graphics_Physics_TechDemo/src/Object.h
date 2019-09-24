@@ -11,13 +11,15 @@ Author: Charlie Jung, jungdae.chur
 Creation date: 9/6/2018
 End Header --------------------------------------------------------*/
 #pragma once
-//#include "glm/glm.hpp"
 
-#include "Base.h"
+#ifndef OBJECT_H
+#define OBJECT_H
+
+#include "glm/glm.hpp"
+
 #include <vector>
 #include <map>
 #include <string>
-
 
 class Camera;
 class Shader;
@@ -29,14 +31,14 @@ private:
 	unsigned m_elementSize = 0;
 	int width, height;
 	float xMax, xMin, yMax, yMin, zMax, zMin;
-	SoftBodyPhysics sb;
+	//SoftBodyPhysics sb;
 
 public:
 	Object();
 	~Object();
 
 	void CreateObject(const char* path, glm::vec3 initial_position, glm::vec3 initial_scale);
-	void Rendering(Camera* camera, Shader* shader, float aspect, GLenum mode, glm::vec3 pos);
+	//void Rendering(Camera* camera, Shader* shader, float aspect, GLenum mode, glm::vec3 pos);
 	void Describe(std::vector<glm::vec3> vertices, std::vector<unsigned> indices, std::vector<glm::vec2> textures);
 	bool loadOBJ(const char* path, glm::vec3& middlePoint);
 	void makeSphere();
@@ -47,6 +49,9 @@ public:
 	bool loadPPM(const char* path, std::vector<glm::vec3>& values_);
 	void SendTextureInfo(Shader* shader, unsigned int& textureBuffer);
 	void LoadTGAFile(std::vector<std::string> faces); // not using
+
+	//physics
+	//SoftBodyPhysics& getSoftBody() { return sb; }
 
 	std::vector<glm::vec3> obj_vertices;
 	std::vector<unsigned> obj_indices;
@@ -62,3 +67,5 @@ public:
 unsigned int loadTexture_Environment(const char* path);
 unsigned int loadTexture_Cubemap();
 unsigned int loadTexture_irradianceMap(unsigned int& captureFBO, unsigned int& captureRBO);
+
+#endif

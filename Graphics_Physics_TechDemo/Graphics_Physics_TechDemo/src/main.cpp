@@ -16,7 +16,11 @@ End Header --------------------------------------------------------*/
 #include "input.h"
 #include "Camera.h"
 #include "Light.h"
-#include "Object.h"
+#include "Base.h"
+
+#include "Physics.h"
+
+
 #include "glm/gtc/matrix_transform.hpp"
 
 #include <iostream>
@@ -33,6 +37,7 @@ glm::vec3 middlePoint = glm::vec3(0, 0, 0);
 
 // Set camera's position
 Camera camera(glm::vec3(0.0f, .7f, 4.0f));
+Physics physics;
 
 unsigned num_obj = 6;
 
@@ -249,10 +254,17 @@ int main(void)
 		main_obj[i].position = glm::vec3(-5.f + 3 * i, 0.f, 0.f);
 	}
 	//main_obj.CreateObject("models\\sphere_mid_poly.obj", glm::vec3(0, 0, 0), glm::vec3(1.f, 1.f, 1.f));
+
 	
-	Object plain;
+	//////////////////////////PHYSICS TEST//////////////////
+	SoftBodyPhysics plain;
 	plain.makePlain();
 	plain.position = glm::vec3(0, 2.f, 0.f);
+	plain.scale = glm::vec3(3.f, 5.f, 1.f);
+	plain.Init();
+
+	physics.push_object(&plain);
+	
 
 	Shader pbrshader(GL_FALSE, Shader::S_PBR);
 	Shader equirectangularToCubmapShader(GL_FALSE, Shader::S_EQUIRECTANGULAR);
@@ -388,6 +400,10 @@ int main(void)
 
 		// Input
 		ProcessInput(&camera, window, deltaTime);
+
+
+		//////////////physics update////////////
+		physics.update(deltaTime);
 
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

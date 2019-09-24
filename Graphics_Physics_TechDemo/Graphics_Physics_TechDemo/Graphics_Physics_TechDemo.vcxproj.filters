@@ -81,6 +81,9 @@
     <ClCompile Include="src\Vector3.cpp">
       <Filter>Source Files\Math</Filter>
     </ClCompile>
+    <ClCompile Include="src\Physics.cpp">
+      <Filter>Source Files\Physics</Filter>
+    </ClCompile>
     <ClCompile Include="src\Base.cpp">
       <Filter>Source Files\Physics</Filter>
     </ClCompile>
@@ -132,6 +135,9 @@
       <Filter>Source Files\Math</Filter>
     </ClInclude>
     <ClInclude Include="src\Base.h">
+      <Filter>Source Files\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Physics.h">
       <Filter>Source Files\Physics</Filter>
     </ClInclude>
   </ItemGroup>

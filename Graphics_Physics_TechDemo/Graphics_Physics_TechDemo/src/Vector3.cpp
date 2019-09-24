@@ -52,6 +52,15 @@ vector3 vector3::operator-(const float& _rhs)
 	return result;
 }
 
+vector3 vector3::operator*(const float& _rhs)
+{
+	vector3 result = *this;
+	result.x *= _rhs;
+	result.y *= _rhs;
+	result.z *= _rhs;
+	return result;
+}
+
 vector3 vector3::operator-()
 {
 	return vector3(-x, -y, -z);

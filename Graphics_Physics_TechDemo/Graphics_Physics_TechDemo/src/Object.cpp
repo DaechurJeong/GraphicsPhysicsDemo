@@ -233,7 +233,7 @@ bool Object::loadOBJ(const char* path, glm::vec3& middlePoint)
 	return true;
 }
 
-void Object::Rendering(Camera* camera, Shader* shader, float aspect, GLenum mode, glm::vec3 pos)
+/*void Object::Rendering(Camera* camera, Shader* shader, float aspect, GLenum mode, glm::vec3 pos)
 {
 	const static glm::vec3 up(0, 1, 0);
 
@@ -252,7 +252,7 @@ void Object::Rendering(Camera* camera, Shader* shader, float aspect, GLenum mode
 	glBindVertexArray(m_vao);
 	glDrawElements(mode, static_cast<GLsizei>(textureUV.size() * sizeof(glm::vec2)), GL_UNSIGNED_INT, nullptr);
 	glBindVertexArray(0);
-}
+}*/
 
 void Object::makeSphere()
 {
@@ -349,8 +349,8 @@ void Object::makePlain()
 			float xSegment = (float)x / (float)X_SEGMENTS;
 			float ySegment = (float)y / (float)Y_SEGMENTS;
 			float xPos = xSegment;
-			float yPos = ySegment;
-			float zPos = 0;
+			float yPos = 0;
+			float zPos = ySegment;
 
 			obj_vertices.push_back(glm::vec3(xPos, yPos, zPos));
 			textureUV.push_back(glm::vec2(xSegment, ySegment));

@@ -1,17 +1,47 @@
 #pragma once
 
-#include "Vector3.h"
+#ifndef BASE_H
+#define BASE_H
 
-class SoftBodyPhysics {
+#include "Object.h"
+#include "Vector3.h"
+//#include <vector>
+
+#define GRAVITY -9.8f
+
+struct constraints {
+	constraints() { p1 = 0; p2 = 0; restlen = 0; }
+	int p1;
+	int p2;
+	float restlen;
+};
+
+class SoftBodyPhysics : public Object
+{
+
 public:
-	SoftBodyPhysics() { pos = 0; rot = 0; scale = 1.f; prev_pos = 0; velocity = 0; mass = 0; }
-	SoftBodyPhysics(float _m) { pos = 0; rot = 0; scale = 1.f; mass = _m; prev_pos = 0; velocity = 0; }
+	SoftBodyPhysics() {}
+	void Init();
+	void Update(float dt);
+
 private:
-	vector3 pos;
-	vector3 rot;
-	vector3 scale;
-	float mass;
-	vector3 prev_pos;
-	vector3 velocity;
+	void Verlet(float dt);
+	void KeepConstraint();
+	void Acceleration();
+
+	std::vector<glm::vec3> m_old_ver;
+	std::vector<constraints> m_cons;
+	float m_gravity;
+	glm::vec3 m_acceleration;
+	glm::vec3 m_velocity;
+
+	int m_dimension;
+
+	//temp
+	std::vector <glm::vec3> m_edge;
 
 };
+
+#endif
+
+

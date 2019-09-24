@@ -30,6 +30,7 @@
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Object.cpp" />
+    <ClCompile Include="src\Physics.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\Vector2.cpp" />
     <ClCompile Include="src\Vector3.cpp" />
@@ -48,6 +49,7 @@
     <ClInclude Include="src\input.h" />
     <ClInclude Include="src\Light.h" />
     <ClInclude Include="src\Object.h" />
+    <ClInclude Include="src\Physics.h" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\Vector2.h" />
     <ClInclude Include="src\Vector3.h" />
