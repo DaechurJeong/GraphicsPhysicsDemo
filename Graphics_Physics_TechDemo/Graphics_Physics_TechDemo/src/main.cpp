@@ -46,102 +46,6 @@ void FrameBufferSizeCallback(GLFWwindow* window, int _width, int _height)
 	UNREFERENCED_PARAMETER(window);
 	glViewport(0, 0, _width, _height);
 }
-// renders (and builds at first invocation) a sphere
-// -------------------------------------------------
-unsigned int sphereVAO = 0;
-unsigned int indexCount;
-void renderSphere()
-{
-	if (sphereVAO == 0)
-	{
-		glGenVertexArrays(1, &sphereVAO);
-
-		unsigned int vbo, ebo;
-		glGenBuffers(1, &vbo);
-		glGenBuffers(1, &ebo);
-
-		std::vector<glm::vec3> positions;
-		std::vector<glm::vec2> uv;
-		std::vector<glm::vec3> normals;
-		std::vector<unsigned int> indices;
-
-		const unsigned int X_SEGMENTS = 64;
-		const unsigned int Y_SEGMENTS = 64;
-		const float PI = 3.14159265359f;
-		for (unsigned int y = 0; y <= Y_SEGMENTS; ++y)
-		{
-			for (unsigned int x = 0; x <= X_SEGMENTS; ++x)
-			{
-				float xSegment = (float)x / (float)X_SEGMENTS;
-				float ySegment = (float)y / (float)Y_SEGMENTS;
-				float xPos = std::cos(xSegment * 2.0f * PI) * std::sin(ySegment * PI);
-				float yPos = std::cos(ySegment * PI);
-				float zPos = std::sin(xSegment * 2.0f * PI) * std::sin(ySegment * PI);
-
-				positions.push_back(glm::vec3(xPos, yPos, zPos));
-				uv.push_back(glm::vec2(xSegment, ySegment));
-				normals.push_back(glm::vec3(xPos, yPos, zPos));
-			}
-		}
-
-		bool oddRow = false;
-		for (int y = 0; y < Y_SEGMENTS; ++y)
-		{
-			if (!oddRow) // even rows: y == 0, y == 2; and so on
-			{
-				for (int x = 0; x <= X_SEGMENTS; ++x)
-				{
-					indices.push_back(y * (X_SEGMENTS + 1) + x);
-					indices.push_back((y + 1) * (X_SEGMENTS + 1) + x);
-				}
-			}
-			else
-			{
-				for (int x = X_SEGMENTS; x >= 0; --x)
-				{
-					indices.push_back((y + 1) * (X_SEGMENTS + 1) + x);
-					indices.push_back(y * (X_SEGMENTS + 1) + x);
-				}
-			}
-			oddRow = !oddRow;
-		}
-		indexCount = static_cast<unsigned int>(indices.size());
-		//indexCount = uv.size() * sizeof(glm::vec2);
-		std::vector<float> data;
-		for (int i = 0; i < positions.size(); ++i)
-		{
-			data.push_back(positions[i].x);
-			data.push_back(positions[i].y);
-			data.push_back(positions[i].z);
-			if (uv.size() > 0)
-			{
-				data.push_back(uv[i].x);
-				data.push_back(uv[i].y);
-			}
-			if (normals.size() > 0)
-			{
-				data.push_back(normals[i].x);
-				data.push_back(normals[i].y);
-				data.push_back(normals[i].z);
-			}
-		}
-		glBindVertexArray(sphereVAO);
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), &data[0], GL_STATIC_DRAW);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
-		float stride = (3 + 2 + 3) * sizeof(float);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (GLsizei)stride, (void*)0);
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, (GLsizei)stride, (void*)(3 * sizeof(float)));
-		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, (GLsizei)stride, (void*)(5 * sizeof(float)));
-	}
-
-	glBindVertexArray(sphereVAO);
-	glDrawElements(GL_TRIANGLE_STRIP, indexCount, GL_UNSIGNED_INT, 0);
-}
 // renderCube() renders a 1x1 3D cube in NDC.
 // -------------------------------------------------
 unsigned int cubeVAO = 0;
@@ -253,6 +157,9 @@ int main(void)
 		main_obj[i].makeSphere();
 		main_obj[i].position = glm::vec3(-5.f + 3 * i, 0.f, 0.f);
 	}
+	Object main_obj_texture;
+	main_obj_texture.makeSphere();
+	main_obj_texture.position = glm::vec3(0.f, 2.f, -1.f);
 	//main_obj.CreateObject("models\\sphere_mid_poly.obj", glm::vec3(0, 0, 0), glm::vec3(1.f, 1.f, 1.f));
 
 	
@@ -266,6 +173,7 @@ int main(void)
 	physics.push_object(&plain);
 	
 	Shader pbrshader(GL_FALSE, Shader::S_PBR);
+	Shader pbr_texture_shader(GL_FALSE, Shader::S_PBR_TEXTURE);
 	Shader equirectangularToCubmapShader(GL_FALSE, Shader::S_EQUIRECTANGULAR);
 	Shader irradianceShader(GL_FALSE, Shader::S_IRRADIANCE);
 	Shader backgroundShader(GL_FALSE, Shader::S_BACKGROUND);
@@ -275,29 +183,22 @@ int main(void)
 	pbrshader.SetVec3("albedo", glm::vec3(0.5f, 0.f, 0.f));
 	pbrshader.SetFloat("ao", 1.0f);
 
-	backgroundShader.Use();
-	backgroundShader.SetInt("environmentMap", 0);
-	/*shader.Use();
-	shader.SetInt("albedoMap", 0);
-	shader.SetInt("normalMap", 1);
-	shader.SetInt("metallicMap", 2);
-	shader.SetInt("roughnessMap", 3);
-	shader.SetInt("aoMap", 4);*/
+	pbr_texture_shader.Use();
+	pbr_texture_shader.SetInt("albedoMap", 1);
+	pbr_texture_shader.SetInt("normalMap", 2);
+	pbr_texture_shader.SetInt("metallicMap", 3);
+	pbr_texture_shader.SetInt("roughnessMap", 4);
+	pbr_texture_shader.SetInt("aoMap", 5);
 
 	// load PBR material textures
-	/*unsigned int albedo[5]    = { 0 };
-	unsigned int normal[5]    = { 0 };
-	unsigned int metallic[5]  = { 0 };
-	unsigned int roughness[5] = { 0 };
-	unsigned int ao[5]        = { 0 };
-	for (unsigned i = 0; i < num_obj; ++i)
-	{
-		albedo[i] = main_obj[i].loadTexture("models\\pbr\\grass\\albedo.png");
-		normal[i] = main_obj[i].loadTexture("models\\pbr\\grass\\normal.png");
-		metallic[i] = main_obj[i].loadTexture("models\\pbr\\grass\\metallic.png");
-		roughness[i] = main_obj[i].loadTexture("models\\pbr\\grass\\roughness.png");
-		ao[i] = main_obj[i].loadTexture("models\\pbr\\grass\\ao.png");
-	}*/
+	unsigned int albedo = main_obj_texture.loadTexture("models\\pbr\\rusted_iron\\albedo.png");
+	unsigned int normal = main_obj_texture.loadTexture("models\\pbr\\rusted_iron\\normal.png");
+	unsigned int metallic = main_obj_texture.loadTexture("models\\pbr\\rusted_iron\\metallic.png");
+	unsigned int roughness = main_obj_texture.loadTexture("models\\pbr\\rusted_iron\\roughness.png");
+	unsigned int ao = main_obj_texture.loadTexture("models\\pbr\\rusted_iron\\ao.png");
+
+	backgroundShader.Use();
+	backgroundShader.SetInt("environmentMap", 0);
 
 	Light light[4];
 	light[0].position = glm::vec3(10.f, 10.f, 10.f);
@@ -323,7 +224,7 @@ int main(void)
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, captureRBO);
 
 	// pbr: load the HDR environment map
-	unsigned int hdrTexture = loadTexture_Environment("models\\HDR_029_Sky_Cloudy_Ref.hdr");
+	unsigned int hdrTexture = loadTexture_Environment("models\\newport_loft.hdr");
 
 	// pbr: setup cubemap to render to and attach to framebuffer
 	unsigned int envCubemap = loadTexture_Cubemap();
@@ -407,23 +308,38 @@ int main(void)
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		pbr_texture_shader.Use();
+		camera.Update(&pbr_texture_shader);
+		pbr_texture_shader.SetVec3("camPos", camera.position);
+
+		// bind pre-computed IBL data
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, albedo);
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, normal);
+		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_2D, metallic);
+		glActiveTexture(GL_TEXTURE4);
+		glBindTexture(GL_TEXTURE_2D, roughness);
+		glActiveTexture(GL_TEXTURE5);
+		glBindTexture(GL_TEXTURE_2D, ao);
+
+		main_obj_texture.render_custom(&camera, &pbr_texture_shader, main_obj_texture.position, aspect);
+		plain.render_custom(&camera, &pbr_texture_shader, plain.position, aspect);
+		// lighting
+		for (unsigned int i = 0; i < sizeof(light) / sizeof(light[0]); ++i)
+		{
+			glm::vec3 newPos = light[i].position + glm::vec3(sin(deltaTime * 5.0) * 5.0, 0.0, 0.0);
+			newPos = light[i].position;
+			pbr_texture_shader.SetVec3("lightPositions[" + std::to_string(i) + "]", newPos);
+			pbr_texture_shader.SetVec3("lightColors[" + std::to_string(i) + "]", light[i].color);
+		}
+
 		pbrshader.Use();
 		camera.Update(&pbrshader);
 		pbrshader.SetVec3("camPos", camera.position);
-
-		// bind pre-computed IBL data
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);
-		/*glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, albedo);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, normal);
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, metallic);
-		glActiveTexture(GL_TEXTURE3);
-		glBindTexture(GL_TEXTURE_2D, roughness);
-		glActiveTexture(GL_TEXTURE4);
-		glBindTexture(GL_TEXTURE_2D, ao);*/
 
 		// render rows*column number of spheres, for now, only one
 		for (unsigned i = 0; i < num_obj; ++i)

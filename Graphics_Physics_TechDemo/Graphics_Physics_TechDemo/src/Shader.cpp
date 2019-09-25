@@ -31,6 +31,8 @@ Shader::Shader(GLboolean geometryUse, ShaderType type)
 		CreateShader("ShaderCodes\\cubemap.vs", "ShaderCodes\\irradiance_convolution.fs", nullptr);
 	else if (type == S_BACKGROUND)
 		CreateShader("ShaderCodes\\background.vs", "ShaderCodes\\background.fs", nullptr);
+	else if (type == S_PBR_TEXTURE)
+		CreateShader("ShaderCodes\\pbr_texture.vs", "ShaderCodes\\pbr_texture.fs", nullptr);
 }
 Shader::~Shader() { glDeleteProgram(m_programId); }
 
