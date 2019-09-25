@@ -36,6 +36,8 @@ Object::~Object()
 {
 	glDeleteVertexArrays(1, &m_vao);
 	glDeleteBuffers(1, &m_vbo);
+	glDeleteBuffers(1, &normalBuffer);
+	glDeleteBuffers(1, &textureBuffer);
 	glDeleteBuffers(1, &m_ebo);
 }
 void Object::CreateObject(const char* path, glm::vec3 initial_position, glm::vec3 initial_scale)
@@ -45,9 +47,56 @@ void Object::CreateObject(const char* path, glm::vec3 initial_position, glm::vec
 		std::cout << "Failed to read object_center OBJ file!" << std::endl;
 		return;
 	}
-	Describe(obj_vertices, obj_indices, textureUV);
+	//Describe(obj_vertices, obj_indices, textureUV);
 }
-void Object::Describe(std::vector<glm::vec3> vertices, std::vector<unsigned> indices, std::vector<glm::vec2> textures)
+void Object::GenerateBuffers()
+{
+	glGenVertexArrays(1, &m_vao);
+
+	glGenBuffers(1, &m_vbo);
+	glGenBuffers(1, &normalBuffer);
+	glGenBuffers(1, &textureBuffer);
+	glGenBuffers(1, &m_ebo);
+}
+void Object::Describe()
+{
+	glBindVertexArray(m_vao);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+	glBufferData(GL_ARRAY_BUFFER, obj_vertices.size() * sizeof(glm::vec3), &obj_vertices[0], GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ARRAY_BUFFER, textureBuffer);
+	glBufferData(GL_ARRAY_BUFFER, textureUV.size() * sizeof(glm::vec2), &textureUV[0], GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
+	glBufferData(GL_ARRAY_BUFFER, vertexNormals.size() * sizeof(glm::vec3), &vertexNormals[0], GL_STATIC_DRAW);
+
+	const GLsizei vertex_size_stride = 0;
+	constexpr GLint three_components_in_vertex_position = 3;
+	constexpr GLint two_components_in_vertex_normal = 3;
+	constexpr GLint three_components_in_vertex_texture_coordinates = 2;
+	constexpr GLenum float_element_type = GL_FLOAT;
+	constexpr GLboolean not_fixedpoint = GL_FALSE;
+	const void* position_offset_in_vertex = reinterpret_cast<void*>(0);
+	const void* normal_offset_in_vertex = reinterpret_cast<void*>(0);
+	const void* texture_coordinates_offset_in_vertex = reinterpret_cast<void*>(0);
+
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+	glVertexAttribPointer(0, three_components_in_vertex_position, float_element_type, not_fixedpoint, vertex_size_stride, position_offset_in_vertex);
+
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, textureBuffer);
+	glVertexAttribPointer(1, three_components_in_vertex_texture_coordinates, float_element_type, not_fixedpoint, vertex_size_stride, texture_coordinates_offset_in_vertex);
+
+	glEnableVertexAttribArray(2);
+	glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
+	glVertexAttribPointer(2, two_components_in_vertex_normal, float_element_type, not_fixedpoint, vertex_size_stride, normal_offset_in_vertex);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, obj_indices.size() * sizeof(unsigned int), &obj_indices[0], GL_STATIC_DRAW); // indices for texture
+	m_elementSize = (unsigned)obj_indices.size();
+}
+/*void Object::Describe(std::vector<glm::vec3> vertices, std::vector<unsigned> indices, std::vector<glm::vec2> textures)
 {
 	glGenVertexArrays(1, &m_vao);
 
@@ -96,7 +145,7 @@ void Object::Describe(std::vector<glm::vec3> vertices, std::vector<unsigned> ind
 	glBindVertexArray(0);
 
 	m_elementSize = (unsigned)indices.size() * sizeof(unsigned);
-}
+}*/
 
 bool Object::loadOBJ(const char* path, glm::vec3& middlePoint)
 {
@@ -232,34 +281,9 @@ bool Object::loadOBJ(const char* path, glm::vec3& middlePoint)
 	}
 	return true;
 }
-
-/*void Object::Rendering(Camera* camera, Shader* shader, float aspect, GLenum mode, glm::vec3 pos)
-{
-	const static glm::vec3 up(0, 1, 0);
-
-	glm::mat4 identity_translate(1.0);
-	glm::mat4 identity_scale(1.0);
-	glm::mat4 identity_rotation(1.0);
-
-	glm::mat4 model = glm::translate(identity_translate, pos) * glm::scale(identity_scale, scale) * glm::rotate(identity_rotation, rotation, up);
-	glm::mat4 projection = glm::perspective(glm::radians(camera->zoom), aspect, 0.1f, 100.0f); // zoom = fov;
-	glm::mat4 view = camera->GetViewMatrix();
-
-	shader->SetMat4("projection", projection);
-	shader->SetMat4("model", model);
-	shader->SetMat4("view", view);
-
-	glBindVertexArray(m_vao);
-	glDrawElements(mode, static_cast<GLsizei>(textureUV.size() * sizeof(glm::vec2)), GL_UNSIGNED_INT, nullptr);
-	glBindVertexArray(0);
-}*/
-
 void Object::makeSphere()
 {
-	glGenVertexArrays(1, &m_vao);
-
-	glGenBuffers(1, &m_vbo);
-	glGenBuffers(1, &m_ebo);
+	GenerateBuffers();
 
 	const unsigned int X_SEGMENTS = 64;
 	const unsigned int Y_SEGMENTS = 64;
@@ -299,56 +323,19 @@ void Object::makeSphere()
 		}
 		oddRow = !oddRow;
 	}
-	m_elementSize = static_cast<unsigned int>(obj_indices.size());
-
-	for (int i = 0; i < obj_vertices.size(); ++i)
-	{
-		data.push_back(obj_vertices[i].x);
-		data.push_back(obj_vertices[i].y);
-		data.push_back(obj_vertices[i].z);
-		if (textureUV.size() > 0)
-		{
-			data.push_back(textureUV[i].x);
-			data.push_back(textureUV[i].y);
-		}
-		if (vertexNormals.size() > 0)
-		{
-			data.push_back(vertexNormals[i].x);
-			data.push_back(vertexNormals[i].y);
-			data.push_back(vertexNormals[i].z);
-		}
-	}
-
-	glBindVertexArray(m_vao);
-
-	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), &data[0], GL_STATIC_DRAW); // normals
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, obj_indices.size() * sizeof(unsigned int), &obj_indices[0], GL_STATIC_DRAW); // indices for texture
-	float stride = (3 + 2 + 3) * sizeof(float);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (GLsizei)stride, (void*)0);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, (GLsizei)stride, (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, (GLsizei)stride, (void*)(5 * sizeof(float)));
-	m_elementSize = (unsigned)obj_indices.size();
+	Describe();
 }
 void Object::makePlain()
 {
-	glGenVertexArrays(1, &m_vao);
-
-	glGenBuffers(1, &m_vbo);
-	glGenBuffers(1, &m_ebo);
-
+	GenerateBuffers();
 
 	/////original
 	//const unsigned int X_SEGMENTS = 64;
 	//const unsigned int Y_SEGMENTS = 64;
 
 	///for physics test
-	const unsigned int X_SEGMENTS = 4;
-	const unsigned int Y_SEGMENTS = 4;
+	const unsigned int X_SEGMENTS = 32;
+	const unsigned int Y_SEGMENTS = 32;
 
 	for (unsigned int y = 0; y <= Y_SEGMENTS; ++y)
 	{
@@ -386,38 +373,9 @@ void Object::makePlain()
 		}
 		oddRow = !oddRow;
 	}
-	for (int i = 0; i < obj_vertices.size(); ++i)
-	{
-		data.push_back(obj_vertices[i].x);
-		data.push_back(obj_vertices[i].y);
-		data.push_back(obj_vertices[i].z);
-		if (textureUV.size() > 0)
-		{
-			data.push_back(textureUV[i].x);
-			data.push_back(textureUV[i].y);
-		}
-		if (vertexNormals.size() > 0)
-		{
-			data.push_back(vertexNormals[i].x);
-			data.push_back(vertexNormals[i].y);
-			data.push_back(vertexNormals[i].z);
-		}
-	}
-	glBindVertexArray(m_vao);
-	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), &data[0], GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, obj_indices.size() * sizeof(unsigned int), &obj_indices[0], GL_STATIC_DRAW);
-	float stride = (3 + 2 + 3) * sizeof(float);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (GLsizei)stride, (void*)0);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, (GLsizei)stride, (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, (GLsizei)stride, (void*)(5 * sizeof(float)));
-	m_elementSize = (unsigned)obj_indices.size();
+	Describe();
 }
-void Object::render_custom(Camera* camera, Shader* shader, glm::vec3 pos, float aspect)
+void Object::render_textured(Camera* camera, Shader* shader, glm::vec3 pos, float aspect)
 {
 	const static glm::vec3 up(0, 1, 0);
 

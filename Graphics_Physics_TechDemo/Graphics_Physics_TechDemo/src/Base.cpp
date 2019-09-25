@@ -7,7 +7,7 @@ void SoftBodyPhysics::Init()
 	for (int i = 0; i < m_scaled_ver.size(); ++i)
 		m_scaled_ver[i] = position + m_scaled_ver[i]*scale;
 	m_old_ver = m_scaled_ver;
-	m_dimension = 5;
+	m_dimension = 33;
 
 	for(int i = 0; i < m_dimension; ++i)
 		m_edge.push_back(m_scaled_ver[i]);

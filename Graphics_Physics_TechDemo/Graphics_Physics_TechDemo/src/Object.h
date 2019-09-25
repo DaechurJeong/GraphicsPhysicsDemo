@@ -38,12 +38,14 @@ public:
 	~Object();
 
 	void CreateObject(const char* path, glm::vec3 initial_position, glm::vec3 initial_scale);
+	void GenerateBuffers();
+	void Describe();
 	//void Rendering(Camera* camera, Shader* shader, float aspect, GLenum mode, glm::vec3 pos);
-	void Describe(std::vector<glm::vec3> vertices, std::vector<unsigned> indices, std::vector<glm::vec2> textures);
+	//void Describe(std::vector<glm::vec3> vertices, std::vector<unsigned> indices, std::vector<glm::vec2> textures);
 	bool loadOBJ(const char* path, glm::vec3& middlePoint);
 	void makeSphere();
 	void makePlain();
-	void render_custom(Camera* camera, Shader* shader, glm::vec3 pos, float aspect);
+	void render_textured(Camera* camera, Shader* shader, glm::vec3 pos, float aspect);
 	void render_line(Camera* camera, Shader* shader, glm::vec3 pos, float aspect);
 	unsigned int loadTexture(const char* path);
 
