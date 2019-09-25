@@ -44,6 +44,7 @@ public:
 	void makeSphere();
 	void makePlain();
 	void render_custom(Camera* camera, Shader* shader, glm::vec3 pos, float aspect);
+	void render_line(Camera* camera, Shader* shader, glm::vec3 pos, float aspect);
 	unsigned int loadTexture(const char* path);
 
 	bool loadPPM(const char* path, std::vector<glm::vec3>& values_);

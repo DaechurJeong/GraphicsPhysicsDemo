@@ -320,6 +320,7 @@ void Object::makeSphere()
 	}
 
 	glBindVertexArray(m_vao);
+
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 	glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), &data[0], GL_STATIC_DRAW); // normals
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
@@ -340,8 +341,15 @@ void Object::makePlain()
 	glGenBuffers(1, &m_vbo);
 	glGenBuffers(1, &m_ebo);
 
-	const unsigned int X_SEGMENTS = 64;
-	const unsigned int Y_SEGMENTS = 64;
+
+	/////original
+	//const unsigned int X_SEGMENTS = 64;
+	//const unsigned int Y_SEGMENTS = 64;
+
+	///for physics test
+	const unsigned int X_SEGMENTS = 4;
+	const unsigned int Y_SEGMENTS = 4;
+
 	for (unsigned int y = 0; y <= Y_SEGMENTS; ++y)
 	{
 		for (unsigned int x = 0; x <= X_SEGMENTS; ++x)
@@ -429,7 +437,26 @@ void Object::render_custom(Camera* camera, Shader* shader, glm::vec3 pos, float 
 	glDrawElements(GL_TRIANGLE_STRIP, m_elementSize, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }
+void Object::render_line(Camera* camera, Shader* shader, glm::vec3 pos, float aspect)
+{
+	const static glm::vec3 up(0, 1, 0);
 
+	glm::mat4 identity_translate(1.0);
+	glm::mat4 identity_scale(1.0);
+	glm::mat4 identity_rotation(1.0);
+
+	glm::mat4 model = glm::translate(identity_translate, pos) * glm::scale(identity_scale, scale) * glm::rotate(identity_rotation, rotation, up);
+	glm::mat4 projection = glm::perspective(glm::radians(camera->zoom), aspect, 0.1f, 100.0f); // zoom = fov;
+	glm::mat4 view = camera->GetViewMatrix();
+
+	shader->SetMat4("projection", projection);
+	shader->SetMat4("model", model);
+	shader->SetMat4("view", view);
+
+	glBindVertexArray(m_vao);
+	glDrawElements(GL_LINE_STRIP, m_elementSize, GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
+}
 unsigned int Object::loadTexture(const char* path)
 {
 	unsigned int textureID;

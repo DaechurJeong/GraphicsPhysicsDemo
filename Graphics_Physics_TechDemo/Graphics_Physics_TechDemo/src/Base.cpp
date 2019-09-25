@@ -3,26 +3,44 @@
 void SoftBodyPhysics::Init()
 {
 	m_gravity = GRAVITY;
-	m_old_ver = obj_vertices;
+	m_scaled_ver = obj_vertices;
+	for (int i = 0; i < m_scaled_ver.size(); ++i)
+		m_scaled_ver[i] = position + m_scaled_ver[i]*scale;
+	m_old_ver = m_scaled_ver;
 	m_dimension = 5;
 
+	for(int i = 0; i < m_dimension; ++i)
+		m_edge.push_back(m_scaled_ver[i]);
+
 	//set constraints
-	for (int i = 0; i < m_dimension; ++i)
+	//horizontal
+	for (int i = 0; i < m_dimension-1; ++i)
 	{
-		m_edge.push_back(obj_vertices[i]);
-		for (int j = 0; j < m_dimension - 1 ; ++j)
+		
+		for (int j = 0; j < m_dimension ; ++j)
 		{
 			constraints h_cons;
 			h_cons.p1 = j * m_dimension + i;
 			h_cons.p2 = h_cons.p1 + 1;
-			h_cons.restlen = (obj_vertices[h_cons.p1] - obj_vertices[h_cons.p2]).length();
+
+			h_cons.restlen = scale.x / (m_dimension - 1);
+			//(m_scaled_ver[h_cons.p1] - m_scaled_ver[h_cons.p2]).length();
 
 			m_cons.push_back(h_cons);
 
+		}
+	}
+
+	//vertical
+	for (int i = 0; i < m_dimension; ++i)
+	{
+		for (int j = 0; j < m_dimension -1 ; ++j)
+		{
 			constraints v_cons;
-			v_cons.p1 = h_cons.p1;
+			v_cons.p1 = j * m_dimension + i;
 			v_cons.p2 = v_cons.p1 + m_dimension;
-			v_cons.restlen = (obj_vertices[v_cons.p1] - obj_vertices[v_cons.p2]).length();
+			v_cons.restlen = scale.z / (m_dimension - 1);
+				//(m_scaled_ver[v_cons.p1] - m_scaled_ver[v_cons.p2]).length();
 
 			m_cons.push_back(v_cons);
 		}
@@ -38,16 +56,20 @@ void SoftBodyPhysics::Update(float dt)
 	Acceleration();
 	Verlet(dt);
 	KeepConstraint();
+
+	for (int i = 0; i < m_scaled_ver.size(); ++i)
+		obj_vertices[i] = (m_scaled_ver[i] - position) / scale;
+	
 }
 
 void SoftBodyPhysics::Verlet(float dt)
 {
 	float f = 0.99f;
-	for (int i = 0; i < obj_vertices.size(); ++i)
+	for (int i = 0; i < m_scaled_ver.size(); ++i)
 	{
-		glm::vec3* temp = &obj_vertices[i];
+		glm::vec3* temp = &m_scaled_ver[i];
 
-		obj_vertices[i] += f * obj_vertices[i] - f * m_old_ver[i] + m_acceleration * dt * dt;
+		m_scaled_ver[i] += f * m_scaled_ver[i] - f * m_old_ver[i] + m_acceleration * dt * dt;
 		m_old_ver[i] = *temp;
 	}
 }
@@ -58,17 +80,17 @@ void SoftBodyPhysics::KeepConstraint()
 	{
 		//staying edge
 		for (int j = 0; j < m_edge.size(); ++j)
-			obj_vertices[j] = m_edge[j];
+			m_scaled_ver[j] = m_edge[j];
 
 
 		for (int j = 0; j < m_cons.size(); ++j)
 		{
 			constraints& c = m_cons[j];
-			glm::vec3& point1 = obj_vertices[c.p1];
-			glm::vec3& point2 = obj_vertices[c.p2];
+			glm::vec3& point1 = m_scaled_ver[c.p1];
+			glm::vec3& point2 = m_scaled_ver[c.p2];
 
 			glm::vec3 delta = point2 - point1;
-			float len = delta.length();
+			float len = glm::sqrt(delta.x * delta.x + delta.y * delta.y + delta.z * delta.z);
 			float diff = (len - c.restlen) / len;
 
 			point1 += delta * 0.5f * diff;

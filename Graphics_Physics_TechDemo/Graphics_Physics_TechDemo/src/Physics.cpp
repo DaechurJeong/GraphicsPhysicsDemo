@@ -7,6 +7,8 @@ void Physics::update(float dt)
 	for (it = softbody_objs.begin(); it < softbody_objs.end(); ++it)
 	{
 		(*it)->Update(dt);
+
+		
 	}
 
 

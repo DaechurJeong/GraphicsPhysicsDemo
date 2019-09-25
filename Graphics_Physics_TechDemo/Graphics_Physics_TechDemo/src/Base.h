@@ -7,7 +7,7 @@
 #include "Vector3.h"
 //#include <vector>
 
-#define GRAVITY -9.8f
+#define GRAVITY -4.0f
 
 struct constraints {
 	constraints() { p1 = 0; p2 = 0; restlen = 0; }
@@ -29,6 +29,7 @@ private:
 	void KeepConstraint();
 	void Acceleration();
 
+	std::vector<glm::vec3> m_scaled_ver;
 	std::vector<glm::vec3> m_old_ver;
 	std::vector<constraints> m_cons;
 	float m_gravity;

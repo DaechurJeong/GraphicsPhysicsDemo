@@ -259,13 +259,12 @@ int main(void)
 	//////////////////////////PHYSICS TEST//////////////////
 	SoftBodyPhysics plain;
 	plain.makePlain();
-	plain.position = glm::vec3(0, 2.f, 0.f);
-	plain.scale = glm::vec3(3.f, 5.f, 1.f);
+	plain.position = glm::vec3(0, 1.5f, -1.5f);
+	plain.scale = glm::vec3(3.f, 1.f, 5.f);
 	plain.Init();
-
+	
 	physics.push_object(&plain);
 	
-
 	Shader pbrshader(GL_FALSE, Shader::S_PBR);
 	Shader equirectangularToCubmapShader(GL_FALSE, Shader::S_EQUIRECTANGULAR);
 	Shader irradianceShader(GL_FALSE, Shader::S_IRRADIANCE);
@@ -403,7 +402,7 @@ int main(void)
 
 
 		//////////////physics update////////////
-		physics.update(deltaTime);
+		//physics.update(deltaTime);
 
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -433,7 +432,7 @@ int main(void)
 			pbrshader.SetFloat("roughness", glm::clamp((float)i / (float)num_obj, 0.05f, 1.0f));
 			main_obj[i].render_custom(&camera, &pbrshader, main_obj[i].position, aspect);
 		}
-		plain.render_custom(&camera, &pbrshader, plain.position, aspect);
+		plain.render_line(&camera, &pbrshader, plain.position, aspect);
 
 		// lighting
 		for (unsigned int i = 0; i < sizeof(light) / sizeof(light[0]); ++i)
