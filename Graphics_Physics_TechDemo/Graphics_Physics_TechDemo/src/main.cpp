@@ -341,7 +341,6 @@ int main(void)
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);
 
-		// render rows*column number of spheres, for now, only one
 		for (unsigned i = 0; i < num_obj; ++i)
 		{
 			pbrshader.SetFloat("metallic", (float)i / (float)num_obj);

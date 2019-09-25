@@ -51,8 +51,6 @@ void SoftBodyPhysics::Init()
 
 void SoftBodyPhysics::Update(float dt)
 {
-
-
 	Acceleration();
 	Verlet(dt);
 	KeepConstraint();
