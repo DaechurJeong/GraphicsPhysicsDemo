@@ -65,6 +65,7 @@ public:
 	std::vector<glm::vec3> vertexNormals;
 	glm::vec3 middlePoint;
 	float rotation;
+	int dimension;
 };
 
 unsigned int loadTexture_Environment(const char* path);

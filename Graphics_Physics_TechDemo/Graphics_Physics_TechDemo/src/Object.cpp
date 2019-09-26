@@ -287,6 +287,8 @@ void Object::makeSphere()
 
 	const unsigned int X_SEGMENTS = 64;
 	const unsigned int Y_SEGMENTS = 64;
+
+	dimension = 64;
 	for (unsigned int y = 0; y <= Y_SEGMENTS; ++y)
 	{
 		for (unsigned int x = 0; x <= X_SEGMENTS; ++x)
@@ -334,8 +336,9 @@ void Object::makePlain()
 	//const unsigned int Y_SEGMENTS = 64;
 
 	///for physics test
-	const unsigned int X_SEGMENTS = 32;
-	const unsigned int Y_SEGMENTS = 32;
+	const unsigned int X_SEGMENTS = 64;
+	const unsigned int Y_SEGMENTS = 64;
+	dimension = 64;
 
 	for (unsigned int y = 0; y <= Y_SEGMENTS; ++y)
 	{
