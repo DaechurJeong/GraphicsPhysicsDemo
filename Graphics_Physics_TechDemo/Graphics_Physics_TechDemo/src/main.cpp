@@ -301,7 +301,6 @@ int main(void)
 		// Input
 		ProcessInput(&camera, window, deltaTime);
 
-
 		//////////////physics update////////////
 		physics.update(deltaTime);
 		//main_obj_texture.Describe();
