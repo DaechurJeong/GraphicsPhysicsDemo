@@ -23,11 +23,15 @@ public:
 	SoftBodyPhysics() {}
 	void Init();
 	void Update(float dt);
+	void CollisionResponseRigid(Object* _rhs);
+	void CollisionResponseSoft(SoftBodyPhysics* _rhs);
 
 private:
 	void Verlet(float dt);
 	void KeepConstraint();
 	void Acceleration();
+
+	bool IsCollided(glm::vec3& point, glm::vec3& center, float& radius);
 
 	std::vector<glm::vec3> m_scaled_ver;
 	std::vector<glm::vec3> m_old_ver;
@@ -36,7 +40,7 @@ private:
 	glm::vec3 m_acceleration;
 	glm::vec3 m_velocity;
 
-	int m_dimension;
+	//int m_dimension;
 
 	//temp
 	std::vector <glm::vec3> m_edge;
