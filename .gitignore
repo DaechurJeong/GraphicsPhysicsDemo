@@ -1,4 +1,7 @@
 Graphics_Physics_TechDemo/.vs/
+Graphics_Physics_TechDemo/x64/
+x64/
+
 *.db
 *.user
 *.suo
@@ -13,4 +16,6 @@ Graphics_Physics_TechDemo/.vs/
 *.obj
 *.log
 *.idb
+*.iobj
+*.ipdb
 *.
