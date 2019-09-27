@@ -40,8 +40,6 @@ public:
 	void CreateObject(const char* path, glm::vec3 initial_position, glm::vec3 initial_scale);
 	void GenerateBuffers();
 	void Describe();
-	//void Rendering(Camera* camera, Shader* shader, float aspect, GLenum mode, glm::vec3 pos);
-	//void Describe(std::vector<glm::vec3> vertices, std::vector<unsigned> indices, std::vector<glm::vec2> textures);
 	bool loadOBJ(const char* path, glm::vec3& middlePoint);
 	void makeSphere();
 	void makePlain();
@@ -68,8 +66,15 @@ public:
 	int dimension;
 };
 
+// helper functions
 unsigned int loadTexture_Environment(const char* path);
 unsigned int loadTexture_Cubemap();
 unsigned int loadTexture_irradianceMap(unsigned int& captureFBO, unsigned int& captureRBO);
+
+void InitFrameBuffer(Shader* equirectangularToCubmapShader, Shader* irradianceShader, unsigned& captureFBO, unsigned& captureRBO,
+	unsigned& envCubemap, unsigned& irradianceMap);
+void InitSkybox(Shader* backgroundShader, Shader* pbrshader, Camera* camera, float width, float height);
+void renderCube();
+void renderSkybox(Shader* backgroundShader, Camera* camera, unsigned& envCubemap);
 
 #endif
