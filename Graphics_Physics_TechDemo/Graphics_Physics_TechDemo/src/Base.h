@@ -20,7 +20,9 @@ class SoftBodyPhysics : public Object
 {
 
 public:
-	SoftBodyPhysics() {}
+	SoftBodyPhysics(ObjectShape shape, glm::vec3 pos, glm::vec3 scale_, int dim):Object(shape, pos, scale_, dim) {
+		Init();
+	}
 	void Init();
 	void Update(float dt);
 	void CollisionResponseRigid(Object* _rhs);
@@ -39,8 +41,6 @@ private:
 	float m_gravity;
 	glm::vec3 m_acceleration;
 	glm::vec3 m_velocity;
-
-	//int m_dimension;
 
 	//temp
 	std::vector <glm::vec3> m_edge;

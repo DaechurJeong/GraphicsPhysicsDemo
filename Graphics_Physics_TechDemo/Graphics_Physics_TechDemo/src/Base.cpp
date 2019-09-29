@@ -7,7 +7,6 @@ void SoftBodyPhysics::Init()
 	for (int i = 0; i < m_scaled_ver.size(); ++i)
 		m_scaled_ver[i] = position + m_scaled_ver[i]*scale;
 	m_old_ver = m_scaled_ver;
-	dimension = 64;
 
 	for(int i = 0; i <= dimension; ++i)
 		m_edge.push_back(m_scaled_ver[i]);
@@ -26,7 +25,6 @@ void SoftBodyPhysics::Init()
 			h_cons.restlen = scale.x / dimension;
 
 			m_cons.push_back(h_cons);
-
 		}
 	}
 

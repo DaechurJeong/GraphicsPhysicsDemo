@@ -35,6 +35,7 @@ glm::vec3 middlePoint = glm::vec3(0, 0, 0);
 // Set camera's position
 Camera camera(glm::vec3(10.f, -2.f, 7.0f));
 Physics physics;
+int dimension = 64;
 
 unsigned num_obj = 6;
 
@@ -74,25 +75,18 @@ int main(void)
 		return -1;
 	}
 
-	Object main_obj[6];
+	std::vector<Object> main_obj;
 	for (unsigned i = 0; i < num_obj; ++i)
 	{
-		main_obj[i].makeSphere();
-		main_obj[i].position = glm::vec3(-5.f + 3 * i, 0.f, -2.f);
+		Object objs(O_SPHERE, glm::vec3(-5.f + 3 * i, 0.f, -2.f), glm::vec3(1.f,1.f,1.f), dimension);
+		main_obj.push_back(objs);
 	}
 
 	//////////////////////////PHYSICS TEST//////////////////
-	Object main_obj_texture;
-	main_obj_texture.makeSphere();
-	main_obj_texture.position = glm::vec3(0.9f, -2.5f, 2.f);
+	Object main_obj_texture(O_SPHERE, glm::vec3(0.9f, -2.5f, 2.f), glm::vec3(1.f,1.f,1.f), dimension);
 	physics.push_object(&main_obj_texture);
 
-	SoftBodyPhysics plain;
-	plain.makePlain();
-	plain.position = glm::vec3(0, 1.5f, 1.f);
-	plain.scale = glm::vec3(4.f, 1.f, 7.f);
-	plain.Init();
-	
+	SoftBodyPhysics plain(O_PLANE, glm::vec3(0, 1.5f, 1.f), glm::vec3(4.f, 1.f, 7.f), dimension);
 	physics.push_object(&plain);
 	
 	Shader pbrshader(GL_FALSE, Shader::S_PBR);
@@ -140,7 +134,6 @@ int main(void)
 	unsigned int captureRBO;
 	unsigned int envCubemap;
 	unsigned int irradianceMap;
-
 	InitFrameBuffer(&equirectangularToCubmapShader, &irradianceShader, captureFBO, captureRBO, envCubemap, irradianceMap);
 	InitSkybox(&backgroundShader, &pbrshader, &camera, (float)width, (float)height);
 
@@ -188,6 +181,7 @@ int main(void)
 		//main_obj_texture.render_line(&camera, &pbr_texture_shader, main_obj_texture.position, aspect);
 		//plain.render_textured(&camera, &pbr_texture_shader, plain.position, aspect);
 		plain.render_line(&camera, &pbr_texture_shader, plain.position, aspect);
+
 		// lighting
 		for (unsigned int i = 0; i < sizeof(light) / sizeof(light[0]); ++i)
 		{
@@ -220,7 +214,7 @@ int main(void)
 		}
 
 		// render skybox (render as last to prevent overdraw)
-		renderSkybox(&backgroundShader, &camera, envCubemap);
+		renderSkybox(&backgroundShader, &camera, envCubemap, irradianceMap);
 
 		glfwMakeContextCurrent(window);
 

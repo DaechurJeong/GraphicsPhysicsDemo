@@ -24,6 +24,11 @@ End Header --------------------------------------------------------*/
 class Camera;
 class Shader;
 
+typedef enum ObjectShape {
+	O_PLANE,
+	O_SPHERE
+};
+
 class Object 
 {
 private:
@@ -31,10 +36,9 @@ private:
 	unsigned m_elementSize = 0;
 	int width, height;
 	float xMax, xMin, yMax, yMin, zMax, zMin;
-	//SoftBodyPhysics sb;
 
 public:
-	Object();
+	Object(ObjectShape shape, glm::vec3 pos, glm::vec3 scale_, int dim);
 	~Object();
 
 	void CreateObject(const char* path, glm::vec3 initial_position, glm::vec3 initial_scale);
@@ -43,6 +47,7 @@ public:
 	bool loadOBJ(const char* path, glm::vec3& middlePoint);
 	void makeSphere();
 	void makePlain();
+
 	void render_textured(Camera* camera, Shader* shader, glm::vec3 pos, float aspect);
 	void render_line(Camera* camera, Shader* shader, glm::vec3 pos, float aspect);
 	unsigned int loadTexture(const char* path);
@@ -64,6 +69,7 @@ public:
 	glm::vec3 middlePoint;
 	float rotation;
 	int dimension;
+	ObjectShape m_shape;
 };
 
 // helper functions
@@ -75,6 +81,6 @@ void InitFrameBuffer(Shader* equirectangularToCubmapShader, Shader* irradianceSh
 	unsigned& envCubemap, unsigned& irradianceMap);
 void InitSkybox(Shader* backgroundShader, Shader* pbrshader, Camera* camera, float width, float height);
 void renderCube();
-void renderSkybox(Shader* backgroundShader, Camera* camera, unsigned& envCubemap);
+void renderSkybox(Shader* backgroundShader, Camera* camera, unsigned& envCubemap, unsigned& irradianceMap);
 
 #endif

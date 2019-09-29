@@ -12,8 +12,5 @@ void Physics::update(float dt)
 		{
 			(*it_soft)->CollisionResponseRigid(*it_rigid);
 		}
-
 	}
-
-
 }

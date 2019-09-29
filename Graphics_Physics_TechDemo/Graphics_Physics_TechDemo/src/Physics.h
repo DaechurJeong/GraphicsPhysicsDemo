@@ -8,8 +8,6 @@
 
 #include <vector>
 
-
-
 class Object;
 class SoftBodyPhysics;
 
