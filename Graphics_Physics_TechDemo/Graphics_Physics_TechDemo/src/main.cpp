@@ -82,12 +82,13 @@ int main(void)
 		return -1;
 	}
 
-	std::vector<Object> main_obj;
+	/*std::vector<Object> main_obj;
 	for (unsigned i = 0; i < num_obj; ++i)
 	{
 		Object objs(O_SPHERE, glm::vec3(-5.f + 3 * i, 0.f, -2.f), glm::vec3(1.f,1.f,1.f), dimension);
 		main_obj.push_back(objs);
-	}
+	}*/
+	Object main_obj(O_SPHERE, glm::vec3(0.f, 0.f, -2.f), glm::vec3(1.f, 1.f, 1.f), dimension);
 
 	//////////////////////////PHYSICS TEST//////////////////
 	Object main_obj_texture(O_SPHERE, glm::vec3(0.9f, -2.5f, 2.f), glm::vec3(1.f,1.f,1.f), dimension);
@@ -168,7 +169,9 @@ int main(void)
 			ImGui::ShowDemoWindow(&show_demo_window);
 		{
 			ImGui::Begin("GUI interface");
-			ImGui::Text("imgui interface");
+			ImGui::Text("Object controller");
+			ImGui::SliderFloat("metallic", &main_obj.metallic, 0.f, 1.f);
+			ImGui::SliderFloat("roughness", &main_obj.roughness, 0.f, 1.f);
 
 			ImGui::End();
 		}
@@ -218,12 +221,13 @@ int main(void)
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);
 
-		for (unsigned i = 0; i < num_obj; ++i)
-		{
-			pbrshader.SetFloat("metallic", (float)i / (float)num_obj);
-			pbrshader.SetFloat("roughness", glm::clamp((float)i / (float)num_obj, 0.05f, 1.0f));
-			main_obj[i].render_textured(&camera, &pbrshader, main_obj[i].position, aspect);
-		}
+		//for (unsigned i = 0; i < num_obj; ++i)
+		//{
+		// main object metallic, roughness
+		pbrshader.SetFloat("metallic", main_obj.metallic);
+		pbrshader.SetFloat("roughness", main_obj.roughness);
+		main_obj.render_textured(&camera, &pbrshader, main_obj.position, aspect);
+		//}
 
 		// lighting
 		for (unsigned int i = 0; i < sizeof(light) / sizeof(light[0]); ++i)

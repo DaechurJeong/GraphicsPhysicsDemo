@@ -28,7 +28,7 @@ End Header --------------------------------------------------------*/
 
 Object::Object(ObjectShape shape, glm::vec3 pos, glm::vec3 scale_, int dim)
 	: position(pos), scale(scale_), color(glm::vec3(1.0f, 1.0f, 1.0f)), rotation(0.f),
-      xMax(0), xMin(0), yMax(0), yMin(0), zMax(0), zMin(0), width(512), height(512), m_shape(shape), dimension(dim)
+      xMax(0), xMin(0), yMax(0), yMin(0), zMax(0), zMin(0), width(512), height(512), m_shape(shape), dimension(dim), roughness(0), metallic(0)
 {
 	if (m_shape == O_PLANE)
 		makePlain();
@@ -117,11 +117,11 @@ bool Object::loadOBJ(const char* path, glm::vec3& middlePoint)
 			faceNormals.clear();
 			for (unsigned i = 0; i < obj_indices.size(); i += 3)
 			{
-				glm::vec3 vec1 = obj_vertices[obj_indices[i + 2]] - obj_vertices[obj_indices[i]];
-				glm::vec3 vec2 = obj_vertices[obj_indices[i + 1]] - obj_vertices[obj_indices[i]];
+				glm::vec3 vec1 = obj_vertices[obj_indices[i + unsigned(2)]] - obj_vertices[obj_indices[i]];
+				glm::vec3 vec2 = obj_vertices[obj_indices[i + unsigned(1)]] - obj_vertices[obj_indices[i]];
 				glm::vec3 faceNormal = glm::normalize(glm::cross(vec2, vec1));
 
-				for (int j = 0; j < 3; ++j)
+				for (unsigned j = 0; j < 3; ++j)
 				{
 					bool exist = false;
 					auto it = faceNormals.equal_range(obj_indices[i + j]);

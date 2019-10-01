@@ -24,10 +24,10 @@ End Header --------------------------------------------------------*/
 class Camera;
 class Shader;
 
-typedef enum ObjectShape {
+typedef enum ObjShape {
 	O_PLANE,
 	O_SPHERE
-};
+}ObjectShape;
 
 class Object 
 {
@@ -69,6 +69,7 @@ public:
 	glm::vec3 middlePoint;
 	float rotation;
 	int dimension;
+	float roughness, metallic;
 	ObjectShape m_shape;
 };
 
