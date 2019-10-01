@@ -18,6 +18,9 @@ End Header --------------------------------------------------------*/
 #include "Light.h"
 #include "Base.h"
 #include "Physics.h"
+#include "imgui-master\imgui.h"
+#include "imgui-master\imgui_impl_glfw.h"
+#include "imgui-master\imgui_impl_opengl3.h"
 #include "glm/gtc/matrix_transform.hpp"
 
 #include <iostream>
@@ -63,6 +66,10 @@ int main(void)
 		glfwTerminate();
 		return -1;
 	}
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init("#version 430");
 
 	// Make the window's context current
 	glfwMakeContextCurrent(window);
@@ -141,6 +148,8 @@ int main(void)
 	int scrWidth, scrHeight;
 	glfwGetFramebufferSize(window, &scrWidth, &scrHeight);
 	glViewport(0, 0, scrWidth, scrHeight);
+
+	bool show_demo_window = false;
 	/* Loop until the user closes the window */
 	while (!glfwWindowShouldClose(window))
 	{
@@ -151,6 +160,18 @@ int main(void)
 		// Input
 		ProcessInput(&camera, window, deltaTime);
 
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+
+		if (show_demo_window)
+			ImGui::ShowDemoWindow(&show_demo_window);
+		{
+			ImGui::Begin("GUI interface");
+			ImGui::Text("imgui interface");
+
+			ImGui::End();
+		}
 		//////////////physics update////////////
 		if (deltaTime < 1.f)
 		{
@@ -216,11 +237,17 @@ int main(void)
 		// render skybox (render as last to prevent overdraw)
 		renderSkybox(&backgroundShader, &camera, envCubemap, irradianceMap);
 
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
 		glfwMakeContextCurrent(window);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
 
 	glfwTerminate();
 	return 0;
