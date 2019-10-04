@@ -8,38 +8,66 @@ void SoftBodyPhysics::Init()
 		m_scaled_ver[i] = position + m_scaled_ver[i]*scale;
 	m_old_ver = m_scaled_ver;
 
-	for(int i = 0; i <= dimension; ++i)
-		m_edge.push_back(m_scaled_ver[i]);
+	if(m_shape == ObjShape::O_PLANE)
+	{ 
+		for(int i = 0; i <= dimension; ++i)
+			m_edge.push_back(m_scaled_ver[i]);
 
-	//set constraints
-	//horizontal
-	for (int i = 0; i < dimension; ++i)
-	{
+		//set constraints
+		//horizontal
+		for (int i = 0; i < dimension; ++i)
+		{
 		
-		for (int j = 0; j <= dimension; ++j)
-		{
-			constraints h_cons;
-			h_cons.p1 = j * (dimension +1) + i;
-			h_cons.p2 = h_cons.p1 + 1;
+			for (int j = 0; j <= dimension; ++j)
+			{
+				constraints h_cons;
+				h_cons.p1 = j * (dimension +1) + i;
+				h_cons.p2 = h_cons.p1 + 1;
 
-			h_cons.restlen = scale.x / dimension;
+				h_cons.restlen = scale.x / dimension;
 
-			m_cons.push_back(h_cons);
+				m_cons.push_back(h_cons);
+			}
 		}
+
+		//vertical
+		for (int i = 0; i <= dimension; ++i)
+		{
+			for (int j = 0; j < dimension; ++j)
+			{
+				constraints v_cons;
+				v_cons.p1 = j * (dimension +1) + i;
+				v_cons.p2 = v_cons.p1 + (dimension +1);
+				v_cons.restlen = scale.z / (dimension);
+
+				m_cons.push_back(v_cons);
+			}
+		}
+
 	}
-
-	//vertical
-	for (int i = 0; i <= dimension; ++i)
+	else if (m_shape == ObjShape::O_SPHERE)
 	{
-		for (int j = 0; j < dimension; ++j)
+		int last_index = (int)m_scaled_ver.size() - 1;
+		//for two pole
+		for (int i = 0; i < dimension; ++i)
 		{
-			constraints v_cons;
-			v_cons.p1 = j * (dimension +1) + i;
-			v_cons.p2 = v_cons.p1 + (dimension +1);
-			v_cons.restlen = scale.z / (dimension);
+			constraints p_u_cons;
+			p_u_cons.p1 = 0;
+			p_u_cons.p2 = dimension + 1 + i;
+			p_u_cons.restlen = glm::distance(m_scaled_ver[0], m_scaled_ver[i]);
+			m_cons.push_back(p_u_cons);
 
-			m_cons.push_back(v_cons);
+			constraints p_d_cons;
+			p_d_cons.p1 = last_index;
+			p_d_cons.p2 = last_index - (dimension + 1 + i);
+			p_d_cons.restlen = p_u_cons.restlen;
+			m_cons.push_back(p_d_cons);
+
 		}
+
+
+
+
 	}
 
 
@@ -109,8 +137,8 @@ void SoftBodyPhysics::Acceleration()
 void SoftBodyPhysics::CollisionResponseRigid(Object* _rhs)
 {
 	glm::vec3 center = _rhs->position;
-	float radius = _rhs->scale.x + 0.01f;
-	float radius_sqr = _rhs->scale.x * _rhs->scale.x;
+	float radius = _rhs->scale.x +0.01f;
+	float radius_sqr = radius * radius;
 	for (int i = 0; i < m_scaled_ver.size(); ++i)
 	{
 		glm::vec3& point = m_scaled_ver[i];

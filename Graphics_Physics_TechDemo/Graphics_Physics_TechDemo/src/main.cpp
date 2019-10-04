@@ -96,6 +96,10 @@ int main(void)
 
 	SoftBodyPhysics plain(O_PLANE, glm::vec3(0, 1.5f, 1.f), glm::vec3(4.f, 1.f, 7.f), dimension);
 	physics.push_object(&plain);
+
+	SoftBodyPhysics sb_sphere(O_SPHERE, glm::vec3(4.f, 1.f, 1.f), glm::vec3(1.f, 1.f, 1.f), dimension);
+	physics.push_object(&sb_sphere);
+
 	
 	Shader pbrshader(GL_FALSE, Shader::S_PBR);
 	Shader pbr_texture_shader(GL_FALSE, Shader::S_PBR_TEXTURE);
@@ -180,6 +184,7 @@ int main(void)
 		{
 			physics.update(deltaTime);
 			plain.Describe();
+			sb_sphere.Describe();
 		}
 
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
@@ -202,9 +207,10 @@ int main(void)
 		glBindTexture(GL_TEXTURE_2D, ao);
 
 		main_obj_texture.render_textured(&camera, &pbr_texture_shader, main_obj_texture.position, aspect);
+		sb_sphere.render_line(&camera, &pbr_texture_shader, sb_sphere.position, aspect);
 		//main_obj_texture.render_line(&camera, &pbr_texture_shader, main_obj_texture.position, aspect);
-		//plain.render_textured(&camera, &pbr_texture_shader, plain.position, aspect);
-		plain.render_line(&camera, &pbr_texture_shader, plain.position, aspect);
+		plain.render_textured(&camera, &pbr_texture_shader, plain.position, aspect);
+		//plain.render_line(&camera, &pbr_texture_shader, plain.position, aspect);
 
 		// lighting
 		for (unsigned int i = 0; i < sizeof(light) / sizeof(light[0]); ++i)

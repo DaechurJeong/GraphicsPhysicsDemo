@@ -13,6 +13,8 @@ End Header --------------------------------------------------------*/
 
 #define PI 3.141592654
 #define TWOPI 6.283185308
+#define S_DIMENSION 4
+#define P_DIMENSION 64
 #define STB_IMAGE_IMPLEMENTATION
 #include "glad/glad.h"
 #include "glm/gtc/matrix_transform.hpp"
@@ -241,10 +243,10 @@ void Object::makeSphere()
 
 	GenerateBuffers();
 
-	const unsigned int X_SEGMENTS = 64;
-	const unsigned int Y_SEGMENTS = 64;
+	const unsigned int X_SEGMENTS = S_DIMENSION;
+	const unsigned int Y_SEGMENTS = S_DIMENSION;
 
-	dimension = 64;
+	dimension = S_DIMENSION;
 	for (unsigned int y = 0; y <= Y_SEGMENTS; ++y)
 	{
 		for (unsigned int x = 0; x <= X_SEGMENTS; ++x)
@@ -294,9 +296,9 @@ void Object::makePlain()
 	GenerateBuffers();
 
 	///original
-	const unsigned int X_SEGMENTS = 64;
-	const unsigned int Y_SEGMENTS = 64;
-	dimension = 64;
+	const unsigned int X_SEGMENTS = P_DIMENSION;
+	const unsigned int Y_SEGMENTS = P_DIMENSION;
+	dimension = P_DIMENSION;
 
 	for (unsigned int y = 0; y <= Y_SEGMENTS; ++y)
 	{
