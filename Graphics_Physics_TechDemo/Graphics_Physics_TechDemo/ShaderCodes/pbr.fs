@@ -11,7 +11,10 @@ uniform float metallic;
 uniform float roughness;
 uniform float ao;
 
+// IBL data
 uniform samplerCube irradianceMap;
+uniform samplerCube prefilterMap;
+uniform sampler2D brdfLUT;
 
 uniform vec3 lightPositions[4];
 uniform vec3 lightColors[4];

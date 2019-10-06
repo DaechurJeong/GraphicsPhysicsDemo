@@ -22,9 +22,7 @@ Shader::Shader(GLboolean geometryUse, ShaderType type)
 	m_infoLogLength(0), m_result(GL_FALSE), UseGeometry(geometryUse), m_type(type)
 {
 	if (type == S_PBR)
-	{
 		CreateShader("ShaderCodes\\pbr.vs", "ShaderCodes\\pbr.fs", nullptr);
-	}
 	else if (type == S_EQUIRECTANGULAR)
 		CreateShader("ShaderCodes\\cubemap.vs", "ShaderCodes\\equirectangular_to_cubemap.fs", nullptr);
 	else if (type == S_IRRADIANCE)
@@ -33,6 +31,10 @@ Shader::Shader(GLboolean geometryUse, ShaderType type)
 		CreateShader("ShaderCodes\\background.vs", "ShaderCodes\\background.fs", nullptr);
 	else if (type == S_PBR_TEXTURE)
 		CreateShader("ShaderCodes\\pbr_texture.vs", "ShaderCodes\\pbr_texture.fs", nullptr);
+	else if (type == S_BRDF)
+		CreateShader("ShaderCodes\\brdf.vs", "ShaderCodes\\brdf.fs", nullptr);
+	else if (type == S_PREFILTER)
+		CreateShader("ShaderCodes\\cubemap.vs", "ShaderCodes\\prefilter.fs", nullptr);
 }
 Shader::~Shader() { glDeleteProgram(m_programId); }
 
@@ -193,6 +195,10 @@ void Shader::SetFloat(const std::string& name, float value) const
 	glUniform1f(glGetUniformLocation(m_programId, name.c_str()), value);
 }
 void Shader::SetInt(const std::string& name, int value) const
+{
+	glUniform1i(glGetUniformLocation(m_programId, name.c_str()), value);
+}
+void Shader::SetBool(const std::string& name, bool value) const
 {
 	glUniform1i(glGetUniformLocation(m_programId, name.c_str()), value);
 }

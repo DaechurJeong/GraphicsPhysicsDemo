@@ -106,18 +106,28 @@ int main(void)
 	Shader equirectangularToCubmapShader(GL_FALSE, Shader::S_EQUIRECTANGULAR);
 	Shader irradianceShader(GL_FALSE, Shader::S_IRRADIANCE);
 	Shader backgroundShader(GL_FALSE, Shader::S_BACKGROUND);
+	Shader prefilterShader(GL_FALSE, Shader::S_PREFILTER);
+	Shader brdfShader(GL_FALSE, Shader::S_BRDF);
 
-	pbrshader.Use();
+	/*pbrshader.Use();
 	pbrshader.SetInt("irradianceMap", 0);
 	pbrshader.SetVec3("albedo", glm::vec3(0.5f, 0.f, 0.f));
-	pbrshader.SetFloat("ao", 1.0f);
+	pbrshader.SetFloat("ao", 1.0f);*/
 
 	pbr_texture_shader.Use();
-	pbr_texture_shader.SetInt("albedoMap", 1);
+	pbr_texture_shader.SetInt("irradianceMap", 0);
+	pbr_texture_shader.SetInt("prefilterMap", 1);
+	pbr_texture_shader.SetInt("brdfLUT", 2);
+	pbr_texture_shader.SetInt("albedoMap", 3);
+	pbr_texture_shader.SetInt("normalMap", 4);
+	pbr_texture_shader.SetInt("metallicMap", 5);
+	pbr_texture_shader.SetInt("roughnessMap", 6);
+	pbr_texture_shader.SetInt("aoMap", 7);
+	/*pbr_texture_shader.SetInt("albedoMap", 1);
 	pbr_texture_shader.SetInt("normalMap", 2);
 	pbr_texture_shader.SetInt("metallicMap", 3);
 	pbr_texture_shader.SetInt("roughnessMap", 4);
-	pbr_texture_shader.SetInt("aoMap", 5);
+	pbr_texture_shader.SetInt("aoMap", 5);*/
 
 	// load PBR material textures
 	unsigned int albedo = main_obj_texture.loadTexture("models\\pbr\\rusted_iron\\albedo.png");
@@ -146,14 +156,19 @@ int main(void)
 	unsigned int captureRBO;
 	unsigned int envCubemap;
 	unsigned int irradianceMap;
-	InitFrameBuffer(&equirectangularToCubmapShader, &irradianceShader, captureFBO, captureRBO, envCubemap, irradianceMap);
-	InitSkybox(&backgroundShader, &pbrshader, &camera, (float)width, (float)height);
+	unsigned int prefilterMap;
+	unsigned int brdfLUTTexture;
+	InitFrameBuffer(&main_obj, &equirectangularToCubmapShader, &irradianceShader, &prefilterShader, &brdfShader,
+		captureFBO, captureRBO, envCubemap, irradianceMap, prefilterMap, brdfLUTTexture);
+	InitSkybox(&backgroundShader, &pbr_texture_shader, &camera, (float)width, (float)height);
 
 	// then before rendering, configure the viewport to the original framebuffer's screen dimensions
 	int scrWidth, scrHeight;
 	glfwGetFramebufferSize(window, &scrWidth, &scrHeight);
 	glViewport(0, 0, scrWidth, scrHeight);
 
+	bool roughness_status = false;
+	bool metallic_status = false;
 	bool show_demo_window = false;
 	/* Loop until the user closes the window */
 	while (!glfwWindowShouldClose(window))
@@ -177,6 +192,14 @@ int main(void)
 			ImGui::SliderFloat("metallic", &main_obj.metallic, 0.f, 1.f);
 			ImGui::SliderFloat("roughness", &main_obj.roughness, 0.f, 1.f);
 
+			if (ImGui::Button("Default roughness"))
+				roughness_status = false;
+			if (ImGui::Button("Control roughness"))
+				roughness_status = true;
+			if (ImGui::Button("Default metallic"))
+				metallic_status = false;
+			if (ImGui::Button("Control metallic"))
+				metallic_status = true;
 			ImGui::End();
 		}
 		//////////////physics update////////////
@@ -195,15 +218,22 @@ int main(void)
 		pbr_texture_shader.SetVec3("camPos", camera.position);
 
 		// bind pre-computed IBL data
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);
 		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, albedo);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, prefilterMap);
 		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, normal);
+		glBindTexture(GL_TEXTURE_2D, brdfLUTTexture);
+
 		glActiveTexture(GL_TEXTURE3);
-		glBindTexture(GL_TEXTURE_2D, metallic);
+		glBindTexture(GL_TEXTURE_2D, albedo);
 		glActiveTexture(GL_TEXTURE4);
-		glBindTexture(GL_TEXTURE_2D, roughness);
+		glBindTexture(GL_TEXTURE_2D, normal);
 		glActiveTexture(GL_TEXTURE5);
+		glBindTexture(GL_TEXTURE_2D, metallic);
+		glActiveTexture(GL_TEXTURE6);
+		glBindTexture(GL_TEXTURE_2D, roughness);
+		glActiveTexture(GL_TEXTURE7);
 		glBindTexture(GL_TEXTURE_2D, ao);
 
 		main_obj_texture.render_textured(&camera, &pbr_texture_shader, main_obj_texture.position, aspect);
@@ -221,18 +251,21 @@ int main(void)
 			pbr_texture_shader.SetVec3("lightColors[" + std::to_string(i) + "]", light[i].color);
 		}
 
-		pbrshader.Use();
-		camera.Update(&pbrshader);
-		pbrshader.SetVec3("camPos", camera.position);
+		pbr_texture_shader.Use();
+		camera.Update(&pbr_texture_shader);
+		pbr_texture_shader.SetVec3("camPos", camera.position);
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
+		//glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);
 
 		//for (unsigned i = 0; i < num_obj; ++i)
 		//{
 		// main object metallic, roughness
-		pbrshader.SetFloat("metallic", main_obj.metallic);
-		pbrshader.SetFloat("roughness", main_obj.roughness);
-		main_obj.render_textured(&camera, &pbrshader, main_obj.position, aspect);
+		pbr_texture_shader.SetFloat("roughness_val", main_obj.roughness);
+		pbr_texture_shader.SetBool("roughness_status", roughness_status);
+		pbr_texture_shader.SetBool("metallic_status", metallic_status);
+		pbr_texture_shader.SetFloat("metallic_val", main_obj.metallic);
+		main_obj.render_textured(&camera, &pbr_texture_shader, main_obj.position, aspect);
 		//}
 
 		// lighting
@@ -240,8 +273,8 @@ int main(void)
 		{
 			glm::vec3 newPos = light[i].position + glm::vec3(sin(deltaTime * 5.0) * 5.0, 0.0, 0.0);
 			newPos = light[i].position;
-			pbrshader.SetVec3("lightPositions[" + std::to_string(i) + "]", newPos);
-			pbrshader.SetVec3("lightColors[" + std::to_string(i) + "]", light[i].color);
+			pbr_texture_shader.SetVec3("lightPositions[" + std::to_string(i) + "]", newPos);
+			pbr_texture_shader.SetVec3("lightColors[" + std::to_string(i) + "]", light[i].color);
 		}
 
 		// render skybox (render as last to prevent overdraw)

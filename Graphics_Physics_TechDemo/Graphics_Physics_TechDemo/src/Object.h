@@ -76,12 +76,18 @@ public:
 // helper functions
 unsigned int loadTexture_Environment(const char* path);
 unsigned int loadTexture_Cubemap();
+unsigned int loadTexture_Cubemap(std::vector<std::string> faces);
 unsigned int loadTexture_irradianceMap(unsigned int& captureFBO, unsigned int& captureRBO);
+unsigned int loadTexture_prefilterMap();
+unsigned int loadTexture_LUT(Shader* brdfShader, unsigned captureFBO, unsigned captureRBO);
+void simulate_prefilter(Shader* prefilterShader, unsigned prefilterMap, unsigned captureFBO, unsigned captureRBO,
+	unsigned envCubemap, float roughness, glm::mat4* captureViews);
 
-void InitFrameBuffer(Shader* equirectangularToCubmapShader, Shader* irradianceShader, unsigned& captureFBO, unsigned& captureRBO,
-	unsigned& envCubemap, unsigned& irradianceMap);
+void InitFrameBuffer(Object* main_obj, Shader* equirectangularToCubmapShader, Shader* irradianceShader, Shader* prefilterShader, Shader* brdfShader,
+	unsigned& captureFBO, unsigned& captureRBO,	unsigned& envCubemap, unsigned& irradianceMap, unsigned& prefilterMap, unsigned& brdfLUTTexture);
 void InitSkybox(Shader* backgroundShader, Shader* pbrshader, Camera* camera, float width, float height);
 void renderCube();
+void renderQuad();
 void renderSkybox(Shader* backgroundShader, Camera* camera, unsigned& envCubemap, unsigned& irradianceMap);
 
 #endif
