@@ -47,25 +47,42 @@ void SoftBodyPhysics::Init()
 	}
 	else if (m_shape == ObjShape::O_SPHERE)
 	{
-		int last_index = (int)m_scaled_ver.size() - 1;
-		//for two pole
-		for (int i = 0; i < dimension; ++i)
+
+		//set constraints
+		//horizontal
+		for (int i = 0; i <= dimension; ++i)
 		{
-			constraints p_u_cons;
-			p_u_cons.p1 = 0;
-			p_u_cons.p2 = dimension + 1 + i;
-			p_u_cons.restlen = glm::distance(m_scaled_ver[0], m_scaled_ver[i]);
-			m_cons.push_back(p_u_cons);
+			for (int j = 0; j <= dimension; ++j)
+			{
+				constraints h_cons;
+				h_cons.p1 = j * (dimension + 1) + i;
+				h_cons.p2 = h_cons.p1 + 1;
 
-			constraints p_d_cons;
-			p_d_cons.p1 = last_index;
-			p_d_cons.p2 = last_index - (dimension + 1 + i);
-			p_d_cons.restlen = p_u_cons.restlen;
-			m_cons.push_back(p_d_cons);
+				if (i == dimension)
+					h_cons.p2 = j * (dimension + 1);
 
+				if (j == 0)
+					h_cons.restlen = 0;
+				else
+					h_cons.restlen = glm::distance(m_scaled_ver[h_cons.p1], m_scaled_ver[h_cons.p2]);
+
+				m_cons.push_back(h_cons);
+			}
 		}
 
+		//vertical
+		for (int i = 0; i <= dimension; ++i)
+		{
+			for (int j = 0; j < dimension; ++j)
+			{
+				constraints v_cons;
+				v_cons.p1 = j * (dimension + 1) + i;
+				v_cons.p2 = v_cons.p1 + (dimension + 1);
+				v_cons.restlen = scale.z / (dimension);
 
+				m_cons.push_back(v_cons);
+			}
+		}
 
 
 	}
