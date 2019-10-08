@@ -19,13 +19,14 @@ class Shader {
 public:
 	enum ShaderType {
 		N_NONE,
-		S_PH_SHADING,
 		S_PBR,
 		S_PBR_TEXTURE,
 		S_EQUIRECTANGULAR,
 		S_IRRADIANCE,
 		S_BACKGROUND,
 		S_SKYBOX,
+		S_BRDF,
+		S_PREFILTER,
 	};
 	void CreateShader(const char* vertex_file_path, const char* fragment_file_path,
 		const char* geometry_file_path);
@@ -39,6 +40,7 @@ public:
 	void SetMat4(const std::string& name, const glm::mat4& mat) const;
 	void SetFloat(const std::string& name, float value) const;
 	void SetInt(const std::string& name, int value) const;
+	void SetBool(const std::string& name, bool value) const;
 
 private:
 	static std::string m_vertexShader, m_fragmentShader, m_geometryShader;

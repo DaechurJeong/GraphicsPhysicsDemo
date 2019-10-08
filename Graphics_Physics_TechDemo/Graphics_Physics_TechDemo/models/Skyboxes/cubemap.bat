@@ -1,0 +1,1 @@
+texassemble.exe cube -w 512 -h 512 -f R8G8B8A8_UNORM -o skybox.dds skybox_right.jpg skybox_left.jpg skybox_top.jpg skybox_bottom.jpg skybox_front.jpg skybox_back.jpg
