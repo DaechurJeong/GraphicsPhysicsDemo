@@ -10,6 +10,7 @@ void SoftBodyPhysics::Init()
 
 	if(m_shape == ObjShape::O_PLANE)
 	{ 
+		m_mass = 0.3f;
 		for(int i = 0; i <= dimension; ++i)
 			m_edge.push_back(m_scaled_ver[i]);
 
@@ -47,7 +48,8 @@ void SoftBodyPhysics::Init()
 	}
 	else if (m_shape == ObjShape::O_SPHERE)
 	{
-
+		m_mass = 0.6f;
+		int last_index = (dimension) * (dimension + 1);
 		//set constraints
 		//horizontal
 		for (int i = 0; i <= dimension; ++i)
@@ -67,20 +69,38 @@ void SoftBodyPhysics::Init()
 					h_cons.restlen = glm::distance(m_scaled_ver[h_cons.p1], m_scaled_ver[h_cons.p2]);
 
 				m_cons.push_back(h_cons);
-			}
-		}
 
-		//vertical
-		for (int i = 0; i <= dimension; ++i)
-		{
+				//if (i < dimension/2)
+				//{
+				//	constraints d_cons;
+				//	d_cons.p1 = h_cons.p1;
+				//	d_cons.p2 = h_cons.p1 + dimension/2;
+				//	d_cons.restlen = glm::distance(m_scaled_ver[d_cons.p1], m_scaled_ver[d_cons.p2]);
+
+				//	m_cons.push_back(d_cons);
+				//}
+			}
+
+
+			//vertical
 			for (int j = 0; j < dimension; ++j)
 			{
 				constraints v_cons;
 				v_cons.p1 = j * (dimension + 1) + i;
 				v_cons.p2 = v_cons.p1 + (dimension + 1);
-				v_cons.restlen = scale.z / (dimension);
+				v_cons.restlen = glm::distance(m_scaled_ver[v_cons.p1], m_scaled_ver[v_cons.p2]);
 
 				m_cons.push_back(v_cons);
+
+				/*if (j < dimension/2)
+				{
+					constraints d_cons;
+					d_cons.p1 = v_cons.p1;
+					d_cons.p2 = v_cons.p2 = v_cons.p1 + (dimension*2 + 1);
+					d_cons.restlen = glm::distance(m_scaled_ver[d_cons.p1], m_scaled_ver[d_cons.p2]);
+
+					m_cons.push_back(d_cons);
+				}*/
 			}
 		}
 
@@ -113,10 +133,6 @@ void SoftBodyPhysics::Verlet(float dt)
 
 		(*_new) +=  f * temp - f * (*old) + m_acceleration * dt * dt;
 		(*old) = temp;
-		//m_scaled_ver[i] = (*_new);
-
-		//m_scaled_ver[i] += f * m_scaled_ver[i] - f * m_old_ver[i] + m_acceleration * dt * dt;
-		//m_old_ver[i] = *temp;
 	}
 }
 
@@ -136,6 +152,9 @@ void SoftBodyPhysics::KeepConstraint()
 			glm::vec3& point2 = m_scaled_ver[c.p2];
 
 			glm::vec3 delta = point2 - point1;
+			if (delta == glm::vec3(0, 0, 0))
+				continue;
+
 			float len = glm::sqrt(delta.x * delta.x + delta.y * delta.y + delta.z * delta.z);
 			float diff = (len - c.restlen) / len;
 
@@ -148,24 +167,46 @@ void SoftBodyPhysics::KeepConstraint()
 
 void SoftBodyPhysics::Acceleration()
 {
-	m_acceleration = glm::vec3(0, m_gravity*0.3, 0);
+	m_acceleration = glm::vec3(0, m_gravity*m_mass, 0);
 }
 
 void SoftBodyPhysics::CollisionResponseRigid(Object* _rhs)
 {
-	glm::vec3 center = _rhs->position;
-	float radius = _rhs->scale.x +0.01f;
-	float radius_sqr = radius * radius;
-	for (int i = 0; i < m_scaled_ver.size(); ++i)
+	if (_rhs->m_shape == ObjShape::O_SPHERE)
 	{
-		glm::vec3& point = m_scaled_ver[i];
-		if (IsCollided(point, center, radius_sqr))
+		glm::vec3 center = _rhs->position;
+		float radius = _rhs->scale.x + 0.01f;
+		float radius_sqr = radius * radius;
+		for (int i = 0; i < m_scaled_ver.size(); ++i)
 		{
-			glm::vec3 normal = point - center;
-			normal = glm::normalize(normal);
+			glm::vec3& point = m_scaled_ver[i];
+			if (IsCollided(point, center, radius_sqr))
+			{
+				glm::vec3 normal = point - center;
+				normal = glm::normalize(normal);
 
-			m_scaled_ver[i] = center + normal * radius;
+				m_scaled_ver[i] = center + normal * radius;
 
+			}
+		}
+	}
+	else if (_rhs->m_shape == ObjShape::O_PLANE)
+	{
+		glm::vec3 center = _rhs->position;
+		float radius = 0.01f;
+		//float radius_sqr = radius * radius;
+		for (int i = 0; i < m_scaled_ver.size(); ++i)
+		{
+			glm::vec3& point = m_scaled_ver[i];
+			if (IsCollidedPlane(point, center, radius))
+			{
+				//glm::vec3 normal = point - center;
+				//normal = glm::normalize(normal);
+				//glm::vec3 normal = glm::vec3(0, 1, 0);
+
+				m_scaled_ver[i].y = center.y + radius;
+
+			}
 		}
 	}
 
@@ -182,6 +223,15 @@ bool SoftBodyPhysics::IsCollided(glm::vec3& point, glm::vec3& center, float& rad
 		(center.z - point.z) * (center.z - point.z);
 
 	if (distance < radius)
+		return true;
+	else
+		return false;
+
+}
+
+bool SoftBodyPhysics::IsCollidedPlane(glm::vec3& point, glm::vec3& center, float& radius)
+{
+	if (glm::abs(point.y - center.y) < radius)
 		return true;
 	else
 		return false;
