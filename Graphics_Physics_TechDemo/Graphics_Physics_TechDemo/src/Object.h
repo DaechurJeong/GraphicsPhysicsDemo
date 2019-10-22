@@ -26,7 +26,8 @@ class Shader;
 
 typedef enum ObjShape {
 	O_PLANE,
-	O_SPHERE
+	O_SPHERE,
+	O_CUBE,
 }ObjectShape;
 
 class Object 
@@ -51,10 +52,11 @@ public:
 	void render_textured(Camera* camera, Shader* shader, glm::vec3 pos, float aspect);
 	void render_line(Camera* camera, Shader* shader, glm::vec3 pos, float aspect);
 	unsigned int loadTexture(const char* path);
+	void LoadTGAFile(std::vector<std::string> faces);
 
 	bool loadPPM(const char* path, std::vector<glm::vec3>& values_);
 	void SendTextureInfo(Shader* shader, unsigned int& textureBuffer);
-	void LoadTGAFile(std::vector<std::string> faces); // not using
+	
 
 	//physics
 	//SoftBodyPhysics& getSoftBody() { return sb; }
@@ -67,6 +69,7 @@ public:
 	std::multimap<int, glm::vec3> faceNormals;
 	std::vector<glm::vec3> vertexNormals;
 	glm::vec3 middlePoint;
+	unsigned m_textures[6];
 	float rotation;
 	int dimension;
 	float roughness, metallic;

@@ -16,6 +16,8 @@ End Header --------------------------------------------------------*/
 #define S_DIMENSION 32
 #define P_DIMENSION 64
 #define STB_IMAGE_IMPLEMENTATION
+#define WIDTH 1280
+#define HEIGHT 800
 #include "glad/glad.h"
 #include "glm/gtc/matrix_transform.hpp"
 #include "GLFW/glfw3.h"
@@ -416,7 +418,34 @@ unsigned int Object::loadTexture(const char* path)
 
 	return textureID;
 }
+void Object::LoadTGAFile(std::vector<std::string> faces)
+{
+	int nrChannels = 0;
+	for (unsigned i = 0; i < faces.size(); ++i)
+	{
+		glGenTextures(1, &m_textures[i]);
+		glActiveTexture(GL_TEXTURE0 + i);
+		glBindTexture(GL_TEXTURE_2D, m_textures[i]);
 
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+		if (data)
+		{
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+			//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_textures[i], 0);
+			glGenerateMipmap(GL_TEXTURE_2D);
+			stbi_image_free(data);
+		}
+		else
+		{
+			std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
+			stbi_image_free(data);
+		}
+	}
+}
 unsigned int loadTexture_Environment(const char* path)
 {
 	stbi_set_flip_vertically_on_load(true);
@@ -602,6 +631,30 @@ void InitFrameBuffer(Object* main_obj, Shader* equirectangularToCubmapShader, Sh
 
 	// pbr: load the HDR environment map
 	unsigned int hdrTexture = loadTexture_Environment("models\\newport_loft.hdr");
+	/*std::vector<std::string> faces
+	{
+		//"models\\skybox\\map_px.jpg",
+		//"models\\skybox\\map_nx.jpg",
+		//"models\\skybox\\map_py.jpg",
+		//"models\\skybox\\map_ny.jpg",
+		//"models\\skybox\\map_pz.jpg",
+		//"models\\skybox\\map_nz.jpg",
+		"models\\skybox\\right.jpg",
+		"models\\skybox\\left.jpg",
+		"models\\skybox\\top.jpg",
+		"models\\skybox\\bottom.jpg",
+		"models\\skybox\\front.jpg",
+		"models\\skybox\\back.jpg",
+
+		//"models\\space_skybox\\space_skyboxesRT.png",
+		//"models\\space_skybox\\space_skyboxesLF.png",
+		//"models\\space_skybox\\space_skyboxesUP.png",
+		//"models\\space_skybox\\space_skyboxesDN.png",
+		//"models\\space_skybox\\space_skyboxesFT.png",
+		//"models\\space_skybox\\space_skyboxesBK.png",
+	};
+	Object skybox(O_CUBE, glm::vec3(0.f,0.f,0.f), glm::vec3(1.f,1.f,1.f), 0);
+	skybox.LoadTGAFile(faces);*/
 
 	envCubemap = loadTexture_Cubemap();
 
@@ -619,6 +672,19 @@ void InitFrameBuffer(Object* main_obj, Shader* equirectangularToCubmapShader, Sh
 	equirectangularToCubmapShader->SetInt("equirectangularMap", 0);
 	equirectangularToCubmapShader->SetMat4("projection", captureProjection);
 
+	/*unsigned int textureColorbuffer[6];
+	for (int i = 0; i < 6; ++i)
+	{
+		glGenTextures(1, &textureColorbuffer[i]);
+		glBindTexture(GL_TEXTURE_2D, textureColorbuffer[i]);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, WIDTH, HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, textureColorbuffer[i], 0);
+	}*/
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, hdrTexture);
 
