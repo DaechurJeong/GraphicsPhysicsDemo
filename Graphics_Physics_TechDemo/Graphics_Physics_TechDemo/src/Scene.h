@@ -18,7 +18,7 @@ public:
 
 private:
 	unsigned curr_scene;
-	std::vector<Object&> scene_obj;
+	std::vector<Object*> scene_obj;
 	Physics m_physics;
 };
 
