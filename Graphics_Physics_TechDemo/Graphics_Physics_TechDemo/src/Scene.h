@@ -9,11 +9,12 @@
 
 class Scene {
 public:
-	Scene(int sceneNum);
-	~Scene();
+	Scene(int sceneNum) : curr_scene(sceneNum) {};
+	~Scene() {};
 	void GenerateObjectsSceneOne(Physics& physics, std::vector<Object>& main_objs, std::vector<Object>& pbr_objs, std::vector<SoftBodyPhysics>& physics_objs);
-	void Update();
-	void Draw();
+	void DrawSceneOne();
+	//void Update();
+	//void Draw();
 
 private:
 	unsigned curr_scene;

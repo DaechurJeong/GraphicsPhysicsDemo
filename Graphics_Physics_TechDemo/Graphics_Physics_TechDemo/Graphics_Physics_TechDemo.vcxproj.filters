@@ -40,6 +40,9 @@
     <Filter Include="Source Files\Physics">
       <UniqueIdentifier>{6c49d7f9-9369-4d75-ac63-8364334e1ae7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Scene">
+      <UniqueIdentifier>{f5248801-a084-449c-a799-e32119ccb063}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\glad.c">
@@ -86,6 +89,9 @@
     </ClCompile>
     <ClCompile Include="src\Base.cpp">
       <Filter>Source Files\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene.cpp">
+      <Filter>Source Files\Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -139,6 +145,9 @@
     </ClInclude>
     <ClInclude Include="src\Physics.h">
       <Filter>Source Files\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scene.h">
+      <Filter>Source Files\Scene</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

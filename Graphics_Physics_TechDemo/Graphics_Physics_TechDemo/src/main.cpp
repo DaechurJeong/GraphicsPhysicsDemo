@@ -112,11 +112,6 @@ int main(void)
 	Shader prefilterShader(GL_FALSE, Shader::S_PREFILTER);
 	Shader brdfShader(GL_FALSE, Shader::S_BRDF);
 
-	/*pbrshader.Use();
-	pbrshader.SetInt("irradianceMap", 0);
-	pbrshader.SetVec3("albedo", glm::vec3(0.5f, 0.f, 0.f));
-	pbrshader.SetFloat("ao", 1.0f);*/
-
 	pbr_texture_shader.Use();
 	pbr_texture_shader.SetInt("irradianceMap", 0);
 	pbr_texture_shader.SetInt("prefilterMap", 1);
@@ -126,11 +121,6 @@ int main(void)
 	pbr_texture_shader.SetInt("metallicMap", 5);
 	pbr_texture_shader.SetInt("roughnessMap", 6);
 	pbr_texture_shader.SetInt("aoMap", 7);
-	/*pbr_texture_shader.SetInt("albedoMap", 1);
-	pbr_texture_shader.SetInt("normalMap", 2);
-	pbr_texture_shader.SetInt("metallicMap", 3);
-	pbr_texture_shader.SetInt("roughnessMap", 4);
-	pbr_texture_shader.SetInt("aoMap", 5);*/
 
 	// load PBR material textures
 	unsigned int albedo = main_obj_texture.loadTexture("models\\pbr\\rusted_iron\\albedo.png");
