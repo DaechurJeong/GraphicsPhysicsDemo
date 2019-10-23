@@ -74,6 +74,10 @@ public:
 	int dimension;
 	float roughness, metallic;
 	ObjectShape m_shape;
+
+	//for collision
+	glm::vec3 normalVec;
+	float d;
 };
 
 // helper functions

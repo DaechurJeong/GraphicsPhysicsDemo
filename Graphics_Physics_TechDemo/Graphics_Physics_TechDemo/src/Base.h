@@ -34,7 +34,8 @@ private:
 	void Acceleration();
 
 	bool IsCollided(glm::vec3& point, glm::vec3& center, float& radius);
-	bool IsCollidedPlane(glm::vec3& point, glm::vec3& center, float& radius);
+	bool IsCollidedPlane(glm::vec3& point, glm::vec3& p_point0, glm::vec3& p_point1, glm::vec3& center, float& radius, float& distance, glm::vec3& norm, float d
+	, glm::vec3& movedpoint);
 
 	std::vector<glm::vec3> m_scaled_ver;
 	std::vector<glm::vec3> m_old_ver;
