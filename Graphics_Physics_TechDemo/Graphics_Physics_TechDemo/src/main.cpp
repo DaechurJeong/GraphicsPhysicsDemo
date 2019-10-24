@@ -74,12 +74,12 @@ int main(void)
 		return -1;
 	}
 	Scene m_scene(0);
-	m_scene.Init(&camera);
+	m_scene.Init(window, &camera);
 
 	// then before rendering, configure the viewport to the original framebuffer's screen dimensions
-	int scrWidth, scrHeight;
+	/*int scrWidth, scrHeight;
 	glfwGetFramebufferSize(window, &scrWidth, &scrHeight);
-	glViewport(0, 0, scrWidth, scrHeight);
+	glViewport(0, 0, scrWidth, scrHeight);*/
 
 	/* Loop until the user closes the window */
 	while (!glfwWindowShouldClose(window))
@@ -91,11 +91,7 @@ int main(void)
 		// Input
 		ProcessInput(&camera, window, deltaTime);
 
-		m_scene.ImGuiUpdate();
-
-		m_scene.Update(&camera, deltaTime);
-
-		m_scene.ImGuirender();
+		m_scene.Update(window, &camera, deltaTime);
 
 		glfwMakeContextCurrent(window);
 

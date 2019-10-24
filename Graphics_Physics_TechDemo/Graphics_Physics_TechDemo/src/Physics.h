@@ -19,6 +19,10 @@ public:
 	void push_object(SoftBodyPhysics* _obj) { softbody_objs.push_back(_obj); }
 
 	void delete_object(Object* obj);
+	void clear_objects() {
+		physics_objs.clear();
+		softbody_objs.clear();
+	};
 private:
 	
 	std::vector<Object*> physics_objs;

@@ -12,21 +12,28 @@
 #include "imgui-master\imgui.h"
 #include "imgui-master\imgui_impl_glfw.h"
 #include "imgui-master\imgui_impl_opengl3.h"
+#include "GLFW\glfw3.h"
 
 class Scene {
 public:
 	Scene(int sceneNum) : curr_scene(sceneNum), width(1280), height(800), aspect(1280.f/800.f),
-		roughness_status(false), metallic_status(false), dimension_(64), met(0.f), rou(0.f){};
+		roughness_status(false), metallic_status(false), dimension_(64), met(0.f), rou(0.f),
+		second_imgui(true){};
 	~Scene() {};
-	void Init(Camera* camera);
-	void Update(Camera* camera, float dt);
+	void Init(GLFWwindow* window, Camera* camera);
+	void Update(GLFWwindow* window, Camera* camera, float dt);
 	void Draw();
+	void Scene0Init(Camera* camera);
+	void Scene1Init(Camera* camera);
+	void Scene0Draw(Camera* camera, float dt);
+	void Scene1Draw(Camera* camera, float dt);
 	void ShutDown();
 
-	void ImGuiUpdate();
+	void ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt);
 	void ImGuirender();
 	void ImGuiShutdown();
 
+	void ResizeFrameBuffer(GLFWwindow* window);
 private:
 	std::vector<Object*> pbr_obj;
 	std::vector<SoftBodyPhysics*> softbody_obj;
@@ -68,6 +75,8 @@ private:
 
 	bool roughness_status;
 	bool metallic_status;
+
+	bool second_imgui;
 };
 
 
