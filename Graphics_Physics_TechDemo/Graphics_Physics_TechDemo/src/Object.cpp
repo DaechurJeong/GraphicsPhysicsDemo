@@ -32,7 +32,7 @@ End Header --------------------------------------------------------*/
 
 Object::Object(ObjectShape shape, glm::vec3 pos, glm::vec3 scale_, int dim)
 	: position(pos), scale(scale_), color(glm::vec3(1.0f, 1.0f, 1.0f)), rotation(0.f),
-      xMax(0), xMin(0), yMax(0), yMin(0), zMax(0), zMin(0), width(512), height(512), m_shape(shape), dimension(dim), roughness(0), metallic(0)
+      xMax(0), xMin(0), yMax(0), yMin(0), zMax(0), zMin(0), width(512), height(512), m_shape(shape), dimension(dim), roughness(0), metallic(0), d(0)
 {
 	if (m_shape == O_PLANE)
 		makePlain();
@@ -68,7 +68,7 @@ void Object::Describe()
 {
 	glBindVertexArray(m_vao);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	glBufferData(GL_ARRAY_BUFFER, obj_vertices.size() * sizeof(glm::vec3), &obj_vertices[0], GL_STATIC_DRAW);
+ 	glBufferData(GL_ARRAY_BUFFER, obj_vertices.size() * sizeof(glm::vec3), &obj_vertices[0], GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ARRAY_BUFFER, textureBuffer);
 	glBufferData(GL_ARRAY_BUFFER, textureUV.size() * sizeof(glm::vec2), &textureUV[0], GL_STATIC_DRAW);
@@ -559,7 +559,7 @@ unsigned int loadTexture_prefilterMap()
 	return prefilterMap;
 }
 void simulate_prefilter(Shader* prefilterShader, unsigned prefilterMap, unsigned captureFBO, unsigned captureRBO, 
-	unsigned envCubemap, float roughness, glm::mat4* captureViews)
+	unsigned envCubemap, glm::mat4* captureViews)
 {
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
@@ -618,7 +618,7 @@ unsigned int loadTexture_LUT(Shader* brdfShader, unsigned captureFBO, unsigned c
 
 	return brdfLUTTexture;
 }
-void InitFrameBuffer(Object* main_obj, Shader* equirectangularToCubmapShader, Shader* irradianceShader, Shader* prefilterShader, Shader* brdfShader,
+void InitFrameBuffer(Shader* equirectangularToCubmapShader, Shader* irradianceShader, Shader* prefilterShader, Shader* brdfShader,
 	unsigned& captureFBO, unsigned& captureRBO,	unsigned& envCubemap, unsigned& irradianceMap, unsigned& prefilterMap, unsigned& brdfLUTTexture)
 {
 	glGenFramebuffers(1, &captureFBO);
@@ -727,7 +727,7 @@ void InitFrameBuffer(Object* main_obj, Shader* equirectangularToCubmapShader, Sh
 	prefilterShader->SetInt("environmentMap", 0);
 	prefilterShader->SetMat4("projection", captureProjection);
 
-	simulate_prefilter(prefilterShader, prefilterMap, captureFBO, captureRBO, envCubemap, main_obj->roughness, captureViews);
+	simulate_prefilter(prefilterShader, prefilterMap, captureFBO, captureRBO, envCubemap, captureViews);
 
 	brdfLUTTexture = loadTexture_LUT(brdfShader, captureFBO, captureRBO);
 }

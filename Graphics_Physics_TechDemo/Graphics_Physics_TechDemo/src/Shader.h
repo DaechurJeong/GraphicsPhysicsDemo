@@ -28,13 +28,15 @@ public:
 		S_BRDF,
 		S_PREFILTER,
 	};
+
+	Shader() {};
+	//Shader(GLboolean geometryUse, ShaderType type);
+	~Shader();
+
 	void CreateShader(const char* vertex_file_path, const char* fragment_file_path,
 		const char* geometry_file_path);
 
 	void Use() const;
-
-	Shader(GLboolean geometryUse, ShaderType type);
-	~Shader();
 
 	void SetVec3(const std::string& name, const glm::vec3& value) const;
 	void SetMat4(const std::string& name, const glm::mat4& mat) const;
@@ -48,6 +50,6 @@ private:
 	int m_infoLogLength;
 	GLint m_result;
 
-	GLboolean UseGeometry;
-	ShaderType m_type;
+	//GLboolean UseGeometry;
+	//ShaderType m_type;
 };

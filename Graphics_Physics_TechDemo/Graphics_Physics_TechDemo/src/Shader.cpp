@@ -17,30 +17,14 @@ End Header --------------------------------------------------------*/
 #include <fstream>
 #include <sstream>
 
-Shader::Shader(GLboolean geometryUse, ShaderType type)
-	:m_programId(0), m_vertexId(0), m_fragmentId(0), m_geometryId(0),
-	m_infoLogLength(0), m_result(GL_FALSE), UseGeometry(geometryUse), m_type(type)
-{
-	if (type == S_PBR)
-		CreateShader("ShaderCodes\\pbr.vs", "ShaderCodes\\pbr.fs", nullptr);
-	else if (type == S_EQUIRECTANGULAR)
-		CreateShader("ShaderCodes\\cubemap.vs", "ShaderCodes\\equirectangular_to_cubemap.fs", nullptr);
-	else if (type == S_IRRADIANCE)
-		CreateShader("ShaderCodes\\cubemap.vs", "ShaderCodes\\irradiance_convolution.fs", nullptr);
-	else if (type == S_BACKGROUND)
-		CreateShader("ShaderCodes\\background.vs", "ShaderCodes\\background.fs", nullptr);
-	else if (type == S_PBR_TEXTURE)
-		CreateShader("ShaderCodes\\pbr_texture.vs", "ShaderCodes\\pbr_texture.fs", nullptr);
-	else if (type == S_BRDF)
-		CreateShader("ShaderCodes\\brdf.vs", "ShaderCodes\\brdf.fs", nullptr);
-	else if (type == S_PREFILTER)
-		CreateShader("ShaderCodes\\cubemap.vs", "ShaderCodes\\prefilter.fs", nullptr);
-}
 Shader::~Shader() { glDeleteProgram(m_programId); }
 
 void Shader::CreateShader(const char* vertex_file_path, const char* fragment_file_path,
 	const char* geometry_file_path)
 {
+	bool UseGeometry = false;
+	if (geometry_file_path != nullptr)
+		UseGeometry = true;
 	// vertex shader
 	m_vertexId = glCreateShader(GL_VERTEX_SHADER);
 

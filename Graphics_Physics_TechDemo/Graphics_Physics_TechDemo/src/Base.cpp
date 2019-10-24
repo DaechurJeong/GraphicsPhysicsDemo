@@ -5,7 +5,7 @@ void SoftBodyPhysics::Init()
 {
 	m_gravity = GRAVITY;
 	m_scaled_ver = obj_vertices;
-	for (int i = 0; i < m_scaled_ver.size(); ++i)
+	for (unsigned i = 0; i < m_scaled_ver.size(); ++i)
 		m_scaled_ver[i] = position + m_scaled_ver[i]*scale;
 	m_old_ver = m_scaled_ver;
 
@@ -126,7 +126,7 @@ void SoftBodyPhysics::Update(float dt)
 void SoftBodyPhysics::Verlet(float dt)
 {
 	float f = 0.99f;
-	for (int i = 0; i < m_scaled_ver.size(); ++i)
+	for (unsigned i = 0; i < m_scaled_ver.size(); ++i)
 	{
 		glm::vec3* _new = &m_scaled_ver[i];
 		glm::vec3 temp = *_new;
@@ -143,11 +143,11 @@ void SoftBodyPhysics::KeepConstraint()
 	for (int i = 0; i < 16; ++i)
 	{
 		//staying edge
-		for (int j = 0; j < m_edge.size(); ++j)
+		for (unsigned j = 0; j < m_edge.size(); ++j)
 			m_scaled_ver[j] = m_edge[j];
 
 
-		for (int j = 0; j < m_cons.size(); ++j)
+		for (unsigned j = 0; j < m_cons.size(); ++j)
 		{
 			constraints& c = m_cons[j];
 			glm::vec3& point1 = m_scaled_ver[c.p1];
@@ -179,7 +179,7 @@ void SoftBodyPhysics::CollisionResponseRigid(Object* _rhs)
 		glm::vec3 center = _rhs->position;
 		float radius = _rhs->scale.x + 0.01f;
 		float radius_sqr = radius * radius;
-		for (int i = 0; i < m_scaled_ver.size(); ++i)
+		for (unsigned i = 0; i < m_scaled_ver.size(); ++i)
 		{
 			glm::vec3& point = m_scaled_ver[i];
 			if (IsCollided(point, center, radius_sqr))
@@ -195,7 +195,7 @@ void SoftBodyPhysics::CollisionResponseRigid(Object* _rhs)
 	else if (_rhs->m_shape == ObjShape::O_PLANE)
 	{
 		glm::vec3 center = _rhs->position;
-		int last = _rhs->obj_vertices.size() - 1;
+		int last = static_cast<int>(_rhs->obj_vertices.size()) - 1;
 		glm::vec3 point0 = center + _rhs->obj_vertices[0] * _rhs->scale;
 		glm::vec3 point1 = center + _rhs->obj_vertices[last] * _rhs->scale;
 		glm::vec3 point2 = center + _rhs->obj_vertices[1] * _rhs->scale;
@@ -211,7 +211,7 @@ void SoftBodyPhysics::CollisionResponseRigid(Object* _rhs)
 			
 		float radius = 0.2f;
 		//float radius_sqr = radius * radius;
-		for (int i = 0; i < m_scaled_ver.size(); ++i)
+		for (unsigned i = 0; i < m_scaled_ver.size(); ++i)
 		{
 			glm::vec3& point = m_scaled_ver[i];
 			float distance = 0;
