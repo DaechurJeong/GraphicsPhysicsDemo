@@ -1,6 +1,8 @@
 #include "Scene.h"
 #include "input.h"
 
+const float FRAME_LIMIT = 1.f / 59.f;
+
 void Scene::Init(GLFWwindow* window, Camera* camera)
 {
 	if (curr_scene == 0)
@@ -83,11 +85,11 @@ void Scene::Scene0Init(Camera* camera)
 	softbody_obj.push_back(sb_sphere);
 
 	// load PBR material textures
-	albedo = main_obj_texture->loadTexture("models\\pbr\\rusted_iron\\albedo.png");
-	normal = main_obj_texture->loadTexture("models\\pbr\\rusted_iron\\normal.png");
-	metallic = main_obj_texture->loadTexture("models\\pbr\\rusted_iron\\metallic.png");
-	roughness = main_obj_texture->loadTexture("models\\pbr\\rusted_iron\\roughness.png");
-	ao = main_obj_texture->loadTexture("models\\pbr\\rusted_iron\\ao.png");
+	albedo = main_obj_texture->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_BaseColor.png");
+	normal = main_obj_texture->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_Normal.png");
+	metallic = main_obj_texture->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_Metallic.png");
+	roughness = main_obj_texture->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_Roughness.png");
+	ao = main_obj_texture->loadTexture("models\\pbr\\selfmade_plastic\\ao.png");
 
 	// light properties
 	for (int i = 0; i < 4; ++i)
@@ -113,11 +115,11 @@ void Scene::Scene1Init(Camera* camera)
 	softbody_obj.push_back(plane);
 
 	// load PBR material textures
-	albedo = main_obj_texture->loadTexture("models\\pbr\\self_made\\albedo.png");
-	normal = main_obj_texture->loadTexture("models\\pbr\\self_made\\Sphere3D_1_defaultMat_Normal.png");
-	metallic = main_obj_texture->loadTexture("models\\pbr\\self_made\\Sphere3D_1_defaultMat_Metallic.png");
-	roughness = main_obj_texture->loadTexture("models\\pbr\\self_made\\Sphere3D_1_defaultMat_Roughness.png");
-	ao = main_obj_texture->loadTexture("models\\pbr\\self_made\\ao.png");
+	albedo = main_obj_texture->loadTexture("models\\pbr\\Steel\\Sphere3D_1_defaultMat_BaseColor.png");
+	normal = main_obj_texture->loadTexture("models\\pbr\\Steel\\Sphere3D_1_defaultMat_Normal.png");
+	metallic = main_obj_texture->loadTexture("models\\pbr\\Steel\\Sphere3D_1_defaultMat_Metallic.png");
+	roughness = main_obj_texture->loadTexture("models\\pbr\\Steel\\Sphere3D_1_defaultMat_Roughness.png");
+	ao = main_obj_texture->loadTexture("models\\pbr\\Steel\\ao.png");
 
 	// light properties
 	for (int i = 0; i < 2; ++i)
@@ -131,7 +133,7 @@ void Scene::Scene1Init(Camera* camera)
 }
 void Scene::Scene0Draw(Camera* camera, float dt)
 {
-	if (dt < 0.2f)
+	if (dt <= FRAME_LIMIT)
 	{
 		if (!softbody_obj.empty())
 		{
@@ -207,7 +209,7 @@ void Scene::Scene0Draw(Camera* camera, float dt)
 }
 void Scene::Scene1Draw(Camera* camera, float dt)
 {
-	if (dt < 0.2f)
+	if (dt <= FRAME_LIMIT)
 	{
 		if (!softbody_obj.empty())
 		{
