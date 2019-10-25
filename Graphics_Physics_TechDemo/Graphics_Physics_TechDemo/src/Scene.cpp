@@ -294,7 +294,7 @@ void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 	{
 		ImGui::Begin("GUI interface");
 		ImGui::Text("Object controller");
-		ImGui::Text("Frame Per Second : %d", static_cast<int>(1.f / dt));
+		ImGui::Text("Frame Per Second : %d ms", static_cast<int>(1.f / dt));
 		ImGui::SliderFloat("metallic", &met, 0.f, 1.f);
 		ImGui::SliderFloat("roughness", &rou, 0.f, 1.f);
 

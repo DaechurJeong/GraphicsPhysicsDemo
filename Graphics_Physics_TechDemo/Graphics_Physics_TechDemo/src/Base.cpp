@@ -6,7 +6,7 @@ void SoftBodyPhysics::Init()
 	m_gravity = GRAVITY;
 	m_scaled_ver = obj_vertices;
 
-	unsigned ver = m_scaled_ver.size();
+	unsigned ver = static_cast<unsigned>(m_scaled_ver.size());
 	for (unsigned i = 0; i < ver; ++i)
 		m_scaled_ver[i] = position + m_scaled_ver[i]*scale;
 	m_old_ver = m_scaled_ver;
@@ -65,7 +65,7 @@ void SoftBodyPhysics::Init()
 		m_acceleration = std::vector<glm::vec3>(ver, glm::vec3(0, m_gravity * m_mass, 0));
 		m_velocity = std::vector<glm::vec3>(ver, glm::vec3(0));
 
-		int last_index = m_scaled_ver.size()-1;
+		int last_index = static_cast<int>(m_scaled_ver.size())-1;
 		//set constraints
 		
 		for (int i = 0; i <= dimension; ++i)
