@@ -69,6 +69,7 @@ public:
 	std::multimap<int, glm::vec3> faceNormals;
 	std::vector<glm::vec3> vertexNormals;
 	glm::vec3 middlePoint;
+	glm::mat4 m_model;
 	unsigned m_textures[6];
 	float rotation;
 	int dimension;

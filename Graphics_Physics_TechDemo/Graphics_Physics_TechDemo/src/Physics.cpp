@@ -11,6 +11,8 @@ void Physics::update(float dt)
 		for (it_rigid = physics_objs.begin(); it_rigid < physics_objs.end(); ++it_rigid)
 		{
 			(*it_soft)->CollisionResponseRigid(*it_rigid);
+			if (!(*it_soft)->colliding())
+				(*it_soft)->SetInitConstraints();
 		}
 	}
 }
