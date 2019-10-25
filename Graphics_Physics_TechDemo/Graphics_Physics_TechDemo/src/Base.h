@@ -28,8 +28,12 @@ public:
 	void CollisionResponseRigid(Object* _rhs);
 	void CollisionResponseSoft(SoftBodyPhysics* _rhs);
 
+	void SetInitConstraints() { m_cons = m_init_cons; }
+	bool colliding() { return isCollided; }
+
 private:
 	void Verlet(float dt);
+	void Move(float dt);
 	void KeepConstraint();
 	void Acceleration();
 
@@ -39,13 +43,17 @@ private:
 
 	std::vector<glm::vec3> m_scaled_ver;
 	std::vector<glm::vec3> m_old_ver;
+	std::vector<constraints> m_init_cons;
 	std::vector<constraints> m_cons;
+	std::vector<constraints> m_in_cons;
 	float m_gravity;
-	glm::vec3 m_acceleration;
-	glm::vec3 m_velocity;
+	std::vector<glm::vec3> m_acceleration;
+	std::vector<glm::vec3> m_velocity;
+	bool isCollided;
 
 	float m_mass;
-
+	float stiffness;
+	float damping;
 	//temp
 	std::vector <glm::vec3> m_edge;
 

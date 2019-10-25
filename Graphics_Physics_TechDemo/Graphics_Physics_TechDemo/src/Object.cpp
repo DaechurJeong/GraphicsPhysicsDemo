@@ -13,7 +13,7 @@ End Header --------------------------------------------------------*/
 
 #define PI 3.141592654
 #define TWOPI 6.283185308
-#define S_DIMENSION 16
+#define S_DIMENSION 32
 #define P_DIMENSION 64
 #define STB_IMAGE_IMPLEMENTATION
 #define WIDTH 1280
@@ -349,12 +349,12 @@ void Object::render_textured(Camera* camera, Shader* shader, glm::vec3 pos, floa
 	glm::mat4 identity_scale(1.0);
 	glm::mat4 identity_rotation(1.0);
 
-	glm::mat4 model = glm::translate(identity_translate, pos) * glm::scale(identity_scale, scale) * glm::rotate(identity_rotation, rotation, up);
+	m_model = glm::translate(identity_translate, pos) * glm::scale(identity_scale, scale) * glm::rotate(identity_rotation, rotation, glm::vec3(0.f,0.f,1.f));
 	glm::mat4 projection = glm::perspective(glm::radians(camera->zoom), aspect, 0.1f, 100.0f); // zoom = fov;
 	glm::mat4 view = camera->GetViewMatrix();
 
 	shader->SetMat4("projection", projection);
-	shader->SetMat4("model", model);
+	shader->SetMat4("model", m_model);
 	shader->SetMat4("view", view);
 
 	glBindVertexArray(m_vao);
