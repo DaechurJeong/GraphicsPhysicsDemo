@@ -1,6 +1,8 @@
 #include "Scene.h"
 #include "input.h"
 
+const float FRAME_LIMIT = 1.f / 59.f;
+
 void Scene::Init(GLFWwindow* window, Camera* camera)
 {
 	if (curr_scene == 0)
@@ -69,16 +71,26 @@ void Scene::Scene0Init(Camera* camera)
 	m_physics.push_object(main_obj_texture);
 	pbr_obj.push_back(main_obj_texture);
 
-	Object* rigid_plane = new Object(O_PLANE, glm::vec3(3.5f, -5.f, 0.f), glm::vec3(4.f, 1.f, 4.f), dimension_);
+	Object* rigid_plane = new Object(O_PLANE, glm::vec3(4.f, -4.f, 0.f), glm::vec3(4.f, 1.f, 4.f), dimension_);
 	rigid_plane->rotation = 1.f;
 	m_physics.push_object(rigid_plane);
 	pbr_obj.push_back(rigid_plane);
+
+	Object* rigid_plane_2 = new Object(O_PLANE, glm::vec3(1.f, -7.f, 0.f), glm::vec3(4.f, 1.f, 4.f), dimension_);
+	rigid_plane_2->rotation = -1.f;
+	m_physics.push_object(rigid_plane_2);
+	pbr_obj.push_back(rigid_plane_2);
+
+	Object* rigid_plane_3 = new Object(O_PLANE, glm::vec3(4.5f, -10.f, 0.f), glm::vec3(4.f, 1.f, 4.f), dimension_);
+	rigid_plane_3->rotation = 1.f;
+	m_physics.push_object(rigid_plane_3);
+	pbr_obj.push_back(rigid_plane_3);
 
 	//SoftBodyPhysics* plane = new SoftBodyPhysics(O_PLANE, glm::vec3(0, 1.5f, 1.f), glm::vec3(4.f, 1.f, 7.f), dimension_);
 	//m_physics.push_object(plane);
 	//softbody_obj.push_back(plane);
 
-	SoftBodyPhysics* sb_sphere = new SoftBodyPhysics(O_SPHERE, glm::vec3(4.5f, 1.f, 2.5f), glm::vec3(1.f, 1.f, 1.f), dimension_);
+	SoftBodyPhysics* sb_sphere = new SoftBodyPhysics(O_SPHERE, glm::vec3(4.3f, 0.f, 2.5f), glm::vec3(1.f, 1.f, 1.f), dimension_);
 	m_physics.push_object(sb_sphere);
 	softbody_obj.push_back(sb_sphere);
 
@@ -131,7 +143,7 @@ void Scene::Scene1Init(Camera* camera)
 }
 void Scene::Scene0Draw(Camera* camera, float dt)
 {
-	if (dt < 0.2f)
+	if (dt <= FRAME_LIMIT)
 	{
 		if (!softbody_obj.empty())
 		{
@@ -207,7 +219,7 @@ void Scene::Scene0Draw(Camera* camera, float dt)
 }
 void Scene::Scene1Draw(Camera* camera, float dt)
 {
-	if (dt < 0.2f)
+	if (dt <= FRAME_LIMIT)
 	{
 		if (!softbody_obj.empty())
 		{

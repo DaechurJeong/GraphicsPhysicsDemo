@@ -179,7 +179,7 @@ void SoftBodyPhysics::Move(float dt)
 
 void SoftBodyPhysics::KeepConstraint()
 {
-	for (int i = 0; i < 16; ++i)
+	for (int i = 0; i < 14; ++i)
 	{
 		//staying edge
 		for (unsigned j = 0; j < m_edge.size(); ++j)
@@ -312,7 +312,7 @@ bool SoftBodyPhysics::IsCollidedPlane(glm::vec3& point, glm::vec3& p_point0, glm
 	
 	distance = glm::dot(point, norm) + d;
 
-	if (distance < 0.f)
+	if (std::abs(distance) < 0.2f && distance < 0.f)
 	{
 		movedpoint = point - (distance * norm);
 
