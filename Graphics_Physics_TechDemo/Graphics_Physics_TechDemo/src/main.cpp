@@ -74,20 +74,9 @@ int main(void)
 	Scene m_scene(0);
 	m_scene.Init(window, &camera);
 
-	/*int scrWidth, scrHeight;
-	glfwGetFramebufferSize(window, &scrWidth, &scrHeight);
-	glViewport(0, 0, scrWidth, scrHeight);*/
-
 	/* Loop until the user closes the window */
 	while (!glfwWindowShouldClose(window))
 	{
-		//float currFrame = (float)glfwGetTime();
-		//deltaTime = currFrame - lastFrame;
-		//lastFrame = currFrame;
-		
-		// Input
-		//ProcessInput(&camera, window, deltaTime);
-
 		m_scene.Update(window, &camera, deltaTime);
 
 		glfwMakeContextCurrent(window);
