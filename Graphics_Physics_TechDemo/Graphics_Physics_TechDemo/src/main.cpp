@@ -12,8 +12,6 @@ Author2: Nahye Park, nahye.park
 Creation date: 9/6/2019
 End Header --------------------------------------------------------*/
 #include "Shader.h"
-//#include "GLFW\glfw3.h"
-#include "input.h"
 #include "Camera.h"
 #include "Light.h"
 #include "Base.h"
@@ -76,7 +74,6 @@ int main(void)
 	Scene m_scene(0);
 	m_scene.Init(window, &camera);
 
-	// then before rendering, configure the viewport to the original framebuffer's screen dimensions
 	/*int scrWidth, scrHeight;
 	glfwGetFramebufferSize(window, &scrWidth, &scrHeight);
 	glViewport(0, 0, scrWidth, scrHeight);*/
@@ -84,12 +81,12 @@ int main(void)
 	/* Loop until the user closes the window */
 	while (!glfwWindowShouldClose(window))
 	{
-		float currFrame = (float)glfwGetTime();
-		deltaTime = currFrame - lastFrame;
-		lastFrame = currFrame;
+		//float currFrame = (float)glfwGetTime();
+		//deltaTime = currFrame - lastFrame;
+		//lastFrame = currFrame;
 		
 		// Input
-		ProcessInput(&camera, window, deltaTime);
+		//ProcessInput(&camera, window, deltaTime);
 
 		m_scene.Update(window, &camera, deltaTime);
 

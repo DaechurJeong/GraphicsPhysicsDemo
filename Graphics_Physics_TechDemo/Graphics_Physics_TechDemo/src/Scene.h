@@ -18,7 +18,7 @@ class Scene {
 public:
 	Scene(int sceneNum) : curr_scene(sceneNum), width(1280), height(800), aspect(1280.f/800.f),
 		roughness_status(false), metallic_status(false), dimension_(64), met(0.f), rou(0.f),
-		second_imgui(true){};
+		second_imgui(true), deltaTime(0.f), lastFrame(0.f){};
 	~Scene() {};
 	void Init(GLFWwindow* window, Camera* camera);
 	void Update(GLFWwindow* window, Camera* camera, float dt);
@@ -77,6 +77,9 @@ private:
 	bool metallic_status;
 
 	bool second_imgui;
+
+	float deltaTime;
+	float lastFrame;
 };
 
 

@@ -1,4 +1,5 @@
 #include "Scene.h"
+#include "input.h"
 
 void Scene::Init(GLFWwindow* window, Camera* camera)
 {
@@ -39,15 +40,21 @@ void Scene::Init(GLFWwindow* window, Camera* camera)
 }
 void Scene::Update(GLFWwindow* window, Camera* camera, float dt)
 {
-	ImGuiUpdate(window, camera, dt);
+	float currFrame = (float)glfwGetTime();
+	deltaTime = currFrame - lastFrame;
+	lastFrame = currFrame;
+
+	ImGuiUpdate(window, camera, deltaTime);
+
+	ProcessInput(camera, window, deltaTime);
 
 	if (curr_scene == 0)
 	{
-		Scene0Draw(camera, dt);
+		Scene0Draw(camera, deltaTime);
 	}
 	else if (curr_scene == 1)
 	{
-		Scene1Draw(camera, dt);
+		Scene1Draw(camera, deltaTime);
 	}
 	ImGuirender();
 }
@@ -123,7 +130,7 @@ void Scene::Scene1Init(Camera* camera)
 }
 void Scene::Scene0Draw(Camera* camera, float dt)
 {
-	if (dt < 1.f)
+	if (dt < 0.2f)
 	{
 		if (!softbody_obj.empty())
 		{
@@ -199,7 +206,7 @@ void Scene::Scene0Draw(Camera* camera, float dt)
 }
 void Scene::Scene1Draw(Camera* camera, float dt)
 {
-	if (dt < 1.f)
+	if (dt < 0.2f)
 	{
 		if (!softbody_obj.empty())
 		{
@@ -358,6 +365,7 @@ void Scene::ShutDown()
 }
 void Scene::ResizeFrameBuffer(GLFWwindow* window)
 {
+	// then before rendering, configure the viewport to the original framebuffer's screen dimensions
 	int scrWidth, scrHeight;
 	glfwGetFramebufferSize(window, &scrWidth, &scrHeight);
 	glViewport(0, 0, scrWidth, scrHeight);
