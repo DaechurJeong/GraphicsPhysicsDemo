@@ -38,6 +38,12 @@ Object::Object(ObjectShape shape, glm::vec3 pos, glm::vec3 scale_, int dim)
 		makePlain();
 	else if (m_shape == O_SPHERE)
 		makeSphere();
+	else if (m_shape == O_OBJ)
+	{
+		loadOBJ("models\\objs\\genie_lamp.obj", middlePoint);
+		GenerateBuffers();
+		Describe();
+	}
 }
 Object::~Object()
 {
@@ -222,7 +228,46 @@ bool Object::loadOBJ(const char* path, glm::vec3& middlePoint)
 
 		if (strcmp(lineHeader, "f") == 0)
 		{
-			unsigned int vertexIndex[3];
+			unsigned vertexIndex[4];
+			unsigned trash[4];
+			int matches = fscanf(file, "%d/%d %d/%d %d/%d %d/%d", &vertexIndex[0], &trash[0], &vertexIndex[1], &trash[1], &vertexIndex[2], &trash[2], &vertexIndex[3], &trash[3]);
+			if (matches == 8)
+			{
+				obj_indices.push_back(vertexIndex[0] - 1);
+				obj_indices.push_back(vertexIndex[3] - 1);
+				obj_indices.push_back(vertexIndex[2] - 1);
+
+				obj_indices.push_back(vertexIndex[2] - 1);
+				obj_indices.push_back(vertexIndex[1] - 1);
+				obj_indices.push_back(vertexIndex[0] - 1);
+				/*obj_indices.push_back(vertexIndex[0] - 1);
+				obj_indices.push_back(vertexIndex[1] - 1);
+				obj_indices.push_back(vertexIndex[2] - 1);
+
+				obj_indices.push_back(vertexIndex[0] - 1);
+				obj_indices.push_back(vertexIndex[1] - 1);
+				obj_indices.push_back(vertexIndex[3] - 1);
+
+				obj_indices.push_back(vertexIndex[0] - 1);
+				obj_indices.push_back(vertexIndex[2] - 1);
+				obj_indices.push_back(vertexIndex[3] - 1);
+
+				obj_indices.push_back(vertexIndex[1] - 1);
+				obj_indices.push_back(vertexIndex[2] - 1);
+				obj_indices.push_back(vertexIndex[3] - 1);*/
+			}
+			else if (matches == 6)
+			{
+				obj_indices.push_back(vertexIndex[2] - 1);
+				obj_indices.push_back(vertexIndex[1] - 1);
+				obj_indices.push_back(vertexIndex[0] - 1);
+			}
+			else
+			{
+				printf("File can't be read by our simple parser : ( Try exporting with other options\n");
+				return false;
+			}
+			/*unsigned int vertexIndex[3];
 			int matches = fscanf(file, "%d %d %d\n", &vertexIndex[0], &vertexIndex[1], &vertexIndex[2]);
 			if (matches != 3)
 			{
@@ -231,7 +276,18 @@ bool Object::loadOBJ(const char* path, glm::vec3& middlePoint)
 			}
 			obj_indices.push_back(vertexIndex[0] - 1);
 			obj_indices.push_back(vertexIndex[1] - 1);
-			obj_indices.push_back(vertexIndex[2] - 1);
+			obj_indices.push_back(vertexIndex[2] - 1);*/
+		}
+		if (strcmp(lineHeader, "vt") == 0)
+		{
+			glm::vec2 uv;
+			int matches = fscanf(file, "%f %f\n", &uv.x, &uv.y);
+			if (matches != 2)
+			{
+				printf("File can't be read by our simple parser : ( Try exporting with other options\n");
+				return false;
+			}
+			textureUV.push_back(uv);
 		}
 	}
 	return true;
@@ -358,7 +414,7 @@ void Object::render_textured(Camera* camera, Shader* shader, glm::vec3 pos, floa
 	shader->SetMat4("view", view);
 
 	glBindVertexArray(m_vao);
-	glDrawElements(GL_TRIANGLE_STRIP, m_elementSize, GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, m_elementSize, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }
 void Object::render_line(Camera* camera, Shader* shader, glm::vec3 pos, float aspect)

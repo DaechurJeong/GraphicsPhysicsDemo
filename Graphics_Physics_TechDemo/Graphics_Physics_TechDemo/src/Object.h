@@ -28,6 +28,7 @@ typedef enum ObjShape {
 	O_PLANE,
 	O_SPHERE,
 	O_CUBE,
+	O_OBJ,
 }ObjectShape;
 
 class Object 

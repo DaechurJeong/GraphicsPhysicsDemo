@@ -60,6 +60,9 @@ void Scene::Update(GLFWwindow* window, Camera* camera, float dt)
 }
 void Scene::Scene0Init(Camera* camera)
 {
+	Object* lamp = new Object(O_OBJ, glm::vec3(3.f, 3.f, 1.f), glm::vec3(1.f, 1.f, 1.f), dimension_);
+	pbr_obj.push_back(lamp);
+
 	// Generate objects for scene0
 	Object* main_obj = new Object(O_SPHERE, glm::vec3(0.f, 0.f, -2.f), glm::vec3(1.f, 1.f, 1.f), dimension_);
 	pbr_obj.push_back(main_obj);
