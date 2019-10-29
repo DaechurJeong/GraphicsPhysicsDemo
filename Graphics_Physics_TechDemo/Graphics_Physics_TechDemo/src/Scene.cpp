@@ -81,7 +81,7 @@ void Scene::Scene0Init(Camera* camera)
 	m_physics.push_object(rigid_plane_4);
 	pbr_obj.push_back(rigid_plane_4);
 
-	Object* rigid_plane_2 = new Object(O_PLANE, glm::vec3(1.f, -7.f, 1.5f), glm::vec3(4.f, 1.f, 4.f), dimension_);
+	Object* rigid_plane_2 = new Object(O_PLANE, glm::vec3(1.3f, -7.f, 1.5f), glm::vec3(4.f, 1.f, 4.f), dimension_);
 	rigid_plane_2->rotation = -1.f;
 	m_physics.push_object(rigid_plane_2);
 	pbr_obj.push_back(rigid_plane_2);
