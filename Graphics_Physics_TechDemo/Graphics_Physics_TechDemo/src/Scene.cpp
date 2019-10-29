@@ -350,6 +350,67 @@ void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 		}
 		ImGui::End();
 	}
+	if (third_imgui)
+	{
+		ImGui::Begin("Select PBR texture");
+		if (ImGui::Button("Plastic"))
+		{
+			albedo = pbr_obj[0]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_BaseColor.png");
+			normal = pbr_obj[0]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_Normal.png");
+			metallic = pbr_obj[0]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_Metallic.png");
+			roughness = pbr_obj[0]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_Roughness.png");
+			ao = pbr_obj[0]->loadTexture("models\\pbr\\selfmade_plastic\\ao.png");
+		}
+		if (ImGui::Button("Steel"))
+		{
+			albedo = pbr_obj[0]->loadTexture("models\\pbr\\Steel\\Sphere3D_1_defaultMat_BaseColor.png");
+			normal = pbr_obj[0]->loadTexture("models\\pbr\\Steel\\Sphere3D_1_defaultMat_Normal.png");
+			metallic = pbr_obj[0]->loadTexture("models\\pbr\\Steel\\Sphere3D_1_defaultMat_Metallic.png");
+			roughness = pbr_obj[0]->loadTexture("models\\pbr\\Steel\\Sphere3D_1_defaultMat_Roughness.png");
+			ao = pbr_obj[0]->loadTexture("models\\pbr\\Steel\\ao.png");
+		}
+		if (ImGui::Button("Wood"))
+		{
+			albedo = pbr_obj[0]->loadTexture("models\\pbr\\Wood\\Sphere3D_1_defaultMat_BaseColor.png");
+			normal = pbr_obj[0]->loadTexture("models\\pbr\\Wood\\Sphere3D_1_defaultMat_Normal.png");
+			metallic = pbr_obj[0]->loadTexture("models\\pbr\\Wood\\Sphere3D_1_defaultMat_Metallic.png");
+			roughness = pbr_obj[0]->loadTexture("models\\pbr\\Wood\\Sphere3D_1_defaultMat_Roughness.png");
+			ao = pbr_obj[0]->loadTexture("models\\pbr\\Wood\\ao.png");
+		}
+		if (ImGui::Button("Rusted-Iron"))
+		{
+			albedo = pbr_obj[0]->loadTexture("models\\pbr\\rusted-iron\\Sphere3D_1_defaultMat_BaseColor.png");
+			normal = pbr_obj[0]->loadTexture("models\\pbr\\rusted-iron\\Sphere3D_1_defaultMat_Normal.png");
+			metallic = pbr_obj[0]->loadTexture("models\\pbr\\rusted-iron\\Sphere3D_1_defaultMat_Metallic.png");
+			roughness = pbr_obj[0]->loadTexture("models\\pbr\\rusted-iron\\Sphere3D_1_defaultMat_Roughness.png");
+			ao = pbr_obj[0]->loadTexture("models\\pbr\\rusted-iron\\ao.png");
+		}
+		if (ImGui::Button("Fabric"))
+		{
+			albedo = pbr_obj[0]->loadTexture("models\\pbr\\Fabric\\Sphere3D_1_defaultMat_BaseColor.png");
+			normal = pbr_obj[0]->loadTexture("models\\pbr\\Fabric\\Sphere3D_1_defaultMat_Normal.png");
+			metallic = pbr_obj[0]->loadTexture("models\\pbr\\Fabric\\Sphere3D_1_defaultMat_Metallic.png");
+			roughness = pbr_obj[0]->loadTexture("models\\pbr\\Fabric\\Sphere3D_1_defaultMat_Roughness.png");
+			ao = pbr_obj[0]->loadTexture("models\\pbr\\Fabric\\ao.png");
+		}
+		if (ImGui::Button("TornFabric"))
+		{
+			albedo = pbr_obj[0]->loadTexture("models\\pbr\\TornFabric\\Sphere3D_1_defaultMat_BaseColor.png");
+			normal = pbr_obj[0]->loadTexture("models\\pbr\\TornFabric\\Sphere3D_1_defaultMat_Normal.png");
+			metallic = pbr_obj[0]->loadTexture("models\\pbr\\TornFabric\\Sphere3D_1_defaultMat_Metallic.png");
+			roughness = pbr_obj[0]->loadTexture("models\\pbr\\TornFabric\\Sphere3D_1_defaultMat_Roughness.png");
+			ao = pbr_obj[0]->loadTexture("models\\pbr\\TornFabric\\ao.png");
+		}
+		if (ImGui::Button("Aluminium"))
+		{
+			albedo = pbr_obj[0]->loadTexture("models\\pbr\\Aluminium\\Sphere3D_1_defaultMat_BaseColor.png");
+			normal = pbr_obj[0]->loadTexture("models\\pbr\\Aluminium\\Sphere3D_1_defaultMat_Normal.png");
+			metallic = pbr_obj[0]->loadTexture("models\\pbr\\Aluminium\\Sphere3D_1_defaultMat_Metallic.png");
+			roughness = pbr_obj[0]->loadTexture("models\\pbr\\Aluminium\\Sphere3D_1_defaultMat_Roughness.png");
+			ao = pbr_obj[0]->loadTexture("models\\pbr\\Aluminium\\ao.png");
+		}
+		ImGui::End();
+	}
 }
 void Scene::ImGuirender()
 {
