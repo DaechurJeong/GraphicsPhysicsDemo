@@ -14,11 +14,12 @@
 #include "imgui-master\imgui_impl_opengl3.h"
 #include "GLFW\glfw3.h"
 
+
 class Scene {
 public:
 	Scene(int sceneNum) : curr_scene(sceneNum), width(1280), height(800), aspect(1280.f/800.f),
 		roughness_status(false), metallic_status(false), dimension_(64), met(0.f), rou(0.f),
-		second_imgui(true), third_imgui(true), deltaTime(0.f), lastFrame(0.f){};
+		second_imgui(true), third_imgui(true), forth_imgui(true), deltaTime(0.f), lastFrame(0.f) {};
 	~Scene() {};
 	void Init(GLFWwindow* window, Camera* camera);
 	void Update(GLFWwindow* window, Camera* camera, float dt);
@@ -28,6 +29,9 @@ public:
 	void Scene0Draw(Camera* camera, float dt);
 	void Scene1Draw(Camera* camera, float dt);
 	void ShutDown();
+
+	void ChangePBRTexture(TextureType type);
+	void Reload(Camera* camera);
 
 	void ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt);
 	void ImGuirender();
@@ -62,11 +66,11 @@ private:
 	unsigned int prefilterMap = 0;
 	unsigned int brdfLUTTexture = 0;
 
-	unsigned int albedo = 0;
-	unsigned int normal = 0;
-	unsigned int metallic = 0;
-	unsigned int roughness = 0;
-	unsigned int ao = 0;
+	//unsigned int albedo = 0;
+	//unsigned int normal = 0;
+	//unsigned int metallic = 0;
+	//unsigned int roughness = 0;
+	//unsigned int ao = 0;
 
 	int dimension_;
 
@@ -78,6 +82,7 @@ private:
 
 	bool second_imgui;
 	bool third_imgui;
+	bool forth_imgui;
 
 	float deltaTime;
 	float lastFrame;

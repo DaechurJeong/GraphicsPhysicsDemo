@@ -81,12 +81,12 @@ void Scene::Scene0Init(Camera* camera)
 	m_physics.push_object(rigid_plane_4);
 	pbr_obj.push_back(rigid_plane_4);
 
-	Object* rigid_plane_2 = new Object(O_PLANE, glm::vec3(1.3f, -7.f, 1.5f), glm::vec3(4.f, 1.f, 4.f), dimension_);
+	Object* rigid_plane_2 = new Object(O_PLANE, glm::vec3(1.3f, -7.f, 0.5f), glm::vec3(4.f, 1.f, 4.f), dimension_);
 	rigid_plane_2->rotation = -1.f;
 	m_physics.push_object(rigid_plane_2);
 	pbr_obj.push_back(rigid_plane_2);
 
-	Object* rigid_plane_3 = new Object(O_PLANE, glm::vec3(3.5f, -11.f, 1.5f), glm::vec3(4.f, 1.f, 4.f), dimension_);
+	Object* rigid_plane_3 = new Object(O_PLANE, glm::vec3(4.f, -10.3f, 0.5f), glm::vec3(4.f, 1.f, 4.f), dimension_);
 	rigid_plane_3->rotation = 1.f;
 	m_physics.push_object(rigid_plane_3);
 	pbr_obj.push_back(rigid_plane_3);
@@ -100,11 +100,22 @@ void Scene::Scene0Init(Camera* camera)
 	softbody_obj.push_back(sb_sphere);
 
 	// load PBR material textures
-	albedo = main_obj_texture->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_BaseColor.png");
-	normal = main_obj_texture->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_Normal.png");
-	metallic = main_obj_texture->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_Metallic.png");
-	roughness = main_obj_texture->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_Roughness.png");
-	ao = main_obj_texture->loadTexture("models\\pbr\\selfmade_plastic\\ao.png");
+	for (unsigned i = 0; i < pbr_obj.size(); ++i)
+	{
+		pbr_obj[i]->albedo = pbr_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_BaseColor.png");
+		pbr_obj[i]->normal = pbr_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_Normal.png");
+		pbr_obj[i]->metallic = pbr_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_Metallic.png");
+		pbr_obj[i]->roughness = pbr_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_Roughness.png");
+		pbr_obj[i]->ao = pbr_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\ao.png");
+	}
+	for (unsigned i = 0; i < softbody_obj.size(); ++i)
+	{
+		softbody_obj[i]->albedo = softbody_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_BaseColor.png");
+		softbody_obj[i]->normal = softbody_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_Normal.png");
+		softbody_obj[i]->metallic = softbody_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_Metallic.png");
+		softbody_obj[i]->roughness = softbody_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_Roughness.png");
+		softbody_obj[i]->ao = softbody_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\ao.png");
+	}
 
 	// light properties
 	for (int i = 0; i < 4; ++i)
@@ -130,12 +141,22 @@ void Scene::Scene1Init(Camera* camera)
 	softbody_obj.push_back(plane);
 
 	// load PBR material textures
-	albedo = main_obj_texture->loadTexture("models\\pbr\\Steel\\Sphere3D_1_defaultMat_BaseColor.png");
-	normal = main_obj_texture->loadTexture("models\\pbr\\Steel\\Sphere3D_1_defaultMat_Normal.png");
-	metallic = main_obj_texture->loadTexture("models\\pbr\\Steel\\Sphere3D_1_defaultMat_Metallic.png");
-	roughness = main_obj_texture->loadTexture("models\\pbr\\Steel\\Sphere3D_1_defaultMat_Roughness.png");
-	ao = main_obj_texture->loadTexture("models\\pbr\\Steel\\ao.png");
-
+	for (unsigned i = 0; i < pbr_obj.size(); ++i)
+	{
+		pbr_obj[i]->albedo = pbr_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_BaseColor.png");
+		pbr_obj[i]->normal = pbr_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_Normal.png");
+		pbr_obj[i]->metallic = pbr_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_Metallic.png");
+		pbr_obj[i]->roughness = pbr_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_Roughness.png");
+		pbr_obj[i]->ao = pbr_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\ao.png");
+	}
+	for (unsigned i = 0; i < softbody_obj.size(); ++i)
+	{
+		softbody_obj[i]->albedo = softbody_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_BaseColor.png");
+		softbody_obj[i]->normal = softbody_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_Normal.png");
+		softbody_obj[i]->metallic = softbody_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_Metallic.png");
+		softbody_obj[i]->roughness = softbody_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_Roughness.png");
+		softbody_obj[i]->ao = softbody_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\ao.png");
+	}
 	// light properties
 	for (int i = 0; i < 2; ++i)
 	{
@@ -172,16 +193,35 @@ void Scene::Scene0Draw(Camera* camera, float dt)
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, brdfLUTTexture);
 
-	glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, albedo);
-	glActiveTexture(GL_TEXTURE4);
-	glBindTexture(GL_TEXTURE_2D, normal);
-	glActiveTexture(GL_TEXTURE5);
-	glBindTexture(GL_TEXTURE_2D, metallic);
-	glActiveTexture(GL_TEXTURE6);
-	glBindTexture(GL_TEXTURE_2D, roughness);
-	glActiveTexture(GL_TEXTURE7);
-	glBindTexture(GL_TEXTURE_2D, ao);
+	unsigned index = 0;
+	for (unsigned i = 0; i < pbr_obj.size(); ++i)
+	{
+		glActiveTexture(GL_TEXTURE3 + i * 5);
+		glBindTexture(GL_TEXTURE_2D, pbr_obj[i]->albedo);
+		glActiveTexture(GL_TEXTURE4 + i * 5);
+		glBindTexture(GL_TEXTURE_2D, pbr_obj[i]->normal);
+		glActiveTexture(GL_TEXTURE5 + i * 5);
+		glBindTexture(GL_TEXTURE_2D, pbr_obj[i]->metallic);
+		glActiveTexture(GL_TEXTURE6 + i * 5);
+		glBindTexture(GL_TEXTURE_2D, pbr_obj[i]->roughness);
+		glActiveTexture(GL_TEXTURE7 + i * 5);
+		glBindTexture(GL_TEXTURE_2D, pbr_obj[i]->ao);
+		index = i * 5;
+	}
+	for (unsigned i = 0; i < softbody_obj.size(); ++i)
+	{
+		glActiveTexture(GL_TEXTURE3 + i * 5 + index);
+		glBindTexture(GL_TEXTURE_2D, softbody_obj[i]->albedo);
+		glActiveTexture(GL_TEXTURE4 + i * 5 + index);
+		glBindTexture(GL_TEXTURE_2D, softbody_obj[i]->normal);
+		glActiveTexture(GL_TEXTURE5 + i * 5 + index);
+		glBindTexture(GL_TEXTURE_2D, softbody_obj[i]->metallic);
+		glActiveTexture(GL_TEXTURE6 + i * 5 + index);
+		glBindTexture(GL_TEXTURE_2D, softbody_obj[i]->roughness);
+		glActiveTexture(GL_TEXTURE7 + i * 5 + index);
+		glBindTexture(GL_TEXTURE_2D, softbody_obj[i]->ao);
+		index = index + i * 5;
+	}
 
 	for (std::vector<Object*>::iterator p_obj = pbr_obj.begin(); p_obj != pbr_obj.end(); ++p_obj)
 		(*p_obj)->render_textured(camera, &pbr_texture_shader, (*p_obj)->position, aspect);
@@ -248,16 +288,35 @@ void Scene::Scene1Draw(Camera* camera, float dt)
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, brdfLUTTexture);
 
-	glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, albedo);
-	glActiveTexture(GL_TEXTURE4);
-	glBindTexture(GL_TEXTURE_2D, normal);
-	glActiveTexture(GL_TEXTURE5);
-	glBindTexture(GL_TEXTURE_2D, metallic);
-	glActiveTexture(GL_TEXTURE6);
-	glBindTexture(GL_TEXTURE_2D, roughness);
-	glActiveTexture(GL_TEXTURE7);
-	glBindTexture(GL_TEXTURE_2D, ao);
+	unsigned index = 0;
+	for (unsigned i = 0; i < pbr_obj.size(); ++i)
+	{
+		glActiveTexture(GL_TEXTURE3 + i * 5);
+		glBindTexture(GL_TEXTURE_2D, pbr_obj[i]->albedo);
+		glActiveTexture(GL_TEXTURE4 + i * 5);
+		glBindTexture(GL_TEXTURE_2D, pbr_obj[i]->normal);
+		glActiveTexture(GL_TEXTURE5 + i * 5);
+		glBindTexture(GL_TEXTURE_2D, pbr_obj[i]->metallic);
+		glActiveTexture(GL_TEXTURE6 + i * 5);
+		glBindTexture(GL_TEXTURE_2D, pbr_obj[i]->roughness);
+		glActiveTexture(GL_TEXTURE7 + i * 5);
+		glBindTexture(GL_TEXTURE_2D, pbr_obj[i]->ao);
+		index = i * 5;
+	}
+	for (unsigned i = 0; i < softbody_obj.size(); ++i)
+	{
+		glActiveTexture(GL_TEXTURE3 + i * 5 + index);
+		glBindTexture(GL_TEXTURE_2D, softbody_obj[i]->albedo);
+		glActiveTexture(GL_TEXTURE4 + i * 5 + index);
+		glBindTexture(GL_TEXTURE_2D, softbody_obj[i]->normal);
+		glActiveTexture(GL_TEXTURE5 + i * 5 + index);
+		glBindTexture(GL_TEXTURE_2D, softbody_obj[i]->metallic);
+		glActiveTexture(GL_TEXTURE6 + i * 5 + index);
+		glBindTexture(GL_TEXTURE_2D, softbody_obj[i]->roughness);
+		glActiveTexture(GL_TEXTURE7 + i * 5 + index);
+		glBindTexture(GL_TEXTURE_2D, softbody_obj[i]->ao);
+		index = index + i * 5;
+	}
 
 	for (std::vector<Object*>::iterator p_obj = pbr_obj.begin(); p_obj != pbr_obj.end(); ++p_obj)
 		(*p_obj)->render_textured(camera, &pbr_texture_shader, (*p_obj)->position, aspect);
@@ -298,6 +357,7 @@ void Scene::Scene1Draw(Camera* camera, float dt)
 	// render skybox (render as last to prevent overdraw)
 	renderSkybox(&backgroundShader, camera, envCubemap, irradianceMap);
 }
+
 void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 {
 	ImGui_ImplOpenGL3_NewFrame();
@@ -355,59 +415,40 @@ void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 		ImGui::Begin("Select PBR texture");
 		if (ImGui::Button("Plastic"))
 		{
-			albedo = pbr_obj[0]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_BaseColor.png");
-			normal = pbr_obj[0]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_Normal.png");
-			metallic = pbr_obj[0]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_Metallic.png");
-			roughness = pbr_obj[0]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_Roughness.png");
-			ao = pbr_obj[0]->loadTexture("models\\pbr\\selfmade_plastic\\ao.png");
+			ChangePBRTexture(PLASTIC);
 		}
 		if (ImGui::Button("Steel"))
 		{
-			albedo = pbr_obj[0]->loadTexture("models\\pbr\\Steel\\Sphere3D_1_defaultMat_BaseColor.png");
-			normal = pbr_obj[0]->loadTexture("models\\pbr\\Steel\\Sphere3D_1_defaultMat_Normal.png");
-			metallic = pbr_obj[0]->loadTexture("models\\pbr\\Steel\\Sphere3D_1_defaultMat_Metallic.png");
-			roughness = pbr_obj[0]->loadTexture("models\\pbr\\Steel\\Sphere3D_1_defaultMat_Roughness.png");
-			ao = pbr_obj[0]->loadTexture("models\\pbr\\Steel\\ao.png");
+			ChangePBRTexture(STEEL);
 		}
 		if (ImGui::Button("Wood"))
 		{
-			albedo = pbr_obj[0]->loadTexture("models\\pbr\\Wood\\Sphere3D_1_defaultMat_BaseColor.png");
-			normal = pbr_obj[0]->loadTexture("models\\pbr\\Wood\\Sphere3D_1_defaultMat_Normal.png");
-			metallic = pbr_obj[0]->loadTexture("models\\pbr\\Wood\\Sphere3D_1_defaultMat_Metallic.png");
-			roughness = pbr_obj[0]->loadTexture("models\\pbr\\Wood\\Sphere3D_1_defaultMat_Roughness.png");
-			ao = pbr_obj[0]->loadTexture("models\\pbr\\Wood\\ao.png");
+			ChangePBRTexture(WOOD);
 		}
 		if (ImGui::Button("Rusted-Iron"))
 		{
-			albedo = pbr_obj[0]->loadTexture("models\\pbr\\rusted-iron\\Sphere3D_1_defaultMat_BaseColor.png");
-			normal = pbr_obj[0]->loadTexture("models\\pbr\\rusted-iron\\Sphere3D_1_defaultMat_Normal.png");
-			metallic = pbr_obj[0]->loadTexture("models\\pbr\\rusted-iron\\Sphere3D_1_defaultMat_Metallic.png");
-			roughness = pbr_obj[0]->loadTexture("models\\pbr\\rusted-iron\\Sphere3D_1_defaultMat_Roughness.png");
-			ao = pbr_obj[0]->loadTexture("models\\pbr\\rusted-iron\\ao.png");
+			ChangePBRTexture(RUSTED_IRON);
 		}
 		if (ImGui::Button("Fabric"))
 		{
-			albedo = pbr_obj[0]->loadTexture("models\\pbr\\Fabric\\Sphere3D_1_defaultMat_BaseColor.png");
-			normal = pbr_obj[0]->loadTexture("models\\pbr\\Fabric\\Sphere3D_1_defaultMat_Normal.png");
-			metallic = pbr_obj[0]->loadTexture("models\\pbr\\Fabric\\Sphere3D_1_defaultMat_Metallic.png");
-			roughness = pbr_obj[0]->loadTexture("models\\pbr\\Fabric\\Sphere3D_1_defaultMat_Roughness.png");
-			ao = pbr_obj[0]->loadTexture("models\\pbr\\Fabric\\ao.png");
+			ChangePBRTexture(FABRIC);
 		}
 		if (ImGui::Button("TornFabric"))
 		{
-			albedo = pbr_obj[0]->loadTexture("models\\pbr\\TornFabric\\Sphere3D_1_defaultMat_BaseColor.png");
-			normal = pbr_obj[0]->loadTexture("models\\pbr\\TornFabric\\Sphere3D_1_defaultMat_Normal.png");
-			metallic = pbr_obj[0]->loadTexture("models\\pbr\\TornFabric\\Sphere3D_1_defaultMat_Metallic.png");
-			roughness = pbr_obj[0]->loadTexture("models\\pbr\\TornFabric\\Sphere3D_1_defaultMat_Roughness.png");
-			ao = pbr_obj[0]->loadTexture("models\\pbr\\TornFabric\\ao.png");
+			ChangePBRTexture(TORN_FABRIC);
 		}
 		if (ImGui::Button("Aluminium"))
 		{
-			albedo = pbr_obj[0]->loadTexture("models\\pbr\\Aluminium\\Sphere3D_1_defaultMat_BaseColor.png");
-			normal = pbr_obj[0]->loadTexture("models\\pbr\\Aluminium\\Sphere3D_1_defaultMat_Normal.png");
-			metallic = pbr_obj[0]->loadTexture("models\\pbr\\Aluminium\\Sphere3D_1_defaultMat_Metallic.png");
-			roughness = pbr_obj[0]->loadTexture("models\\pbr\\Aluminium\\Sphere3D_1_defaultMat_Roughness.png");
-			ao = pbr_obj[0]->loadTexture("models\\pbr\\Aluminium\\ao.png");
+			ChangePBRTexture(ALUMINIUM);
+		}
+		ImGui::End();
+	}
+	if (forth_imgui)
+	{
+		ImGui::Begin("Reload");
+		if (ImGui::Button("Reload"))
+		{
+			Reload(camera);
 		}
 		ImGui::End();
 	}
@@ -422,6 +463,14 @@ void Scene::ImGuiShutdown()
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
+}
+void Scene::Reload(Camera* camera)
+{
+	ShutDown();
+	if (curr_scene == 0)
+		Scene0Init(camera);
+	else if (curr_scene == 1)
+		Scene1Init(camera);
 }
 void Scene::ShutDown()
 {
@@ -439,6 +488,7 @@ void Scene::ShutDown()
 	}
 	if(!softbody_obj.empty())
 		softbody_obj.clear();
+	m_physics.clear_objects();
 	if(!light.empty())
 		light.clear();
 }
@@ -448,4 +498,141 @@ void Scene::ResizeFrameBuffer(GLFWwindow* window)
 	int scrWidth, scrHeight;
 	glfwGetFramebufferSize(window, &scrWidth, &scrHeight);
 	glViewport(0, 0, scrWidth, scrHeight);
+}
+void Scene::ChangePBRTexture(TextureType type)
+{
+	//m_textype = type;
+	if (type == PLASTIC)
+	{
+		for (unsigned i = 0; i < pbr_obj.size(); ++i)
+		{
+			pbr_obj[i]->albedo = pbr_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_BaseColor.png");
+			pbr_obj[i]->normal = pbr_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_Normal.png");
+			pbr_obj[i]->metallic = pbr_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_Metallic.png");
+			pbr_obj[i]->roughness = pbr_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_Roughness.png");
+			pbr_obj[i]->ao = pbr_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\ao.png");
+		}
+		for (unsigned i = 0; i < softbody_obj.size(); ++i)
+		{
+			softbody_obj[i]->albedo = softbody_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_BaseColor.png");
+			softbody_obj[i]->normal = softbody_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_Normal.png");
+			softbody_obj[i]->metallic = softbody_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_Metallic.png");
+			softbody_obj[i]->roughness = softbody_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_Roughness.png");
+			softbody_obj[i]->ao = softbody_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\ao.png");
+		}
+	}
+	else if (type == STEEL)
+	{
+		for (unsigned i = 0; i < pbr_obj.size(); ++i)
+		{
+			pbr_obj[i]->albedo = pbr_obj[i]->loadTexture("models\\pbr\\steel\\Sphere3D_1_defaultMat_BaseColor.png");
+			pbr_obj[i]->normal = pbr_obj[i]->loadTexture("models\\pbr\\steel\\Sphere3D_1_defaultMat_Normal.png");
+			pbr_obj[i]->metallic = pbr_obj[i]->loadTexture("models\\pbr\\steel\\Sphere3D_1_defaultMat_Metallic.png");
+			pbr_obj[i]->roughness = pbr_obj[i]->loadTexture("models\\pbr\\steel\\Sphere3D_1_defaultMat_Roughness.png");
+			pbr_obj[i]->ao = pbr_obj[i]->loadTexture("models\\pbr\\steel\\ao.png");
+		}
+		for (unsigned i = 0; i < softbody_obj.size(); ++i)
+		{
+			softbody_obj[i]->albedo = softbody_obj[i]->loadTexture("models\\pbr\\steel\\Sphere3D_1_defaultMat_BaseColor.png");
+			softbody_obj[i]->normal = softbody_obj[i]->loadTexture("models\\pbr\\steel\\Sphere3D_1_defaultMat_Normal.png");
+			softbody_obj[i]->metallic = softbody_obj[i]->loadTexture("models\\pbr\\steel\\Sphere3D_1_defaultMat_Metallic.png");
+			softbody_obj[i]->roughness = softbody_obj[i]->loadTexture("models\\pbr\\steel\\Sphere3D_1_defaultMat_Roughness.png");
+			softbody_obj[i]->ao = softbody_obj[i]->loadTexture("models\\pbr\\steel\\ao.png");
+		}
+	}
+	else if (type == WOOD)
+	{
+		for (unsigned i = 0; i < pbr_obj.size(); ++i)
+		{
+			pbr_obj[i]->albedo = pbr_obj[i]->loadTexture("models\\pbr\\Wood\\Sphere3D_1_defaultMat_BaseColor.png");
+			pbr_obj[i]->normal = pbr_obj[i]->loadTexture("models\\pbr\\Wood\\Sphere3D_1_defaultMat_Normal.png");
+			pbr_obj[i]->metallic = pbr_obj[i]->loadTexture("models\\pbr\\Wood\\Sphere3D_1_defaultMat_Metallic.png");
+			pbr_obj[i]->roughness = pbr_obj[i]->loadTexture("models\\pbr\\Wood\\Sphere3D_1_defaultMat_Roughness.png");
+			pbr_obj[i]->ao = pbr_obj[i]->loadTexture("models\\pbr\\Wood\\ao.png");
+		}
+		for (unsigned i = 0; i < softbody_obj.size(); ++i)
+		{
+			softbody_obj[i]->albedo = softbody_obj[i]->loadTexture("models\\pbr\\Wood\\Sphere3D_1_defaultMat_BaseColor.png");
+			softbody_obj[i]->normal = softbody_obj[i]->loadTexture("models\\pbr\\Wood\\Sphere3D_1_defaultMat_Normal.png");
+			softbody_obj[i]->metallic = softbody_obj[i]->loadTexture("models\\pbr\\Wood\\Sphere3D_1_defaultMat_Metallic.png");
+			softbody_obj[i]->roughness = softbody_obj[i]->loadTexture("models\\pbr\\Wood\\Sphere3D_1_defaultMat_Roughness.png");
+			softbody_obj[i]->ao = softbody_obj[i]->loadTexture("models\\pbr\\Wood\\ao.png");
+		}
+	}
+	else if (type == RUSTED_IRON)
+	{
+		for (unsigned i = 0; i < pbr_obj.size(); ++i)
+		{
+			pbr_obj[i]->albedo = pbr_obj[i]->loadTexture("models\\pbr\\rusted-iron\\Sphere3D_1_defaultMat_BaseColor.png");
+			pbr_obj[i]->normal = pbr_obj[i]->loadTexture("models\\pbr\\rusted-iron\\Sphere3D_1_defaultMat_Normal.png");
+			pbr_obj[i]->metallic = pbr_obj[i]->loadTexture("models\\pbr\\rusted-iron\\Sphere3D_1_defaultMat_Metallic.png");
+			pbr_obj[i]->roughness = pbr_obj[i]->loadTexture("models\\pbr\\rusted-iron\\Sphere3D_1_defaultMat_Roughness.png");
+			pbr_obj[i]->ao = pbr_obj[i]->loadTexture("models\\pbr\\rusted-iron\\ao.png");
+		}
+		for (unsigned i = 0; i < softbody_obj.size(); ++i)
+		{
+			softbody_obj[i]->albedo = softbody_obj[i]->loadTexture("models\\pbr\\rusted-iron\\Sphere3D_1_defaultMat_BaseColor.png");
+			softbody_obj[i]->normal = softbody_obj[i]->loadTexture("models\\pbr\\rusted-iron\\Sphere3D_1_defaultMat_Normal.png");
+			softbody_obj[i]->metallic = softbody_obj[i]->loadTexture("models\\pbr\\rusted-iron\\Sphere3D_1_defaultMat_Metallic.png");
+			softbody_obj[i]->roughness = softbody_obj[i]->loadTexture("models\\pbr\\rusted-iron\\Sphere3D_1_defaultMat_Roughness.png");
+			softbody_obj[i]->ao = softbody_obj[i]->loadTexture("models\\pbr\\rusted-iron\\ao.png");
+		}
+	}
+	else if (type == FABRIC)
+	{
+		for (unsigned i = 0; i < pbr_obj.size(); ++i)
+		{
+			pbr_obj[i]->albedo = pbr_obj[i]->loadTexture("models\\pbr\\Fabric\\Sphere3D_1_defaultMat_BaseColor.png");
+			pbr_obj[i]->normal = pbr_obj[i]->loadTexture("models\\pbr\\Fabric\\Sphere3D_1_defaultMat_Normal.png");
+			pbr_obj[i]->metallic = pbr_obj[i]->loadTexture("models\\pbr\\Fabric\\Sphere3D_1_defaultMat_Metallic.png");
+			pbr_obj[i]->roughness = pbr_obj[i]->loadTexture("models\\pbr\\Fabric\\Sphere3D_1_defaultMat_Roughness.png");
+			pbr_obj[i]->ao = pbr_obj[i]->loadTexture("models\\pbr\\Fabric\\ao.png");
+		}
+		for (unsigned i = 0; i < softbody_obj.size(); ++i)
+		{
+			softbody_obj[i]->albedo = softbody_obj[i]->loadTexture("models\\pbr\\Fabric\\Sphere3D_1_defaultMat_BaseColor.png");
+			softbody_obj[i]->normal = softbody_obj[i]->loadTexture("models\\pbr\\Fabric\\Sphere3D_1_defaultMat_Normal.png");
+			softbody_obj[i]->metallic = softbody_obj[i]->loadTexture("models\\pbr\\Fabric\\Sphere3D_1_defaultMat_Metallic.png");
+			softbody_obj[i]->roughness = softbody_obj[i]->loadTexture("models\\pbr\\Fabric\\Sphere3D_1_defaultMat_Roughness.png");
+			softbody_obj[i]->ao = softbody_obj[i]->loadTexture("models\\pbr\\Fabric\\ao.png");
+		}
+	}
+	else if (type == TORN_FABRIC)
+	{
+		for (unsigned i = 0; i < pbr_obj.size(); ++i)
+		{
+			pbr_obj[i]->albedo = pbr_obj[i]->loadTexture("models\\pbr\\TornFabric\\Sphere3D_1_defaultMat_BaseColor.png");
+			pbr_obj[i]->normal = pbr_obj[i]->loadTexture("models\\pbr\\TornFabric\\Sphere3D_1_defaultMat_Normal.png");
+			pbr_obj[i]->metallic = pbr_obj[i]->loadTexture("models\\pbr\\TornFabric\\Sphere3D_1_defaultMat_Metallic.png");
+			pbr_obj[i]->roughness = pbr_obj[i]->loadTexture("models\\pbr\\TornFabric\\Sphere3D_1_defaultMat_Roughness.png");
+			pbr_obj[i]->ao = pbr_obj[i]->loadTexture("models\\pbr\\TornFabric\\ao.png");
+		}
+		for (unsigned i = 0; i < softbody_obj.size(); ++i)
+		{
+			softbody_obj[i]->albedo = softbody_obj[i]->loadTexture("models\\pbr\\TornFabric\\Sphere3D_1_defaultMat_BaseColor.png");
+			softbody_obj[i]->normal = softbody_obj[i]->loadTexture("models\\pbr\\TornFabric\\Sphere3D_1_defaultMat_Normal.png");
+			softbody_obj[i]->metallic = softbody_obj[i]->loadTexture("models\\pbr\\TornFabric\\Sphere3D_1_defaultMat_Metallic.png");
+			softbody_obj[i]->roughness = softbody_obj[i]->loadTexture("models\\pbr\\TornFabric\\Sphere3D_1_defaultMat_Roughness.png");
+			softbody_obj[i]->ao = softbody_obj[i]->loadTexture("models\\pbr\\TornFabric\\ao.png");
+		}
+	}
+	else if (type == ALUMINIUM)
+	{
+		for (unsigned i = 0; i < pbr_obj.size(); ++i)
+		{
+			pbr_obj[i]->albedo = pbr_obj[i]->loadTexture("models\\pbr\\Aluminium\\Sphere3D_1_defaultMat_BaseColor.png");
+			pbr_obj[i]->normal = pbr_obj[i]->loadTexture("models\\pbr\\Aluminium\\Sphere3D_1_defaultMat_Normal.png");
+			pbr_obj[i]->metallic = pbr_obj[i]->loadTexture("models\\pbr\\Aluminium\\Sphere3D_1_defaultMat_Metallic.png");
+			pbr_obj[i]->roughness = pbr_obj[i]->loadTexture("models\\pbr\\Aluminium\\Sphere3D_1_defaultMat_Roughness.png");
+			pbr_obj[i]->ao = pbr_obj[i]->loadTexture("models\\pbr\\Aluminium\\ao.png");
+		}
+		for (unsigned i = 0; i < softbody_obj.size(); ++i)
+		{
+			softbody_obj[i]->albedo = softbody_obj[i]->loadTexture("models\\pbr\\Aluminium\\Sphere3D_1_defaultMat_BaseColor.png");
+			softbody_obj[i]->normal = softbody_obj[i]->loadTexture("models\\pbr\\Aluminium\\Sphere3D_1_defaultMat_Normal.png");
+			softbody_obj[i]->metallic = softbody_obj[i]->loadTexture("models\\pbr\\Aluminium\\Sphere3D_1_defaultMat_Metallic.png");
+			softbody_obj[i]->roughness = softbody_obj[i]->loadTexture("models\\pbr\\Aluminium\\Sphere3D_1_defaultMat_Roughness.png");
+			softbody_obj[i]->ao = softbody_obj[i]->loadTexture("models\\pbr\\Aluminium\\ao.png");
+		}
+	}
 }
