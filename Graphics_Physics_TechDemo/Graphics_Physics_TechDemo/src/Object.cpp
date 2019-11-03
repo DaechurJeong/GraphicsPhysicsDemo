@@ -76,8 +76,16 @@ void Object::Describe()
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
  	glBufferData(GL_ARRAY_BUFFER, obj_vertices.size() * sizeof(glm::vec3), &obj_vertices[0], GL_STATIC_DRAW);
 
-	glBindBuffer(GL_ARRAY_BUFFER, textureBuffer);
-	glBufferData(GL_ARRAY_BUFFER, textureUV.size() * sizeof(glm::vec2), &textureUV[0], GL_STATIC_DRAW);
+	if (m_shape != O_OBJ)
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, textureBuffer);
+		glBufferData(GL_ARRAY_BUFFER, textureUV.size() * sizeof(glm::vec2), &textureUV[0], GL_STATIC_DRAW);
+	}
+	else
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, textureBuffer);
+		glBufferData(GL_ARRAY_BUFFER, textureUV_fromIndices.size() * sizeof(glm::vec2), &textureUV_fromIndices[0], GL_STATIC_DRAW);
+	}
 
 	glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
 	glBufferData(GL_ARRAY_BUFFER, vertexNormals.size() * sizeof(glm::vec3), &vertexNormals[0], GL_STATIC_DRAW);
@@ -187,7 +195,11 @@ bool Object::loadOBJ(const char* path, glm::vec3& middlePoint)
 			yMin -= (2.f * middlePoint.y);
 			zMax -= (2.f * middlePoint.z);
 			zMin -= (2.f * middlePoint.z);
-			for (unsigned i = 0; i < obj_vertices.size(); ++i)
+			for (unsigned i = 0; i < test_indices.size(); i += 3)
+			{
+				textureUV_fromIndices.push_back(textureUV[test_indices[i]]);
+			}
+			/*for (unsigned i = 0; i < obj_vertices.size(); ++i)
 			{
 				obj_vertices[i].x /= (0.5f * abs_max);
 				obj_vertices[i].y /= (0.5f * abs_max);
@@ -200,7 +212,7 @@ bool Object::loadOBJ(const char* path, glm::vec3& middlePoint)
 				glm::vec2 textUV = glm::vec2(theta / TWOPI, (normalized.z + 1) * 0.5f);
 
 				textureUV.push_back(textUV);
-			}
+			}*/
 			break;
 		}
 		if (strcmp(lineHeader, "v") == 0)
@@ -230,16 +242,24 @@ bool Object::loadOBJ(const char* path, glm::vec3& middlePoint)
 		{
 			unsigned vertexIndex[4];
 			unsigned trash[4];
-			int matches = fscanf(file, "%d/%d %d/%d %d/%d %d/%d", &vertexIndex[0], &trash[0], &vertexIndex[1], &trash[1], &vertexIndex[2], &trash[2], &vertexIndex[3], &trash[3]);
+			int matches = fscanf(file, "%d/%d %d/%d %d/%d %d/%d\n", &vertexIndex[0], &trash[0], &vertexIndex[1], &trash[1], &vertexIndex[2], &trash[2], &vertexIndex[3], &trash[3]);
 			if (matches == 8)
 			{
 				obj_indices.push_back(vertexIndex[0] - 1);
-				obj_indices.push_back(vertexIndex[3] - 1);
-				obj_indices.push_back(vertexIndex[2] - 1);
-
-				obj_indices.push_back(vertexIndex[2] - 1);
 				obj_indices.push_back(vertexIndex[1] - 1);
-				obj_indices.push_back(vertexIndex[0] - 1);
+				obj_indices.push_back(vertexIndex[3] - 1);
+
+				obj_indices.push_back(vertexIndex[1] - 1);
+				obj_indices.push_back(vertexIndex[2] - 1);
+				obj_indices.push_back(vertexIndex[3] - 1);
+
+				test_indices.push_back(trash[0] - 1);
+				test_indices.push_back(trash[1] - 1);
+				test_indices.push_back(trash[3] - 1);
+
+				test_indices.push_back(trash[1] - 1);
+				test_indices.push_back(trash[2] - 1);
+				test_indices.push_back(trash[3] - 1);
 				/*obj_indices.push_back(vertexIndex[0] - 1);
 				obj_indices.push_back(vertexIndex[1] - 1);
 				obj_indices.push_back(vertexIndex[2] - 1);
@@ -258,9 +278,13 @@ bool Object::loadOBJ(const char* path, glm::vec3& middlePoint)
 			}
 			else if (matches == 6)
 			{
-				obj_indices.push_back(vertexIndex[2] - 1);
-				obj_indices.push_back(vertexIndex[1] - 1);
 				obj_indices.push_back(vertexIndex[0] - 1);
+				obj_indices.push_back(vertexIndex[1] - 1);
+				obj_indices.push_back(vertexIndex[2] - 1);
+
+				test_indices.push_back(trash[0] - 1);
+				test_indices.push_back(trash[1] - 1);
+				test_indices.push_back(trash[2] - 1);
 			}
 			else
 			{
@@ -296,6 +320,7 @@ void Object::makeSphere()
 {
 	obj_vertices.clear();
 	textureUV.clear();
+	textureUV_fromIndices.clear();
 	vertexNormals.clear();
 	obj_indices.clear();
 
@@ -348,6 +373,7 @@ void Object::makePlain()
 {
 	obj_vertices.clear();
 	textureUV.clear();
+	textureUV_fromIndices.clear();
 	vertexNormals.clear();
 	obj_indices.clear();
 

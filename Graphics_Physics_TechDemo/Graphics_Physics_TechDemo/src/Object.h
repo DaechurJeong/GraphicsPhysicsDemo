@@ -77,6 +77,9 @@ public:
 	float roughness, metallic;
 	ObjectShape m_shape;
 
+	std::vector<unsigned> test_indices;
+	std::vector<glm::vec2> textureUV_fromIndices;
+
 	//for collision
 	glm::vec3 normalVec;
 	float d;
