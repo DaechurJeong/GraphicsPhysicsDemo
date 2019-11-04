@@ -10,7 +10,7 @@ void SoftBodyPhysics::Init()
 	for (unsigned i = 0; i < ver; ++i)
 		m_scaled_ver[i] = position + m_scaled_ver[i]*scale;
 	m_old_ver = m_scaled_ver;
-	stiffness = 0.4f;
+	stiffness = 0.5f;
 	damping = 1.f;
 
 	isCollided = false;
@@ -143,9 +143,11 @@ void SoftBodyPhysics::Init()
 void SoftBodyPhysics::Update(float dt)
 {
 	Acceleration();
-	Verlet(dt);
+	
 	//Move(dt);
-	KeepConstraint();
+	if(!isCollided)
+		KeepConstraint();
+	Verlet(dt);
 
 	for (int i = 0; i < m_scaled_ver.size(); ++i)
 		obj_vertices[i] = (m_scaled_ver[i] - position) / scale;

@@ -31,6 +31,16 @@ typedef enum ObjShape {
 	O_OBJ,
 }ObjectShape;
 
+typedef enum TexType {
+	PLASTIC,
+	STEEL,
+	WOOD,
+	RUSTED_IRON,
+	FABRIC,
+	TORN_FABRIC,
+	ALUMINIUM,
+}TextureType;
+
 class Object 
 {
 private:
@@ -58,7 +68,11 @@ public:
 	bool loadPPM(const char* path, std::vector<glm::vec3>& values_);
 	void SendTextureInfo(Shader* shader, unsigned int& textureBuffer);
 	
-
+	unsigned int albedo = 0;
+	unsigned int normal = 0;
+	unsigned int metallic = 0;
+	unsigned int roughness = 0;
+	unsigned int ao = 0;
 	//physics
 	//SoftBodyPhysics& getSoftBody() { return sb; }
 
@@ -74,8 +88,8 @@ public:
 	unsigned m_textures[6];
 	float rotation;
 	int dimension;
-	float roughness, metallic;
 	ObjectShape m_shape;
+	TextureType m_textype;
 
 	std::vector<unsigned> test_indices;
 	std::vector<glm::vec2> textureUV_fromIndices;

@@ -19,8 +19,19 @@ public:
 	void push_object(SoftBodyPhysics* _obj) { softbody_objs.push_back(_obj); }
 
 	void delete_object(Object* obj);
+	bool empty() { return physics_objs.empty(); }
 	void clear_objects() {
+		//for (auto ph : physics_objs)
+		//{
+		//	delete ph;
+		//	ph = NULL;
+		//}
 		physics_objs.clear();
+		//for (auto sf : softbody_objs)
+		//{
+		//	delete sf;
+		//	sf = NULL;
+		//}
 		softbody_objs.clear();
 	};
 private:

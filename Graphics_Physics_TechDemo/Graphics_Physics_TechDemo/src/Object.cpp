@@ -13,7 +13,7 @@ End Header --------------------------------------------------------*/
 
 #define PI 3.141592654
 #define TWOPI 6.283185308
-#define S_DIMENSION 28
+#define S_DIMENSION 30
 #define P_DIMENSION 64
 #define STB_IMAGE_IMPLEMENTATION
 #define WIDTH 1280
@@ -32,7 +32,8 @@ End Header --------------------------------------------------------*/
 
 Object::Object(ObjectShape shape, glm::vec3 pos, glm::vec3 scale_, int dim)
 	: position(pos), scale(scale_), color(glm::vec3(1.0f, 1.0f, 1.0f)), rotation(0.f),
-      xMax(0), xMin(0), yMax(0), yMin(0), zMax(0), zMin(0), width(512), height(512), m_shape(shape), dimension(dim), roughness(0), metallic(0), d(0)
+      xMax(0), xMin(0), yMax(0), yMin(0), zMax(0), zMin(0), width(512), height(512), m_shape(shape), dimension(dim), d(0),
+	  m_textype(PLASTIC)
 {
 	if (m_shape == O_PLANE)
 		makePlain();
