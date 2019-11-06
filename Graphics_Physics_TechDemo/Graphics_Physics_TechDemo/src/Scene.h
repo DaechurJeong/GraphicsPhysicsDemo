@@ -19,17 +19,21 @@ class Scene {
 public:
 	Scene(int sceneNum) : curr_scene(sceneNum), width(1280), height(800), aspect(1280.f/800.f),
 		roughness_status(false), metallic_status(false), dimension_(64), met(0.f), rou(0.f),
-		second_imgui(true), third_imgui(true), forth_imgui(true), deltaTime(0.f), lastFrame(0.f) {};
+		second_imgui(true), third_imgui(true), forth_imgui(true), deltaTime(0.f), lastFrame(0.f),
+		textIndex(0) {};
 	~Scene() {};
 	void Init(GLFWwindow* window, Camera* camera);
 	void Update(GLFWwindow* window, Camera* camera, float dt);
 
 	void Scene0Init(Camera* camera);
 	void Scene1Init(Camera* camera);
+	void Scene2Init(Camera* camera);
 	void Scene0Draw(Camera* camera, float dt);
 	void Scene1Draw(Camera* camera, float dt);
+	void Scene2Draw(Camera* camera, float dt);
 	void ShutDown();
 
+	void InitAllPBRTexture();
 	void ChangePBRTexture(TextureType type);
 	void Reload(Camera* camera);
 
@@ -66,11 +70,11 @@ private:
 	unsigned int prefilterMap = 0;
 	unsigned int brdfLUTTexture = 0;
 
-	//unsigned int albedo = 0;
-	//unsigned int normal = 0;
-	//unsigned int metallic = 0;
-	//unsigned int roughness = 0;
-	//unsigned int ao = 0;
+	unsigned int albedo[7] = { 0 };
+	unsigned int normal[7] = { 0 };
+	unsigned int metallic[7] = { 0 };
+	unsigned int roughness[7] = { 0 };
+	unsigned int ao[7] = { 0 };
 
 	int dimension_;
 
@@ -86,6 +90,8 @@ private:
 
 	float deltaTime;
 	float lastFrame;
+
+	unsigned textIndex;
 };
 
 
