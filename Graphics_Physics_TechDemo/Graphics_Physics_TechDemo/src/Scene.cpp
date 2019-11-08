@@ -25,11 +25,11 @@ void Scene::Init(GLFWwindow* window, Camera* camera)
 	pbr_texture_shader.SetInt("prefilterMap", 1);
 	pbr_texture_shader.SetInt("brdfLUT", 2);
 
-	pbr_texture_shader.SetInt("albedoMap", 3);
+	/*pbr_texture_shader.SetInt("albedoMap", 3);
 	pbr_texture_shader.SetInt("normalMap", 4);
 	pbr_texture_shader.SetInt("metallicMap", 5);
 	pbr_texture_shader.SetInt("roughnessMap", 6);
-	pbr_texture_shader.SetInt("aoMap", 7);
+	pbr_texture_shader.SetInt("aoMap", 7);*/
 
 	backgroundShader.Use();
 	backgroundShader.SetInt("environmentMap", 0);
@@ -65,6 +65,12 @@ void Scene::Update(GLFWwindow* window, Camera* camera, float dt)
 }
 void Scene::Scene0Init(Camera* camera)
 {
+	// camera setting
+	camera->position = glm::vec3(10.f, -6.f, 15.0f);
+	camera->yaw = -115.f;
+	camera->pitch = 0.0f;
+	camera->zoom = 45.0f;
+
 	Object* rigid_plane = new Object(O_PLANE, glm::vec3(4.f, -4.f, 1.f), glm::vec3(7.f, 1.f, 0.5f), dimension_);
 	rigid_plane->rotation = 1.f;
 	m_physics.push_object(rigid_plane);
@@ -85,10 +91,6 @@ void Scene::Scene0Init(Camera* camera)
 	m_physics.push_object(rigid_plane_3);
 	pbr_obj.push_back(rigid_plane_3);
 
-	//SoftBodyPhysics* plane = new SoftBodyPhysics(O_PLANE, glm::vec3(0, 1.5f, 1.f), glm::vec3(4.f, 1.f, 7.f), dimension_);
-	//m_physics.push_object(plane);
-	//softbody_obj.push_back(plane);
-
 	SoftBodyPhysics* sb_sphere = new SoftBodyPhysics(O_SPHERE, glm::vec3(6.5f, 0.f, 2.f), glm::vec3(1.f, 1.f, 1.f), dimension_);
 	m_physics.push_object(sb_sphere);
 	softbody_obj.push_back(sb_sphere);
@@ -96,19 +98,22 @@ void Scene::Scene0Init(Camera* camera)
 	// load PBR material textures
 	for (unsigned i = 0; i < pbr_obj.size(); ++i)
 	{
-		pbr_obj[i]->albedo = pbr_obj[i]->loadTexture("models\\pbr\\Wood\\Sphere3D_1_defaultMat_BaseColor.png");
-		pbr_obj[i]->normal = pbr_obj[i]->loadTexture("models\\pbr\\Wood\\Sphere3D_1_defaultMat_Normal.png");
-		pbr_obj[i]->metallic = pbr_obj[i]->loadTexture("models\\pbr\\Wood\\Sphere3D_1_defaultMat_Metallic.png");
-		pbr_obj[i]->roughness = pbr_obj[i]->loadTexture("models\\pbr\\Wood\\Sphere3D_1_defaultMat_Roughness.png");
-		pbr_obj[i]->ao = pbr_obj[i]->loadTexture("models\\pbr\\Wood\\ao.png");
+		// Fabric
+		pbr_obj[i]->albedo = albedo[4];
+		pbr_obj[i]->normal = normal[4];
+		pbr_obj[i]->metallic = metallic[4];
+		pbr_obj[i]->roughness = roughness[4];
+		pbr_obj[i]->ao = ao[4];
 	}
 	for (unsigned i = 0; i < softbody_obj.size(); ++i)
 	{
-		softbody_obj[i]->albedo = softbody_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_BaseColor.png");
-		softbody_obj[i]->normal = softbody_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_Normal.png");
-		softbody_obj[i]->metallic = softbody_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_Metallic.png");
-		softbody_obj[i]->roughness = softbody_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_Roughness.png");
-		softbody_obj[i]->ao = softbody_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\ao.png");
+		// wood
+		softbody_obj[i]->albedo = albedo[2];
+		softbody_obj[i]->normal = normal[2];
+		softbody_obj[i]->metallic = metallic[2];
+		softbody_obj[i]->roughness = roughness[2];
+		softbody_obj[i]->ao = ao[2];
+		softbody_obj[i]->m_textype = STEEL;
 	}
 
 	// light properties
@@ -125,6 +130,12 @@ void Scene::Scene0Init(Camera* camera)
 }
 void Scene::Scene1Init(Camera* camera)
 {
+	// camera setting
+	camera->position = glm::vec3(10.f, -2.f, 7.0f);
+	camera->yaw = -160.f;
+	camera->pitch = 0.0f;
+	camera->zoom = 45.0f;
+
 	// Generate objects for scene0
 	Object* main_obj_texture = new Object(O_SPHERE, glm::vec3(0.9f, -2.5f, 2.f), glm::vec3(1.f, 1.f, 1.f), dimension_);
 	m_physics.push_object(main_obj_texture);
@@ -137,20 +148,24 @@ void Scene::Scene1Init(Camera* camera)
 	// load PBR material textures
 	for (unsigned i = 0; i < pbr_obj.size(); ++i)
 	{
-		pbr_obj[i]->albedo = pbr_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_BaseColor.png");
-		pbr_obj[i]->normal = pbr_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_Normal.png");
-		pbr_obj[i]->metallic = pbr_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_Metallic.png");
-		pbr_obj[i]->roughness = pbr_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_Roughness.png");
-		pbr_obj[i]->ao = pbr_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\ao.png");
+		// plastic
+		pbr_obj[i]->albedo = albedo[0];
+		pbr_obj[i]->normal = normal[0];
+		pbr_obj[i]->metallic = metallic[0];
+		pbr_obj[i]->roughness = roughness[0];
+		pbr_obj[i]->ao = ao[0];
 	}
 	for (unsigned i = 0; i < softbody_obj.size(); ++i)
 	{
-		softbody_obj[i]->albedo = softbody_obj[i]->loadTexture("models\\pbr\\Wood\\Sphere3D_1_defaultMat_BaseColor.png");
-		softbody_obj[i]->normal = softbody_obj[i]->loadTexture("models\\pbr\\Wood\\Sphere3D_1_defaultMat_Normal.png");
-		softbody_obj[i]->metallic = softbody_obj[i]->loadTexture("models\\pbr\\Wood\\Sphere3D_1_defaultMat_Metallic.png");
-		softbody_obj[i]->roughness = softbody_obj[i]->loadTexture("models\\pbr\\Wood\\Sphere3D_1_defaultMat_Roughness.png");
-		softbody_obj[i]->ao = softbody_obj[i]->loadTexture("models\\pbr\\Wood\\ao.png");
+		// wood
+		softbody_obj[i]->albedo = albedo[2];
+		softbody_obj[i]->normal = normal[2];
+		softbody_obj[i]->metallic = metallic[2];
+		softbody_obj[i]->roughness = roughness[2];
+		softbody_obj[i]->ao = ao[2];
+		softbody_obj[i]->m_textype = WOOD;
 	}
+
 	// light properties
 	for (int i = 0; i < 2; ++i)
 	{
@@ -163,24 +178,77 @@ void Scene::Scene1Init(Camera* camera)
 }
 void Scene::Scene2Init(Camera* camera)
 {
+	// camera setting
+	camera->position = glm::vec3(2.f, 3.f, 20.0f);
+	camera->yaw = -90.f;
+	camera->pitch = 0.0f;
+	camera->zoom = 45.0f;
+
+	Object* rigid_plane = new Object(O_PLANE, glm::vec3(4.f, 0.5f, -2.f), glm::vec3(10.f, 10.f, 4.f), dimension_);
+	rigid_plane->rotation = 0.5f;
+	m_physics.push_object(rigid_plane);
+	pbr_obj.push_back(rigid_plane);
+
+	Object* rigid_plane_2 = new Object(O_PLANE, glm::vec3(0.f, 5.f, -10.f), glm::vec3(4.f, 10.f, 10.f), dimension_);
+	rigid_plane_2->axis = glm::vec3(1.f, 0.f, 0.f);
+	rigid_plane_2->rotation = 0.5f;
+	//rigid_plane_2->rotation = -0.5f;
+	m_physics.push_object(rigid_plane_2);
+	pbr_obj.push_back(rigid_plane_2);
+
+	Object* rigid_plane_3 = new Object(O_PLANE, glm::vec3(-9.f, 5.f, -2.f), glm::vec3(10.f, 10.f, 4.f), dimension_);
+	//rigid_plane_3->rotation = -0.5f;
+	rigid_plane_3->axis = glm::vec3(0.f, 0.f, -1.f);
+	rigid_plane_3->rotation = 0.5f;
+	m_physics.push_object(rigid_plane_3);
+	pbr_obj.push_back(rigid_plane_3);
+
+	SoftBodyPhysics* sb_sphere = new SoftBodyPhysics(O_SPHERE, glm::vec3(10.f, 6.8f, 0.f), glm::vec3(1.f, 1.f, 1.f), dimension_);
+	m_physics.push_object(sb_sphere);
+	softbody_obj.push_back(sb_sphere);
+
+	SoftBodyPhysics* sb_sphere2 = new SoftBodyPhysics(O_SPHERE, glm::vec3(2.f, 7.f, -8.f), glm::vec3(1.f, 1.f, 1.f), dimension_);
+	m_physics.push_object(sb_sphere2);
+	softbody_obj.push_back(sb_sphere2);
+
+	SoftBodyPhysics* sb_sphere3 = new SoftBodyPhysics(O_SPHERE, glm::vec3(-8.f, 7.f, 0.f), glm::vec3(1.f, 1.f, 1.f), dimension_);
+	m_physics.push_object(sb_sphere3);
+	softbody_obj.push_back(sb_sphere3);
 
 	// load PBR material textures
 	for (unsigned i = 0; i < pbr_obj.size(); ++i)
 	{
-		pbr_obj[i]->albedo = pbr_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_BaseColor.png");
-		pbr_obj[i]->normal = pbr_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_Normal.png");
-		pbr_obj[i]->metallic = pbr_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_Metallic.png");
-		pbr_obj[i]->roughness = pbr_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_Roughness.png");
-		pbr_obj[i]->ao = pbr_obj[i]->loadTexture("models\\pbr\\selfmade_plastic\\ao.png");
+		// plastic
+		pbr_obj[i]->albedo = albedo[0];
+		pbr_obj[i]->normal = normal[0];
+		pbr_obj[i]->metallic = metallic[0];
+		pbr_obj[i]->roughness = roughness[0];
+		pbr_obj[i]->ao = ao[0];
 	}
-	for (unsigned i = 0; i < softbody_obj.size(); ++i)
-	{
-		softbody_obj[i]->albedo = softbody_obj[i]->loadTexture("models\\pbr\\Wood\\Sphere3D_1_defaultMat_BaseColor.png");
-		softbody_obj[i]->normal = softbody_obj[i]->loadTexture("models\\pbr\\Wood\\Sphere3D_1_defaultMat_Normal.png");
-		softbody_obj[i]->metallic = softbody_obj[i]->loadTexture("models\\pbr\\Wood\\Sphere3D_1_defaultMat_Metallic.png");
-		softbody_obj[i]->roughness = softbody_obj[i]->loadTexture("models\\pbr\\Wood\\Sphere3D_1_defaultMat_Roughness.png");
-		softbody_obj[i]->ao = softbody_obj[i]->loadTexture("models\\pbr\\Wood\\ao.png");
-	}
+	// steel
+	softbody_obj[0]->albedo = albedo[1];
+	softbody_obj[0]->normal = normal[1];
+	softbody_obj[0]->metallic = metallic[1];
+	softbody_obj[0]->roughness = roughness[1];
+	softbody_obj[0]->ao = ao[1];
+	softbody_obj[0]->m_textype = STEEL;
+
+	// torn_fabric
+	softbody_obj[1]->albedo = albedo[5];
+	softbody_obj[1]->normal = normal[5];
+	softbody_obj[1]->metallic = metallic[5];
+	softbody_obj[1]->roughness = roughness[5];
+	softbody_obj[1]->ao = ao[5];
+	softbody_obj[1]->m_textype = TORN_FABRIC;
+
+	// rusted_iron
+	softbody_obj[2]->albedo = albedo[3];
+	softbody_obj[2]->normal = normal[3];
+	softbody_obj[2]->metallic = metallic[3];
+	softbody_obj[2]->roughness = roughness[3];
+	softbody_obj[2]->ao = ao[3];
+	softbody_obj[2]->m_textype = RUSTED_IRON;
+	
 	// light properties
 	for (int i = 0; i < 2; ++i)
 	{
@@ -209,67 +277,8 @@ void Scene::Scene0Draw(Camera* camera, float dt)
 	camera->Update(&pbr_texture_shader);
 	pbr_texture_shader.SetVec3("camPos", camera->position);
 
-	// bind pre-computed IBL data
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, prefilterMap);
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, brdfLUTTexture);
-
-	for (unsigned i = 0; i < pbr_obj.size(); ++i)
-	{
-		glActiveTexture(GL_TEXTURE3);
-		glBindTexture(GL_TEXTURE_2D, pbr_obj[i]->albedo + 2);
-		glActiveTexture(GL_TEXTURE4);
-		glBindTexture(GL_TEXTURE_2D, pbr_obj[i]->normal + 2);
-		glActiveTexture(GL_TEXTURE5);
-		glBindTexture(GL_TEXTURE_2D, pbr_obj[i]->metallic + 2);
-		glActiveTexture(GL_TEXTURE6);
-		glBindTexture(GL_TEXTURE_2D, pbr_obj[i]->roughness + 2);
-		glActiveTexture(GL_TEXTURE7);
-		glBindTexture(GL_TEXTURE_2D, pbr_obj[i]->ao + 2);
-	}
-	for (unsigned i = 0; i < softbody_obj.size(); ++i)
-	{
-		glActiveTexture(GL_TEXTURE3);
-		glBindTexture(GL_TEXTURE_2D, softbody_obj[i]->albedo);
-		glActiveTexture(GL_TEXTURE4);
-		glBindTexture(GL_TEXTURE_2D, softbody_obj[i]->normal);
-		glActiveTexture(GL_TEXTURE5);
-		glBindTexture(GL_TEXTURE_2D, softbody_obj[i]->metallic);
-		glActiveTexture(GL_TEXTURE6);
-		glBindTexture(GL_TEXTURE_2D, softbody_obj[i]->roughness);
-		glActiveTexture(GL_TEXTURE7);
-		glBindTexture(GL_TEXTURE_2D, softbody_obj[i]->ao);
-	}
-
-	for (std::vector<Object*>::iterator p_obj = pbr_obj.begin(); p_obj != pbr_obj.end(); ++p_obj)
-	{
-		pbr_texture_shader.SetInt("albedoMap", (*p_obj)->albedo);
-		pbr_texture_shader.SetInt("normalMap", (*p_obj)->normal);
-		pbr_texture_shader.SetInt("metallicMap", (*p_obj)->metallic);
-		pbr_texture_shader.SetInt("roughnessMap", (*p_obj)->roughness);
-		pbr_texture_shader.SetInt("aoMap", (*p_obj)->ao);
-		(*p_obj)->render_textured(camera, &pbr_texture_shader, (*p_obj)->position, aspect);
-	}
-	for (std::vector<SoftBodyPhysics*>::iterator s_obj = softbody_obj.begin(); s_obj != softbody_obj.end(); ++s_obj)
-	{
-		pbr_texture_shader.SetInt("albedoMap", (*s_obj)->albedo);
-		pbr_texture_shader.SetInt("normalMap", (*s_obj)->normal);
-		pbr_texture_shader.SetInt("metallicMap", (*s_obj)->metallic);
-		pbr_texture_shader.SetInt("roughnessMap", (*s_obj)->roughness);
-		pbr_texture_shader.SetInt("aoMap", (*s_obj)->ao);
-		(*s_obj)->render_textured(camera, &pbr_texture_shader, (*s_obj)->position, aspect);
-	}
-	// lighting
-	for (unsigned int i = 0; i < sizeof(light) / sizeof(light[0]); ++i)
-	{
-		glm::vec3 newPos = light[i].position + glm::vec3(sin(dt * 5.0) * 5.0, 0.0, 0.0);
-		newPos = light[i].position;
-		pbr_texture_shader.SetVec3("lightPositions[" + std::to_string(i) + "]", newPos);
-		pbr_texture_shader.SetVec3("lightColors[" + std::to_string(i) + "]", light[i].color);
-	}
+	// Draw objs
+	DrawObjs(camera);
 
 	pbr_texture_shader.Use();
 	camera->Update(&pbr_texture_shader);
@@ -314,59 +323,9 @@ void Scene::Scene1Draw(Camera* camera, float dt)
 	camera->Update(&pbr_texture_shader);
 	pbr_texture_shader.SetVec3("camPos", camera->position);
 
-	// bind pre-computed IBL data
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, prefilterMap);
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, brdfLUTTexture);
+	// Draw objs
+	DrawObjs(camera);
 
-	for (unsigned i = 0; i < pbr_obj.size(); ++i)
-	{
-		glActiveTexture(GL_TEXTURE3);
-		glBindTexture(GL_TEXTURE_2D, pbr_obj[i]->albedo + 2);
-		glActiveTexture(GL_TEXTURE4);
-		glBindTexture(GL_TEXTURE_2D, pbr_obj[i]->normal + 2);
-		glActiveTexture(GL_TEXTURE5);
-		glBindTexture(GL_TEXTURE_2D, pbr_obj[i]->metallic + 2);
-		glActiveTexture(GL_TEXTURE6);
-		glBindTexture(GL_TEXTURE_2D, pbr_obj[i]->roughness + 2);
-		glActiveTexture(GL_TEXTURE7);
-		glBindTexture(GL_TEXTURE_2D, pbr_obj[i]->ao + 2);
-	}
-	for (unsigned i = 0; i < softbody_obj.size(); ++i)
-	{
-		glActiveTexture(GL_TEXTURE3);
-		glBindTexture(GL_TEXTURE_2D, softbody_obj[i]->albedo + 2);
-		glActiveTexture(GL_TEXTURE4);
-		glBindTexture(GL_TEXTURE_2D, softbody_obj[i]->normal + 2);
-		glActiveTexture(GL_TEXTURE5);
-		glBindTexture(GL_TEXTURE_2D, softbody_obj[i]->metallic + 2);
-		glActiveTexture(GL_TEXTURE6);
-		glBindTexture(GL_TEXTURE_2D, softbody_obj[i]->roughness + 2);
-		glActiveTexture(GL_TEXTURE7);
-		glBindTexture(GL_TEXTURE_2D, softbody_obj[i]->ao + 2);
-	}
-
-	for (std::vector<Object*>::iterator p_obj = pbr_obj.begin(); p_obj != pbr_obj.end(); ++p_obj)
-	{
-		pbr_texture_shader.SetInt("albedoMap", (*p_obj)->albedo);
-		pbr_texture_shader.SetInt("normalMap", (*p_obj)->normal);
-		pbr_texture_shader.SetInt("metallicMap", (*p_obj)->metallic);
-		pbr_texture_shader.SetInt("roughnessMap", (*p_obj)->roughness);
-		pbr_texture_shader.SetInt("aoMap", (*p_obj)->ao);
-		(*p_obj)->render_textured(camera, &pbr_texture_shader, (*p_obj)->position, aspect);
-	}
-	for (std::vector<SoftBodyPhysics*>::iterator s_obj = softbody_obj.begin(); s_obj != softbody_obj.end(); ++s_obj)
-	{
-		pbr_texture_shader.SetInt("albedoMap", (*s_obj)->albedo);
-		pbr_texture_shader.SetInt("normalMap", (*s_obj)->normal);
-		pbr_texture_shader.SetInt("metallicMap", (*s_obj)->metallic);
-		pbr_texture_shader.SetInt("roughnessMap", (*s_obj)->roughness);
-		pbr_texture_shader.SetInt("aoMap", (*s_obj)->ao);
-		(*s_obj)->render_textured(camera, &pbr_texture_shader, (*s_obj)->position, aspect);
-	}
 	// lighting
 	for (unsigned int i = 0; i < sizeof(light) / sizeof(light[0]); ++i)
 	{
@@ -420,63 +379,8 @@ void Scene::Scene2Draw(Camera* camera, float dt)
 	camera->Update(&pbr_texture_shader);
 	pbr_texture_shader.SetVec3("camPos", camera->position);
 
-	// bind pre-computed IBL data
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, prefilterMap);
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, brdfLUTTexture);
-
-	unsigned index = textIndex;
-	for (unsigned i = 0; i < pbr_obj.size(); ++i)
-	{
-		glActiveTexture(GL_TEXTURE3 + i * 5);
-		glBindTexture(GL_TEXTURE_2D, pbr_obj[i]->albedo);
-		glActiveTexture(GL_TEXTURE4 + i * 5);
-		glBindTexture(GL_TEXTURE_2D, pbr_obj[i]->normal);
-		glActiveTexture(GL_TEXTURE5 + i * 5);
-		glBindTexture(GL_TEXTURE_2D, pbr_obj[i]->metallic);
-		glActiveTexture(GL_TEXTURE6 + i * 5);
-		glBindTexture(GL_TEXTURE_2D, pbr_obj[i]->roughness);
-		glActiveTexture(GL_TEXTURE7 + i * 5);
-		glBindTexture(GL_TEXTURE_2D, pbr_obj[i]->ao);
-		index += 5;
-	}
-	for (unsigned i = 0; i < softbody_obj.size(); ++i)
-	{
-		glActiveTexture(GL_TEXTURE3 + i * 5 + index);
-		glBindTexture(GL_TEXTURE_2D, softbody_obj[i]->albedo);
-		glActiveTexture(GL_TEXTURE4 + i * 5 + index);
-		glBindTexture(GL_TEXTURE_2D, softbody_obj[i]->normal);
-		glActiveTexture(GL_TEXTURE5 + i * 5 + index);
-		glBindTexture(GL_TEXTURE_2D, softbody_obj[i]->metallic);
-		glActiveTexture(GL_TEXTURE6 + i * 5 + index);
-		glBindTexture(GL_TEXTURE_2D, softbody_obj[i]->roughness);
-		glActiveTexture(GL_TEXTURE7 + i * 5 + index);
-		glBindTexture(GL_TEXTURE_2D, softbody_obj[i]->ao);
-		index += 5;
-	}
-	textIndex = index;
-
-	for (std::vector<Object*>::iterator p_obj = pbr_obj.begin(); p_obj != pbr_obj.end(); ++p_obj)
-	{
-		pbr_texture_shader.SetInt("albedoMap", (*p_obj)->albedo);
-		pbr_texture_shader.SetInt("normalMap", (*p_obj)->normal);
-		pbr_texture_shader.SetInt("metallicMap", (*p_obj)->metallic);
-		pbr_texture_shader.SetInt("roughnessMap", (*p_obj)->roughness);
-		pbr_texture_shader.SetInt("aoMap", (*p_obj)->ao);
-		(*p_obj)->render_textured(camera, &pbr_texture_shader, (*p_obj)->position, aspect);
-	}
-	for (std::vector<SoftBodyPhysics*>::iterator s_obj = softbody_obj.begin(); s_obj != softbody_obj.end(); ++s_obj)
-	{
-		pbr_texture_shader.SetInt("albedoMap", (*s_obj)->albedo);
-		pbr_texture_shader.SetInt("normalMap", (*s_obj)->normal);
-		pbr_texture_shader.SetInt("metallicMap", (*s_obj)->metallic);
-		pbr_texture_shader.SetInt("roughnessMap", (*s_obj)->roughness);
-		pbr_texture_shader.SetInt("aoMap", (*s_obj)->ao);
-		(*s_obj)->render_textured(camera, &pbr_texture_shader, (*s_obj)->position, aspect);
-	}
+	// Draw objs
+	DrawObjs(camera);
 
 	// lighting
 	for (unsigned int i = 0; i < sizeof(light) / sizeof(light[0]); ++i)
@@ -512,6 +416,62 @@ void Scene::Scene2Draw(Camera* camera, float dt)
 	// render skybox (render as last to prevent overdraw)
 	renderSkybox(&backgroundShader, camera, envCubemap, irradianceMap);
 }
+void Scene::DrawObjs(Camera* camera)
+{
+	// bind pre-computed IBL data
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, prefilterMap);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, brdfLUTTexture);
+
+	for (auto obj : pbr_obj)
+	{
+		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_2D, (*obj).albedo);
+		glActiveTexture(GL_TEXTURE4);
+		glBindTexture(GL_TEXTURE_2D, (*obj).normal);
+		glActiveTexture(GL_TEXTURE5);
+		glBindTexture(GL_TEXTURE_2D, (*obj).metallic);
+		glActiveTexture(GL_TEXTURE6);
+		glBindTexture(GL_TEXTURE_2D, (*obj).roughness);
+		glActiveTexture(GL_TEXTURE7);
+		glBindTexture(GL_TEXTURE_2D, (*obj). ao);
+	}
+	for (std::vector<Object*>::iterator p_obj = pbr_obj.begin(); p_obj != pbr_obj.end(); ++p_obj)
+	{
+		pbr_texture_shader.SetInt("albedoMap", (*p_obj)->albedo + 2);
+		pbr_texture_shader.SetInt("normalMap", (*p_obj)->normal + 2);
+		pbr_texture_shader.SetInt("metallicMap", (*p_obj)->metallic + 2);
+		pbr_texture_shader.SetInt("roughnessMap", (*p_obj)->roughness + 2);
+		pbr_texture_shader.SetInt("aoMap", (*p_obj)->ao + 2);
+		(*p_obj)->render_textured(camera, &pbr_texture_shader, (*p_obj)->position, aspect);
+	}
+	for(unsigned i = 0; i < softbody_obj.size(); ++i)
+	{
+		int buff_offset = ChangePBRTexture(softbody_obj[i]->m_textype, i);
+		glActiveTexture(GL_TEXTURE3 + buff_offset);
+		glBindTexture(GL_TEXTURE_2D, softbody_obj[i]->albedo);
+		glActiveTexture(GL_TEXTURE4 + buff_offset);
+		glBindTexture(GL_TEXTURE_2D, softbody_obj[i]->normal);
+		glActiveTexture(GL_TEXTURE5 + buff_offset);
+		glBindTexture(GL_TEXTURE_2D, softbody_obj[i]->metallic);
+		glActiveTexture(GL_TEXTURE6 + buff_offset);
+		glBindTexture(GL_TEXTURE_2D, softbody_obj[i]->roughness);
+		glActiveTexture(GL_TEXTURE7 + buff_offset);
+		glBindTexture(GL_TEXTURE_2D, softbody_obj[i]->ao);
+	}
+	for (std::vector<SoftBodyPhysics*>::iterator s_obj = softbody_obj.begin(); s_obj != softbody_obj.end(); ++s_obj)
+	{
+		pbr_texture_shader.SetInt("albedoMap", (*s_obj)->albedo + 2);
+		pbr_texture_shader.SetInt("normalMap", (*s_obj)->normal + 2);
+		pbr_texture_shader.SetInt("metallicMap", (*s_obj)->metallic + 2);
+		pbr_texture_shader.SetInt("roughnessMap", (*s_obj)->roughness + 2);
+		pbr_texture_shader.SetInt("aoMap", (*s_obj)->ao + 2);
+		(*s_obj)->render_textured(camera, &pbr_texture_shader, (*s_obj)->position, aspect);
+	}
+}
 void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 {
 	ImGui_ImplOpenGL3_NewFrame();
@@ -542,6 +502,10 @@ void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 	if (second_imgui)
 	{
 		ImGui::Begin("Scene selector");
+		if (ImGui::Button("Reload"))
+		{
+			Reload(camera);
+		}
 		if (ImGui::Button("Scene0"))
 		{
 			if (curr_scene != 0)
@@ -562,47 +526,49 @@ void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 				Init(window, camera);
 			}
 		}
+		if (ImGui::Button("Scene2"))
+		{
+			if (curr_scene != 2)
+			{
+				ShutDown();
+				m_physics.clear_objects();
+				curr_scene = 2;
+				Init(window, camera);
+			}
+		}
 		ImGui::End();
 	}
 	if (third_imgui)
 	{
 		ImGui::Begin("Select PBR texture");
+		unsigned sz = softbody_obj.size() + 1;
 		if (ImGui::Button("Plastic"))
 		{
-			ChangePBRTexture(PLASTIC);
+			ChangePBRTexture(PLASTIC, sz);
 		}
 		if (ImGui::Button("Steel"))
 		{
-			ChangePBRTexture(STEEL);
+			ChangePBRTexture(STEEL, sz);
 		}
 		if (ImGui::Button("Wood"))
 		{
-			ChangePBRTexture(WOOD);
+			ChangePBRTexture(WOOD, sz);
 		}
 		if (ImGui::Button("Rusted-Iron"))
 		{
-			ChangePBRTexture(RUSTED_IRON);
+			ChangePBRTexture(RUSTED_IRON, sz);
 		}
 		if (ImGui::Button("Fabric"))
 		{
-			ChangePBRTexture(FABRIC);
+			ChangePBRTexture(FABRIC, sz);
 		}
 		if (ImGui::Button("TornFabric"))
 		{
-			ChangePBRTexture(TORN_FABRIC);
+			ChangePBRTexture(TORN_FABRIC, sz);
 		}
 		if (ImGui::Button("Aluminium"))
 		{
-			ChangePBRTexture(ALUMINIUM);
-		}
-		ImGui::End();
-	}
-	if (forth_imgui)
-	{
-		ImGui::Begin("Reload");
-		if (ImGui::Button("Reload"))
-		{
-			Reload(camera);
+			ChangePBRTexture(ALUMINIUM, sz);
 		}
 		ImGui::End();
 	}
@@ -625,6 +591,8 @@ void Scene::Reload(Camera* camera)
 		Scene0Init(camera);
 	else if (curr_scene == 1)
 		Scene1Init(camera);
+	else if (curr_scene == 2)
+		Scene2Init(camera);
 }
 void Scene::ShutDown()
 {
@@ -707,140 +675,156 @@ void Scene::InitAllPBRTexture()
 	ao[6] = rigid_plane->loadTexture("models\\pbr\\Aluminium\\ao.png");
 }
 
-void Scene::ChangePBRTexture(TextureType type)
+int Scene::ChangePBRTexture(TextureType type, unsigned index)
 {
-	//m_textype = type;
-	if (type == PLASTIC)
+	int to_return = 0;
+	if (index > softbody_obj.size())
 	{
-		for (unsigned i = 0; i < pbr_obj.size(); ++i)
+		// change all text
+		for (auto obj : softbody_obj)
 		{
-			pbr_obj[i]->albedo = albedo[0];
-			pbr_obj[i]->normal = normal[0];
-			pbr_obj[i]->metallic = metallic[0];
-			pbr_obj[i]->roughness = roughness[0];
-			pbr_obj[i]->ao = ao[0];
-		}
-		for (unsigned i = 0; i < softbody_obj.size(); ++i)
-		{
-			softbody_obj[i]->albedo = albedo[0];
-			softbody_obj[i]->normal = normal[0];
-			softbody_obj[i]->metallic = metallic[0];
-			softbody_obj[i]->roughness = roughness[0];
-			softbody_obj[i]->ao = ao[0];
+			if (type == PLASTIC)
+			{
+				(*obj).albedo = albedo[0];
+				(*obj).normal = normal[0];
+				(*obj).metallic = metallic[0];
+				(*obj).roughness = roughness[0];
+				(*obj).ao = ao[0];
+				(*obj).m_textype = PLASTIC;
+			}
+			else if (type == STEEL)
+			{
+				(*obj).albedo = albedo[1];
+				(*obj).normal = normal[1];
+				(*obj).metallic = metallic[1];
+				(*obj).roughness = roughness[1];
+				(*obj).ao = ao[1];
+				(*obj).m_textype = STEEL;
+				to_return = 5;
+			}
+			else if (type == WOOD)
+			{
+				(*obj).albedo = albedo[2];
+				(*obj).normal = normal[2];
+				(*obj).metallic = metallic[2];
+				(*obj).roughness = roughness[2];
+				(*obj).ao = ao[2];
+				(*obj).m_textype = WOOD;
+				to_return = 10;
+			}
+			else if (type == RUSTED_IRON)
+			{
+				(*obj).albedo = albedo[3];
+				(*obj).normal = normal[3];
+				(*obj).metallic = metallic[3];
+				(*obj).roughness = roughness[3];
+				(*obj).ao = ao[3];
+				(*obj).m_textype = RUSTED_IRON;
+				to_return = 15;
+			}
+			else if (type == FABRIC)
+			{
+				(*obj).albedo = albedo[4];
+				(*obj).normal = normal[4];
+				(*obj).metallic = metallic[4];
+				(*obj).roughness = roughness[4];
+				(*obj).ao = ao[4];
+				(*obj).m_textype = FABRIC;
+				to_return = 20;
+			}
+			else if (type == TORN_FABRIC)
+			{
+				(*obj).albedo = albedo[5];
+				(*obj).normal = normal[5];
+				(*obj).metallic = metallic[5];
+				(*obj).roughness = roughness[5];
+				(*obj).ao = ao[5];
+				(*obj).m_textype = TORN_FABRIC;
+				to_return = 25;
+			}
+			else if (type == ALUMINIUM)
+			{
+				(*obj).albedo = albedo[6];
+				(*obj).normal = normal[6];
+				(*obj).metallic = metallic[6];
+				(*obj).roughness = roughness[6];
+				(*obj).ao = ao[6];
+				(*obj).m_textype = ALUMINIUM;
+				to_return = 30;
+			}
 		}
 	}
-	if (type == STEEL)
+	else
 	{
-		for (unsigned i = 0; i < pbr_obj.size(); ++i)
+		if (type == PLASTIC)
 		{
-			pbr_obj[i]->albedo = albedo[1];
-			pbr_obj[i]->normal = normal[1];
-			pbr_obj[i]->metallic = metallic[1];
-			pbr_obj[i]->roughness = roughness[1];
-			pbr_obj[i]->ao = ao[1];
+			softbody_obj[index]->albedo = albedo[0];
+			softbody_obj[index]->normal = normal[0];
+			softbody_obj[index]->metallic = metallic[0];
+			softbody_obj[index]->roughness = roughness[0];
+			softbody_obj[index]->ao = ao[0];
+			softbody_obj[index]->m_textype = PLASTIC;
 		}
-		for (unsigned i = 0; i < softbody_obj.size(); ++i)
+		else if (type == STEEL)
 		{
-			softbody_obj[i]->albedo = albedo[1];
-			softbody_obj[i]->normal = normal[1];
-			softbody_obj[i]->metallic = metallic[1];
-			softbody_obj[i]->roughness = roughness[1];
-			softbody_obj[i]->ao = ao[1];
+			softbody_obj[index]->albedo = albedo[1];
+			softbody_obj[index]->normal = normal[1];
+			softbody_obj[index]->metallic = metallic[1];
+			softbody_obj[index]->roughness = roughness[1];
+			softbody_obj[index]->ao = ao[1];
+			softbody_obj[index]->m_textype = STEEL;
+			to_return = 5;
+		}
+		else if (type == WOOD)
+		{
+			softbody_obj[index]->albedo = albedo[2];
+			softbody_obj[index]->normal = normal[2];
+			softbody_obj[index]->metallic = metallic[2];
+			softbody_obj[index]->roughness = roughness[2];
+			softbody_obj[index]->ao = ao[2];
+			softbody_obj[index]->m_textype = WOOD;
+			to_return = 10;
+		}
+		else if (type == RUSTED_IRON)
+		{
+			softbody_obj[index]->albedo = albedo[3];
+			softbody_obj[index]->normal = normal[3];
+			softbody_obj[index]->metallic = metallic[3];
+			softbody_obj[index]->roughness = roughness[3];
+			softbody_obj[index]->ao = ao[3];
+			softbody_obj[index]->m_textype = RUSTED_IRON;
+			to_return = 15;
+		}
+		else if (type == FABRIC)
+		{
+			softbody_obj[index]->albedo = albedo[4];
+			softbody_obj[index]->normal = normal[4];
+			softbody_obj[index]->metallic = metallic[4];
+			softbody_obj[index]->roughness = roughness[4];
+			softbody_obj[index]->ao = ao[4];
+			softbody_obj[index]->m_textype = FABRIC;
+			to_return = 20;
+		}
+		else if (type == TORN_FABRIC)
+		{
+			softbody_obj[index]->albedo = albedo[5];
+			softbody_obj[index]->normal = normal[5];
+			softbody_obj[index]->metallic = metallic[5];
+			softbody_obj[index]->roughness = roughness[5];
+			softbody_obj[index]->ao = ao[5];
+			softbody_obj[index]->m_textype = TORN_FABRIC;
+			to_return = 25;
+		}
+		else if (type == ALUMINIUM)
+		{
+			softbody_obj[index]->albedo = albedo[6];
+			softbody_obj[index]->normal = normal[6];
+			softbody_obj[index]->metallic = metallic[6];
+			softbody_obj[index]->roughness = roughness[6];
+			softbody_obj[index]->ao = ao[6];
+			softbody_obj[index]->m_textype = ALUMINIUM;
+			to_return = 30;
 		}
 	}
-	if (type == WOOD)
-	{
-		for (unsigned i = 0; i < pbr_obj.size(); ++i)
-		{
-			pbr_obj[i]->albedo = albedo[2];
-			pbr_obj[i]->normal = normal[2];
-			pbr_obj[i]->metallic = metallic[2];
-			pbr_obj[i]->roughness = roughness[2];
-			pbr_obj[i]->ao = ao[2];
-		}
-		for (unsigned i = 0; i < softbody_obj.size(); ++i)
-		{
-			softbody_obj[i]->albedo = albedo[2];
-			softbody_obj[i]->normal = normal[2];
-			softbody_obj[i]->metallic = metallic[2];
-			softbody_obj[i]->roughness = roughness[2];
-			softbody_obj[i]->ao = ao[2];
-		}
-	}
-	if (type == RUSTED_IRON)
-	{
-		for (unsigned i = 0; i < pbr_obj.size(); ++i)
-		{
-			pbr_obj[i]->albedo = albedo[3];
-			pbr_obj[i]->normal = normal[3];
-			pbr_obj[i]->metallic = metallic[3];
-			pbr_obj[i]->roughness = roughness[3];
-			pbr_obj[i]->ao = ao[3];
-		}
-		for (unsigned i = 0; i < softbody_obj.size(); ++i)
-		{
-			softbody_obj[i]->albedo = albedo[3];
-			softbody_obj[i]->normal = normal[3];
-			softbody_obj[i]->metallic = metallic[3];
-			softbody_obj[i]->roughness = roughness[3];
-			softbody_obj[i]->ao = ao[3];
-		}
-	}
-	else if (type == FABRIC)
-	{
-		for (unsigned i = 0; i < pbr_obj.size(); ++i)
-		{
-			pbr_obj[i]->albedo = albedo[4];
-			pbr_obj[i]->normal = normal[4];
-			pbr_obj[i]->metallic = metallic[4];
-			pbr_obj[i]->roughness = roughness[4];
-			pbr_obj[i]->ao = ao[4];
-		}
-		for (unsigned i = 0; i < softbody_obj.size(); ++i)
-		{
-			softbody_obj[i]->albedo = albedo[4];
-			softbody_obj[i]->normal = normal[4];
-			softbody_obj[i]->metallic = metallic[4];
-			softbody_obj[i]->roughness = roughness[4];
-			softbody_obj[i]->ao = ao[4];
-		}
-	}
-	else if (type == TORN_FABRIC)
-	{
-		for (unsigned i = 0; i < pbr_obj.size(); ++i)
-		{
-			pbr_obj[i]->albedo = albedo[5];
-			pbr_obj[i]->normal = normal[5];
-			pbr_obj[i]->metallic = metallic[5];
-			pbr_obj[i]->roughness = roughness[5];
-			pbr_obj[i]->ao = ao[5];
-		}
-		for (unsigned i = 0; i < softbody_obj.size(); ++i)
-		{
-			softbody_obj[i]->albedo = albedo[5];
-			softbody_obj[i]->normal = normal[5];
-			softbody_obj[i]->metallic = metallic[5];
-			softbody_obj[i]->roughness = roughness[5];
-			softbody_obj[i]->ao = ao[5];
-		}
-	}
-	else if (type == ALUMINIUM)
-	{
-		for (unsigned i = 0; i < pbr_obj.size(); ++i)
-		{
-			pbr_obj[i]->albedo = albedo[6];
-			pbr_obj[i]->normal = normal[6];
-			pbr_obj[i]->metallic = metallic[6];
-			pbr_obj[i]->roughness = roughness[6];
-			pbr_obj[i]->ao = ao[6];
-		}
-		for (unsigned i = 0; i < softbody_obj.size(); ++i)
-		{
-			softbody_obj[i]->albedo = albedo[6];
-			softbody_obj[i]->normal = normal[6];
-			softbody_obj[i]->metallic = metallic[6];
-			softbody_obj[i]->roughness = roughness[6];
-			softbody_obj[i]->ao = ao[6];
-		}
-	}
+	return to_return;
 }

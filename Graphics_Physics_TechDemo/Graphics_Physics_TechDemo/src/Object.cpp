@@ -33,7 +33,7 @@ End Header --------------------------------------------------------*/
 Object::Object(ObjectShape shape, glm::vec3 pos, glm::vec3 scale_, int dim)
 	: position(pos), scale(scale_), color(glm::vec3(1.0f, 1.0f, 1.0f)), rotation(0.f),
       xMax(0), xMin(0), yMax(0), yMin(0), zMax(0), zMin(0), width(512), height(512), m_shape(shape), dimension(dim), d(0),
-	  m_textype(PLASTIC)
+	  m_textype(PLASTIC), axis(glm::vec3(0.f,0.f,1.f))
 {
 	if (m_shape == O_PLANE)
 		makePlain();
@@ -432,7 +432,8 @@ void Object::render_textured(Camera* camera, Shader* shader, glm::vec3 pos, floa
 	glm::mat4 identity_scale(1.0);
 	glm::mat4 identity_rotation(1.0);
 
-	m_model = glm::translate(identity_translate, pos) * glm::scale(identity_scale, scale) * glm::rotate(identity_rotation, rotation, glm::vec3(0.f,0.f,1.f));
+	// glm::vec3(0.f,0.f,1.f)
+	m_model = glm::translate(identity_translate, pos) * glm::scale(identity_scale, scale) * glm::rotate(identity_rotation, rotation, axis);
 	glm::mat4 projection = glm::perspective(glm::radians(camera->zoom), aspect, 0.1f, 100.0f); // zoom = fov;
 	glm::mat4 view = camera->GetViewMatrix();
 
@@ -441,7 +442,7 @@ void Object::render_textured(Camera* camera, Shader* shader, glm::vec3 pos, floa
 	shader->SetMat4("view", view);
 
 	glBindVertexArray(m_vao);
-	glDrawElements(GL_TRIANGLES, m_elementSize, GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLE_STRIP, m_elementSize, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }
 void Object::render_line(Camera* camera, Shader* shader, glm::vec3 pos, float aspect)
@@ -480,7 +481,7 @@ unsigned int Object::loadTexture(const char* path)
 			format = GL_RGB;
 		else if (nrChannels == 4)
 			format = GL_RGBA;
-		glActiveTexture(GL_TEXTURE1 + textureID - 1);
+		glActiveTexture(GL_TEXTURE3 + textureID - 1);
 		glBindTexture(GL_TEXTURE_2D, textureID);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);

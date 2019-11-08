@@ -19,7 +19,7 @@ class Scene {
 public:
 	Scene(int sceneNum) : curr_scene(sceneNum), width(1280), height(800), aspect(1280.f/800.f),
 		roughness_status(false), metallic_status(false), dimension_(64), met(0.f), rou(0.f),
-		second_imgui(true), third_imgui(true), forth_imgui(true), deltaTime(0.f), lastFrame(0.f),
+		second_imgui(true), third_imgui(true), deltaTime(0.f), lastFrame(0.f),
 		textIndex(0) {};
 	~Scene() {};
 	void Init(GLFWwindow* window, Camera* camera);
@@ -33,8 +33,9 @@ public:
 	void Scene2Draw(Camera* camera, float dt);
 	void ShutDown();
 
+	void DrawObjs(Camera* camera);
 	void InitAllPBRTexture();
-	void ChangePBRTexture(TextureType type);
+	int ChangePBRTexture(TextureType type, unsigned index);
 	void Reload(Camera* camera);
 
 	void ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt);
@@ -86,7 +87,6 @@ private:
 
 	bool second_imgui;
 	bool third_imgui;
-	bool forth_imgui;
 
 	float deltaTime;
 	float lastFrame;

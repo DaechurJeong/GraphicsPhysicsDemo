@@ -90,6 +90,7 @@ public:
 	int dimension;
 	ObjectShape m_shape;
 	TextureType m_textype;
+	glm::vec3 axis;
 
 	std::vector<unsigned> test_indices;
 	std::vector<glm::vec2> textureUV_fromIndices;

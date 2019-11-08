@@ -7,7 +7,7 @@
 #include "Vector3.h"
 //#include <vector>
 
-#define GRAVITY -4.0f
+#define GRAVITY -6.0f
 
 struct constraints {
 	constraints() { p1 = 0; p2 = 0; restlen = 0; }
