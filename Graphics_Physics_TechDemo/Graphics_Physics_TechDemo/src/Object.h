@@ -91,6 +91,8 @@ public:
 	TextureType m_textype;
 	glm::vec3 axis;
 
+	bool phy = false;
+
 	std::vector<unsigned> test_indices;
 	std::vector<glm::vec2> textureUV_fromIndices;
 

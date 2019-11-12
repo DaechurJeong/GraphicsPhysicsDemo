@@ -15,15 +15,20 @@ void SoftBodyPhysics::Init()
 
 	isCollided = false;
 
-
 	if(m_shape == ObjShape::O_PLANE)
 	{ 
 		m_mass = 0.3f;
 		m_acceleration = std::vector<glm::vec3>(ver, glm::vec3(0, m_gravity * m_mass, 0));
 		m_velocity = std::vector<glm::vec3>(ver, glm::vec3(0));
 
+		//m_edge.push_back(std::make_pair(0, m_scaled_ver[0]));
+		//m_edge.push_back(std::make_pair(dimension, m_scaled_ver[dimension]));
+		//m_edge.push_back(std::make_pair(ver-dimension, m_scaled_ver[ver - dimension]));
+		//m_edge.push_back(std::make_pair(ver-1, m_scaled_ver[ver - 1]));
+
+
 		for(int i = 0; i <= dimension; ++i)
-			m_edge.push_back(m_scaled_ver[i]);
+			m_edge.push_back(std::make_pair(i, m_scaled_ver[i]));
 
 		//set constraints
 		//horizontal
@@ -184,8 +189,12 @@ void SoftBodyPhysics::KeepConstraint()
 	for (int i = 0; i < 14; ++i)
 	{
 		//staying edge
+		//for (unsigned j = 0; j < m_edge.size(); ++j)
+		//	m_scaled_ver[j] = m_edge[j];
+
 		for (unsigned j = 0; j < m_edge.size(); ++j)
-			m_scaled_ver[j] = m_edge[j];
+			m_scaled_ver[m_edge[j].first] = m_edge[j].second;
+
 
 
 		for (unsigned j = 0; j < m_cons.size(); ++j)

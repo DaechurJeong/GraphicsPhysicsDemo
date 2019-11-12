@@ -12,6 +12,8 @@ void Scene::Init(GLFWwindow* window, Camera* camera)
 		Scene1Init(camera);
 	else if (curr_scene == 2)
 		Scene2Init(camera);
+	else if (curr_scene == 3)
+		Scene3Init(camera);
 
 	pbr_texture_shader.CreateShader("ShaderCodes\\pbr_texture.vs", "ShaderCodes\\pbr_texture.fs", nullptr);
 	equirectangularToCubmapShader.CreateShader("ShaderCodes\\cubemap.vs", "ShaderCodes\\equirectangular_to_cubemap.fs", nullptr);
@@ -60,6 +62,8 @@ void Scene::Update(GLFWwindow* window, Camera* camera, float dt)
 		Scene1Draw(camera, deltaTime);
 	else if (curr_scene == 2)
 		Scene2Draw(camera, deltaTime);
+	else if (curr_scene == 3)
+		Scene3Draw(camera, deltaTime);
 
 	ImGuirender();
 }
@@ -137,15 +141,15 @@ void Scene::Scene1Init(Camera* camera)
 	camera->zoom = 45.0f;
 
 	// Generate objects for scene0
-	Object* main_obj_texture = new Object(O_SPHERE, glm::vec3(0.9f, -2.5f, 4.0f), glm::vec3(1.f, 1.f, 1.f), dimension_);
+	Object* main_obj_texture = new Object(O_SPHERE, glm::vec3(1.2f,  -2.5f, 4.0f), glm::vec3(1.f, 1.f, 1.f), dimension_);
 	m_physics.push_object(main_obj_texture);
 	pbr_obj.push_back(main_obj_texture);
 
-	Object* main_obj_texture2 = new Object(O_SPHERE, glm::vec3(0.9f, -0.5f, 2.0f), glm::vec3(1.f, 1.f, 1.f), dimension_);
+	Object* main_obj_texture2 = new Object(O_SPHERE, glm::vec3(1.2f, -0.5f, 2.0f), glm::vec3(1.f, 1.f, 1.f), dimension_);
 	m_physics.push_object(main_obj_texture2);
 	pbr_obj.push_back(main_obj_texture2);
 
-	Object* main_obj_texture3 = new Object(O_SPHERE, glm::vec3(0.9f, -4.5f, 6.0f), glm::vec3(1.f, 1.f, 1.f), dimension_);
+	Object* main_obj_texture3 = new Object(O_SPHERE, glm::vec3(1.2f, -4.5f, 6.0f), glm::vec3(1.f, 1.f, 1.f), dimension_);
 	m_physics.push_object(main_obj_texture3);
 	pbr_obj.push_back(main_obj_texture3);
 
@@ -242,7 +246,7 @@ void Scene::Scene2Init(Camera* camera)
 	// load PBR material textures
 	for (unsigned i = 0; i < pbr_obj.size(); ++i)
 	{
-		// plastic
+		// wood
 		pbr_obj[i]->albedo = albedo[2];
 		pbr_obj[i]->normal = normal[2];
 		pbr_obj[i]->metallic = metallic[2];
@@ -273,6 +277,51 @@ void Scene::Scene2Init(Camera* camera)
 	softbody_obj[2]->ao = ao[3];
 	softbody_obj[2]->m_textype = RUSTED_IRON;
 	
+	// light properties
+	for (int i = 0; i < 2; ++i)
+	{
+		Light m_light;
+		m_light.color = glm::vec3(300.f, 300.f, 300.f);
+		light.push_back(m_light);
+	}
+	light[0].position = glm::vec3(10.f, 10.f, 10.f);
+	light[1].position = glm::vec3(-10.f, 10.f, 10.f);
+}
+void Scene::Scene3Init(Camera* camera)
+{
+	// camera setting
+	camera->position = glm::vec3(4.f, 4.f, 10.0f);
+	camera->yaw = -90.f;
+	camera->pitch = -10.0f;
+	camera->zoom = 45.0f;
+
+	SoftBodyPhysics* rigid_plane = new SoftBodyPhysics(O_PLANE, glm::vec3(-1.f, 1.5f, -2.f), glm::vec3(10.f, 10.f, 10.f), dimension_);
+	m_physics.push_object(rigid_plane);
+	softbody_obj.push_back(rigid_plane);
+
+	Object* rigid_sphere = new Object(O_SPHERE, glm::vec3(4.f, 2.5f, 2.f), glm::vec3(1.f, 1.f, 1.f), dimension_);
+	m_physics.push_object(rigid_sphere);
+	pbr_obj.push_back(rigid_sphere);
+	rigid_sphere->phy = true;
+
+	// load PBR material textures
+	for (unsigned i = 0; i < pbr_obj.size(); ++i)
+	{
+		// wood
+		pbr_obj[i]->albedo = albedo[2];
+		pbr_obj[i]->normal = normal[2];
+		pbr_obj[i]->metallic = metallic[2];
+		pbr_obj[i]->roughness = roughness[2];
+		pbr_obj[i]->ao = ao[2];
+	}
+	// steel
+	softbody_obj[0]->albedo = albedo[1];
+	softbody_obj[0]->normal = normal[1];
+	softbody_obj[0]->metallic = metallic[1];
+	softbody_obj[0]->roughness = roughness[1];
+	softbody_obj[0]->ao = ao[1];
+	softbody_obj[0]->m_textype = STEEL;
+
 	// light properties
 	for (int i = 0; i < 2; ++i)
 	{
@@ -440,6 +489,10 @@ void Scene::Scene2Draw(Camera* camera, float dt)
 	// render skybox (render as last to prevent overdraw)
 	renderSkybox(&backgroundShader, camera, envCubemap, irradianceMap);
 }
+void Scene::Scene3Draw(Camera* camera, float dt)
+{
+	Scene2Draw(camera, dt);
+}
 void Scene::DrawObjs(Camera* camera)
 {
 	// bind pre-computed IBL data
@@ -470,7 +523,7 @@ void Scene::DrawObjs(Camera* camera)
 		pbr_texture_shader.SetInt("metallicMap", (*p_obj)->metallic + 2);
 		pbr_texture_shader.SetInt("roughnessMap", (*p_obj)->roughness + 2);
 		pbr_texture_shader.SetInt("aoMap", (*p_obj)->ao + 2);
-		(*p_obj)->render_objs(camera, &pbr_texture_shader, (*p_obj)->position, aspect, draw_line);
+		(*p_obj)->render_objs(camera, &pbr_texture_shader, (*p_obj)->position, aspect, false);
 	}
 	for(unsigned i = 0; i < softbody_obj.size(); ++i)
 	{
@@ -560,6 +613,16 @@ void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 				Scene2Init(camera);
 			}
 		}
+		if (ImGui::Button("Scene3"))
+		{
+			if (curr_scene != 3)
+			{
+				ShutDown();
+				m_physics.clear_objects();
+				curr_scene = 3;
+				Scene3Init(camera);
+			}
+		}
 		ImGui::End();
 	}
 	if (third_imgui)
@@ -627,6 +690,8 @@ void Scene::Reload(Camera* camera)
 		Scene1Init(camera);
 	else if (curr_scene == 2)
 		Scene2Init(camera);
+	else if (curr_scene == 3)
+		Scene3Init(camera);
 }
 void Scene::ShutDown()
 {

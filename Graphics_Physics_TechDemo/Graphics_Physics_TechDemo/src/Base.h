@@ -55,7 +55,8 @@ private:
 	float stiffness;
 	float damping;
 	//temp
-	std::vector <glm::vec3> m_edge;
+	std::vector <std::pair<unsigned, glm::vec3>> m_edge;
+
 
 };
 
