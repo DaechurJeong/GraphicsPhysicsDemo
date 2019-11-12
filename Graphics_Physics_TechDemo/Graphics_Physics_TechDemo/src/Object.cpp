@@ -429,7 +429,7 @@ void Object::makePlain()
 	Describe();
 }
 
-void Object::render_textured(Camera* camera, Shader* shader, glm::vec3 pos, float aspect)
+void Object::render_objs(Camera* camera, Shader* shader, glm::vec3 pos, float aspect, bool draw_line)
 {
 	glm::mat4 identity_translate(1.0);
 	glm::mat4 identity_scale(1.0);
@@ -445,25 +445,10 @@ void Object::render_textured(Camera* camera, Shader* shader, glm::vec3 pos, floa
 	shader->SetMat4("view", view);
 
 	glBindVertexArray(m_vao);
-	glDrawElements(GL_TRIANGLE_STRIP, m_elementSize, GL_UNSIGNED_INT, 0);
-	glBindVertexArray(0);
-}
-void Object::render_line(Camera* camera, Shader* shader, glm::vec3 pos, float aspect)
-{
-	glm::mat4 identity_translate(1.0);
-	glm::mat4 identity_scale(1.0);
-	glm::mat4 identity_rotation(1.0);
-
-	glm::mat4 model = glm::translate(identity_translate, pos) * glm::scale(identity_scale, scale) * glm::rotate(identity_rotation, rotation, axis);
-	glm::mat4 projection = glm::perspective(glm::radians(camera->zoom), aspect, 0.1f, 100.0f); // zoom = fov;
-	glm::mat4 view = camera->GetViewMatrix();
-
-	shader->SetMat4("projection", projection);
-	shader->SetMat4("model", model);
-	shader->SetMat4("view", view);
-
-	glBindVertexArray(m_vao);
-	glDrawElements(GL_LINE_STRIP, m_elementSize, GL_UNSIGNED_INT, 0);
+	if(draw_line)
+		glDrawElements(GL_LINE_STRIP, m_elementSize, GL_UNSIGNED_INT, 0);
+	else
+		glDrawElements(GL_TRIANGLE_STRIP, m_elementSize, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }
 unsigned int Object::loadTexture(const char* path)

@@ -470,7 +470,7 @@ void Scene::DrawObjs(Camera* camera)
 		pbr_texture_shader.SetInt("metallicMap", (*p_obj)->metallic + 2);
 		pbr_texture_shader.SetInt("roughnessMap", (*p_obj)->roughness + 2);
 		pbr_texture_shader.SetInt("aoMap", (*p_obj)->ao + 2);
-		(*p_obj)->render_textured(camera, &pbr_texture_shader, (*p_obj)->position, aspect);
+		(*p_obj)->render_objs(camera, &pbr_texture_shader, (*p_obj)->position, aspect, draw_line);
 	}
 	for(unsigned i = 0; i < softbody_obj.size(); ++i)
 	{
@@ -493,7 +493,7 @@ void Scene::DrawObjs(Camera* camera)
 		pbr_texture_shader.SetInt("metallicMap", (*s_obj)->metallic + 2);
 		pbr_texture_shader.SetInt("roughnessMap", (*s_obj)->roughness + 2);
 		pbr_texture_shader.SetInt("aoMap", (*s_obj)->ao + 2);
-		(*s_obj)->render_textured(camera, &pbr_texture_shader, (*s_obj)->position, aspect);
+		(*s_obj)->render_objs(camera, &pbr_texture_shader, (*s_obj)->position, aspect, draw_line);
 	}
 }
 void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
@@ -565,6 +565,7 @@ void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 	if (third_imgui)
 	{
 		ImGui::Begin("Select PBR texture");
+		
 		unsigned sz = softbody_obj.size() + 1;
 		if (ImGui::Button("Plastic"))
 		{
@@ -594,6 +595,15 @@ void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 		{
 			ChangePBRTexture(ALUMINIUM, sz);
 		}
+		ImGui::End();
+	}
+	if (forth_imgui)
+	{
+		ImGui::Begin("Draw by Texture / Line");
+		if (ImGui::Button("Draw Line"))
+			draw_line = true;
+		if (ImGui::Button("Draw Texture"))
+			draw_line = false;
 		ImGui::End();
 	}
 }

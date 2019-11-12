@@ -60,8 +60,7 @@ public:
 	void makeSphere();
 	void makePlain();
 
-	void render_textured(Camera* camera, Shader* shader, glm::vec3 pos, float aspect);
-	void render_line(Camera* camera, Shader* shader, glm::vec3 pos, float aspect);
+	void render_objs(Camera* camera, Shader* shader, glm::vec3 pos, float aspect, bool draw_line);
 	unsigned int loadTexture(const char* path);
 	void LoadTGAFile(std::vector<std::string> faces);
 
