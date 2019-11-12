@@ -39,6 +39,10 @@ typedef enum TexType {
 	FABRIC,
 	TORN_FABRIC,
 	ALUMINIUM,
+	COPPER,
+	CONCRETE,
+	LEATHER,
+	GOLD,
 }TextureType;
 
 class Object 
