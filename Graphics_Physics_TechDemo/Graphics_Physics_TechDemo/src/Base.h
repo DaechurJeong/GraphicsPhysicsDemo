@@ -5,6 +5,7 @@
 
 #include "Object.h"
 #include "Vector3.h"
+#include <set>
 //#include <vector>
 
 #define GRAVITY -6.0f
@@ -14,6 +15,11 @@ struct constraints {
 	int p1;
 	int p2;
 	float restlen;
+	bool operator<(constraints const& op2) const{
+		if (p1 == op2.p1)
+			return p2 < op2.p2;
+		return (p1 < op2.p1);
+	}
 };
 
 class SoftBodyPhysics : public Object
@@ -25,8 +31,10 @@ public:
 	}
 	void Init();
 	void Update(float dt);
+	void KeepConstraint();
 	void CollisionResponseRigid(Object* _rhs);
 	void CollisionResponseSoft(SoftBodyPhysics* _rhs);
+
 
 	void SetInitConstraints() { m_cons = m_init_cons; }
 	bool colliding() { return isCollided; }
@@ -34,18 +42,24 @@ public:
 private:
 	void Verlet(float dt);
 	void Move(float dt);
-	void KeepConstraint();
+	
 	void Acceleration();
 
+
 	bool IsCollided(glm::vec3& point, glm::vec3& center, float& radius);
-	bool IsCollidedPlane(glm::vec3& point, glm::vec3& p_point0, glm::vec3& p_point1, glm::vec3& center, float& radius, float& distance, glm::vec3& norm, float d
+	bool IsCollidedPlane(glm::vec3& point, glm::vec3& p_point0, glm::vec3& p_point1, float& radius, float& distance, glm::vec3& norm, float d
 	, glm::vec3& movedpoint);
 
 	std::vector<glm::vec3> m_scaled_ver;
 	std::vector<glm::vec3> m_old_ver;
+
+
 	std::vector<constraints> m_init_cons;
 	std::vector<constraints> m_cons;
 	std::vector<constraints> m_in_cons;
+
+	std::set<constraints> m_const;
+
 	float m_gravity;
 	std::vector<glm::vec3> m_acceleration;
 	std::vector<glm::vec3> m_velocity;
