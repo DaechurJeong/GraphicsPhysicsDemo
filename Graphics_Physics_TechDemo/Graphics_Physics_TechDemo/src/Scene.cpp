@@ -658,6 +658,14 @@ void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 		{
 			ChangePBRTexture(ALUMINIUM, sz);
 		}
+		if (ImGui::Button("Copper"))
+			ChangePBRTexture(COPPER, sz);
+		if (ImGui::Button("Concrete"))
+			ChangePBRTexture(CONCRETE, sz);
+		if (ImGui::Button("Leather"))
+			ChangePBRTexture(LEATHER, sz);
+		if (ImGui::Button("Gold"))
+			ChangePBRTexture(GOLD, sz);
 		ImGui::End();
 	}
 	if (forth_imgui)
@@ -725,11 +733,11 @@ void Scene::InitAllPBRTexture()
 	Object* rigid_plane = new Object(O_PLANE, glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 0.f, 0.f), dimension_);
 
 	// plastic
-	albedo[0] = rigid_plane->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_BaseColor.png");
-	normal[0] = rigid_plane->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_Normal.png");
-	metallic[0] = rigid_plane->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_Metallic.png");
-	roughness[0] = rigid_plane->loadTexture("models\\pbr\\selfmade_plastic\\Sphere3D_1_defaultMat_Roughness.png");
-	ao[0] = rigid_plane->loadTexture("models\\pbr\\selfmade_plastic\\ao.png");
+	albedo[0] = rigid_plane->loadTexture("models\\pbr\\plastic\\Sphere3D_1_defaultMat_BaseColor.png");
+	normal[0] = rigid_plane->loadTexture("models\\pbr\\plastic\\Sphere3D_1_defaultMat_Normal.png");
+	metallic[0] = rigid_plane->loadTexture("models\\pbr\\plastic\\Sphere3D_1_defaultMat_Metallic.png");
+	roughness[0] = rigid_plane->loadTexture("models\\pbr\\plastic\\Sphere3D_1_defaultMat_Roughness.png");
+	ao[0] = rigid_plane->loadTexture("models\\pbr\\plastic\\ao.png");
 
 	// steel
 	albedo[1] = rigid_plane->loadTexture("models\\pbr\\steel\\Sphere3D_1_defaultMat_BaseColor.png");
@@ -772,6 +780,34 @@ void Scene::InitAllPBRTexture()
 	metallic[6] = rigid_plane->loadTexture("models\\pbr\\Aluminium\\Sphere3D_1_defaultMat_Metallic.png");
 	roughness[6] = rigid_plane->loadTexture("models\\pbr\\Aluminium\\Sphere3D_1_defaultMat_Roughness.png");
 	ao[6] = rigid_plane->loadTexture("models\\pbr\\Aluminium\\ao.png");
+
+	// copper
+	albedo[7] = rigid_plane->loadTexture("models\\pbr\\Copper\\Sphere3D_1_defaultMat_BaseColor.png");
+	normal[7] = rigid_plane->loadTexture("models\\pbr\\Copper\\Sphere3D_1_defaultMat_Normal.png");
+	metallic[7] = rigid_plane->loadTexture("models\\pbr\\Copper\\Sphere3D_1_defaultMat_Metallic.png");
+	roughness[7] = rigid_plane->loadTexture("models\\pbr\\Copper\\Sphere3D_1_defaultMat_Roughness.png");
+	ao[7] = rigid_plane->loadTexture("models\\pbr\\Copper\\ao.png");
+
+	// concrete
+	albedo[8] = rigid_plane->loadTexture("models\\pbr\\Concrete\\Sphere3D_1_defaultMat_BaseColor.png");
+	normal[8] = rigid_plane->loadTexture("models\\pbr\\Concrete\\Sphere3D_1_defaultMat_Normal.png");
+	metallic[8] = rigid_plane->loadTexture("models\\pbr\\Concrete\\Sphere3D_1_defaultMat_Metallic.png");
+	roughness[8] = rigid_plane->loadTexture("models\\pbr\\Concrete\\Sphere3D_1_defaultMat_Roughness.png");
+	ao[8] = rigid_plane->loadTexture("models\\pbr\\Concrete\\ao.png");
+
+	// leather
+	albedo[9] = rigid_plane->loadTexture("models\\pbr\\Leather\\Sphere3D_1_defaultMat_BaseColor.png");
+	normal[9] = rigid_plane->loadTexture("models\\pbr\\Leather\\Sphere3D_1_defaultMat_Normal.png");
+	metallic[9] = rigid_plane->loadTexture("models\\pbr\\Leather\\Sphere3D_1_defaultMat_Metallic.png");
+	roughness[9] = rigid_plane->loadTexture("models\\pbr\\Leather\\Sphere3D_1_defaultMat_Roughness.png");
+	ao[9] = rigid_plane->loadTexture("models\\pbr\\Leather\\ao.png");
+
+	// gold
+	albedo[10] = rigid_plane->loadTexture("models\\pbr\\gold\\Sphere3D_1_defaultMat_BaseColor.png");
+	normal[10] = rigid_plane->loadTexture("models\\pbr\\gold\\Sphere3D_1_defaultMat_Normal.png");
+	metallic[10] = rigid_plane->loadTexture("models\\pbr\\gold\\Sphere3D_1_defaultMat_Metallic.png");
+	roughness[10] = rigid_plane->loadTexture("models\\pbr\\gold\\Sphere3D_1_defaultMat_Roughness.png");
+	ao[10] = rigid_plane->loadTexture("models\\pbr\\gold\\ao.png");
 }
 
 int Scene::ChangePBRTexture(TextureType type, unsigned index)
@@ -851,6 +887,46 @@ int Scene::ChangePBRTexture(TextureType type, unsigned index)
 				(*obj).m_textype = ALUMINIUM;
 				to_return = 30;
 			}
+			else if (type == COPPER)
+			{
+				(*obj).albedo = albedo[7];
+				(*obj).normal = normal[7];
+				(*obj).metallic = metallic[7];
+				(*obj).roughness = roughness[7];
+				(*obj).ao = ao[7];
+				(*obj).m_textype = COPPER;
+				to_return = 35;
+			}
+			else if (type == CONCRETE)
+			{
+				(*obj).albedo = albedo[8];
+				(*obj).normal = normal[8];
+				(*obj).metallic = metallic[8];
+				(*obj).roughness = roughness[8];
+				(*obj).ao = ao[8];
+				(*obj).m_textype = CONCRETE;
+				to_return = 40;
+			}
+			else if (type == LEATHER)
+			{
+				(*obj).albedo = albedo[9];
+				(*obj).normal = normal[9];
+				(*obj).metallic = metallic[9];
+				(*obj).roughness = roughness[9];
+				(*obj).ao = ao[9];
+				(*obj).m_textype = LEATHER;
+				to_return = 45;
+			}
+			else if (type == GOLD)
+			{
+				(*obj).albedo = albedo[10];
+				(*obj).normal = normal[10];
+				(*obj).metallic = metallic[10];
+				(*obj).roughness = roughness[10];
+				(*obj).ao = ao[10];
+				(*obj).m_textype = GOLD;
+				to_return = 50;
+			}
 		}
 	}
 	else
@@ -923,6 +999,46 @@ int Scene::ChangePBRTexture(TextureType type, unsigned index)
 			softbody_obj[index]->ao = ao[6];
 			softbody_obj[index]->m_textype = ALUMINIUM;
 			to_return = 30;
+		}
+		else if (type == COPPER)
+		{
+			softbody_obj[index]->albedo = albedo[7];
+			softbody_obj[index]->normal = normal[7];
+			softbody_obj[index]->metallic = metallic[7];
+			softbody_obj[index]->roughness = roughness[7];
+			softbody_obj[index]->ao = ao[7];
+			softbody_obj[index]->m_textype = COPPER;
+			to_return = 35;
+		}
+		else if (type == CONCRETE)
+		{
+			softbody_obj[index]->albedo = albedo[8];
+			softbody_obj[index]->normal = normal[8];
+			softbody_obj[index]->metallic = metallic[8];
+			softbody_obj[index]->roughness = roughness[8];
+			softbody_obj[index]->ao = ao[8];
+			softbody_obj[index]->m_textype = CONCRETE;
+			to_return = 40;
+		}
+		else if (type == LEATHER)
+		{
+			softbody_obj[index]->albedo = albedo[9];
+			softbody_obj[index]->normal = normal[9];
+			softbody_obj[index]->metallic = metallic[9];
+			softbody_obj[index]->roughness = roughness[9];
+			softbody_obj[index]->ao = ao[9];
+			softbody_obj[index]->m_textype = LEATHER;
+			to_return = 45;
+		}
+		else if (type == GOLD)
+		{
+			softbody_obj[index]->albedo = albedo[10];
+			softbody_obj[index]->normal = normal[10];
+			softbody_obj[index]->metallic = metallic[10];
+			softbody_obj[index]->roughness = roughness[10];
+			softbody_obj[index]->ao = ao[10];
+			softbody_obj[index]->m_textype = GOLD;
+			to_return = 50;
 		}
 	}
 	return to_return;

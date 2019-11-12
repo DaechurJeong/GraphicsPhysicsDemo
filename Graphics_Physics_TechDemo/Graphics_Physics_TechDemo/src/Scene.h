@@ -75,11 +75,11 @@ private:
 	unsigned int prefilterMap = 0;
 	unsigned int brdfLUTTexture = 0;
 
-	unsigned int albedo[7] = { 0 };
-	unsigned int normal[7] = { 0 };
-	unsigned int metallic[7] = { 0 };
-	unsigned int roughness[7] = { 0 };
-	unsigned int ao[7] = { 0 };
+	unsigned int albedo[11] = { 0 };
+	unsigned int normal[11] = { 0 };
+	unsigned int metallic[11] = { 0 };
+	unsigned int roughness[11] = { 0 };
+	unsigned int ao[11] = { 0 };
 
 	int dimension_;
 
