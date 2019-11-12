@@ -346,26 +346,31 @@ void Object::makeSphere()
 			vertexNormals.push_back(glm::vec3(xPos, yPos, zPos));
 		}
 	}
-	bool oddRow = false;
-	for (int y = 0; y < Y_SEGMENTS; ++y)
+	int k1, k2 = 0;
+	for (int i = 0; i < X_SEGMENTS; ++i)
 	{
-		if (!oddRow) // even rows: y == 0, y == 2; and so on
+		k1 = i * (Y_SEGMENTS + 1);     // beginning of current stack
+		k2 = k1 + Y_SEGMENTS + 1;      // beginning of next stack
+
+		for (int j = 0; j < Y_SEGMENTS; ++j, ++k1, ++k2)
 		{
-			for (int x = 0; x <= X_SEGMENTS; ++x)
+			// 2 triangles per sector excluding first and last stacks
+			// k1 => k2 => k1+1
+			if (i != 0)
 			{
-				obj_indices.push_back(y * (X_SEGMENTS + 1) + x);
-				obj_indices.push_back((y + 1) * (X_SEGMENTS + 1) + x);
+				obj_indices.push_back(k1);
+				obj_indices.push_back(k2);
+				obj_indices.push_back(k1 + 1);
+			}
+
+			// k1+1 => k2 => k2+1
+			if (i != (X_SEGMENTS - 1))
+			{
+				obj_indices.push_back(k1 + 1);
+				obj_indices.push_back(k2);
+				obj_indices.push_back(k2 + 1);
 			}
 		}
-		else
-		{
-			for (int x = X_SEGMENTS; x >= 0; --x)
-			{
-				obj_indices.push_back((y + 1) * (X_SEGMENTS + 1) + x);
-				obj_indices.push_back(y * (X_SEGMENTS + 1) + x);
-			}
-		}
-		oddRow = !oddRow;
 	}
 	Describe();
 }
@@ -426,8 +431,6 @@ void Object::makePlain()
 
 void Object::render_textured(Camera* camera, Shader* shader, glm::vec3 pos, float aspect)
 {
-	const static glm::vec3 up(0, 1, 0);
-
 	glm::mat4 identity_translate(1.0);
 	glm::mat4 identity_scale(1.0);
 	glm::mat4 identity_rotation(1.0);
@@ -447,13 +450,11 @@ void Object::render_textured(Camera* camera, Shader* shader, glm::vec3 pos, floa
 }
 void Object::render_line(Camera* camera, Shader* shader, glm::vec3 pos, float aspect)
 {
-	const static glm::vec3 up(0, 1, 0);
-
 	glm::mat4 identity_translate(1.0);
 	glm::mat4 identity_scale(1.0);
 	glm::mat4 identity_rotation(1.0);
 
-	glm::mat4 model = glm::translate(identity_translate, pos) * glm::scale(identity_scale, scale) * glm::rotate(identity_rotation, rotation, up);
+	glm::mat4 model = glm::translate(identity_translate, pos) * glm::scale(identity_scale, scale) * glm::rotate(identity_rotation, rotation, axis);
 	glm::mat4 projection = glm::perspective(glm::radians(camera->zoom), aspect, 0.1f, 100.0f); // zoom = fov;
 	glm::mat4 view = camera->GetViewMatrix();
 
