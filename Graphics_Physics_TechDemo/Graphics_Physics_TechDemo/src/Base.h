@@ -59,6 +59,7 @@ private:
 	std::vector<constraints> m_in_cons;
 
 	std::set<constraints> m_const;
+	std::set<std::pair<constraints, constraints>> m_volume_cons;
 
 	float m_gravity;
 	std::vector<glm::vec3> m_acceleration;
