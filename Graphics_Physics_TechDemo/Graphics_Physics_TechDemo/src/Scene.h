@@ -28,9 +28,13 @@ public:
 	void Scene0Init(Camera* camera);
 	void Scene1Init(Camera* camera);
 	void Scene2Init(Camera* camera);
+	void Scene3Init(Camera* camera);
+
 	void Scene0Draw(Camera* camera, float dt);
 	void Scene1Draw(Camera* camera, float dt);
 	void Scene2Draw(Camera* camera, float dt);
+	void Scene3Draw(Camera* camera, float dt);
+
 	void ShutDown();
 
 	void DrawObjs(Camera* camera);
