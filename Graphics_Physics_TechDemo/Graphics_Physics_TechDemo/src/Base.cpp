@@ -209,7 +209,7 @@ void SoftBodyPhysics::Update(float dt)
 
 	Verlet(dt);
 
-	//if(!isCollided)
+	if(!isCollided)
 		KeepConstraint();
 
 
@@ -493,9 +493,9 @@ bool SoftBodyPhysics::IsCollidedPlane(glm::vec3& point, glm::vec3& p_point0, glm
 		glm::vec3 max = glm::max(p_point0, p_point1);
 		glm::vec3 min = glm::min(p_point0, p_point1);
 
-		if (movedpoint.x > min.x+ radius && movedpoint.x < max.x- radius
-			&& movedpoint.y > min.y + radius && movedpoint.y < max.y - radius
-			&& movedpoint.z > min.z + radius && movedpoint.z < max.z - radius)
+		if (movedpoint.x >= min.x && movedpoint.x <= max.x
+			&& movedpoint.y >= min.y && movedpoint.y <= max.y
+			&& movedpoint.z >= min.z && movedpoint.z <= max.z)
 			return true;
 		else
 			return false;
