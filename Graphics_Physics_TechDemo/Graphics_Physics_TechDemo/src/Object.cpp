@@ -451,6 +451,26 @@ void Object::render_objs(Camera* camera, Shader* shader, glm::vec3 pos, float as
 		glDrawElements(GL_TRIANGLE_STRIP, m_elementSize, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }
+void Object::render_lights(Camera* camera, Shader* shader, glm::vec3 pos, float aspect)
+{
+	const static glm::vec3 up(0, 1, 0);
+
+	glm::mat4 identity_translate(1.0);
+	glm::mat4 identity_scale(1.0);
+	glm::mat4 identity_rotation(1.0);
+
+	glm::mat4 model = glm::translate(identity_translate, pos) * glm::scale(identity_scale, scale) * glm::rotate(identity_rotation, rotation, up);
+	glm::mat4 projection = glm::perspective(glm::radians(camera->zoom), aspect, 0.1f, 100.0f);
+	glm::mat4 view = camera->GetViewMatrix();
+
+	shader->SetMat4("model", model);
+	shader->SetMat4("projection", projection);
+	shader->SetMat4("view", view);
+
+	glBindVertexArray(m_vao);
+	glDrawElements(GL_TRIANGLES, m_elementSize, GL_UNSIGNED_INT, nullptr);
+	glBindVertexArray(0);
+}
 unsigned int Object::loadTexture(const char* path)
 {
 	unsigned int textureID;

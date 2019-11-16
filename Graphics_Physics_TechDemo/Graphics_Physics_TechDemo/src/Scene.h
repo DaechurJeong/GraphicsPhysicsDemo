@@ -14,6 +14,8 @@
 #include "imgui-master\imgui_impl_opengl3.h"
 #include "GLFW\glfw3.h"
 
+const unsigned pbr_number = 11;
+const unsigned light_num = 8;
 
 class Scene {
 public:
@@ -29,15 +31,18 @@ public:
 	void Scene1Init(Camera* camera);
 	void Scene2Init(Camera* camera);
 	void Scene3Init(Camera* camera);
+	void Scene4Init(Camera* camera);
 
 	void Scene0Draw(Camera* camera, float dt);
 	void Scene1Draw(Camera* camera, float dt);
 	void Scene2Draw(Camera* camera, float dt);
 	void Scene3Draw(Camera* camera, float dt);
+	void Scene4Draw(Camera* camera, float dt);
 
 	void ShutDown();
 
 	void DrawObjs(Camera* camera);
+
 	void InitAllPBRTexture();
 	int ChangePBRTexture(TextureType type, unsigned index);
 	void Reload(Camera* camera);
@@ -49,6 +54,7 @@ public:
 	void ResizeFrameBuffer(GLFWwindow* window);
 private:
 	std::vector<Object*> pbr_obj;
+	std::vector<Object*> light_obj;
 	std::vector<SoftBodyPhysics*> softbody_obj;
 	std::vector<Light> light;
 
@@ -67,6 +73,7 @@ private:
 	Shader backgroundShader;
 	Shader prefilterShader;
 	Shader brdfShader;
+	Shader lightShader;
 
 	unsigned int captureFBO = 0;
 	unsigned int captureRBO = 0;
@@ -75,13 +82,17 @@ private:
 	unsigned int prefilterMap = 0;
 	unsigned int brdfLUTTexture = 0;
 
-	unsigned int albedo[11] = { 0 };
-	unsigned int normal[11] = { 0 };
-	unsigned int metallic[11] = { 0 };
-	unsigned int roughness[11] = { 0 };
-	unsigned int ao[11] = { 0 };
+	unsigned int albedo[pbr_number] = { 0 };
+	unsigned int normal[pbr_number] = { 0 };
+	unsigned int metallic[pbr_number] = { 0 };
+	unsigned int roughness[pbr_number] = { 0 };
+	unsigned int ao[pbr_number] = { 0 };
 
 	int dimension_;
+
+	float orbit_speed = 0.003f;
+	float angle = 0.f;
+	float magnitude = 7.f;
 
 	float met = 0.f;
 	float rou = 0.f;

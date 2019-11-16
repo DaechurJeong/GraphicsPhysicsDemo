@@ -27,6 +27,7 @@ public:
 		S_SKYBOX,
 		S_BRDF,
 		S_PREFILTER,
+		S_LIGHT,
 	};
 
 	Shader() : m_programId(0), m_vertexId(0), m_fragmentId(0), m_geometryId(0), m_infoLogLength(0), m_result(0){};
