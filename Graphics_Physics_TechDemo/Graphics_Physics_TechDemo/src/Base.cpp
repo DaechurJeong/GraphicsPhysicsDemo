@@ -209,7 +209,7 @@ void SoftBodyPhysics::Update(float dt)
 
 	Verlet(dt);
 
-	if(!isCollided)
+	//if(!isCollided)
 		KeepConstraint();
 
 
