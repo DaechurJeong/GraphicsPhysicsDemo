@@ -72,7 +72,7 @@ int main(void)
 		std::cout << "Failed to initialize GLAD" << std::endl;
 		return -1;
 	}
-	Scene m_scene(2);
+	Scene m_scene(4);
 	m_scene.Init(window, &camera);
 
 	/* Loop until the user closes the window */
