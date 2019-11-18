@@ -65,6 +65,7 @@ public:
 	void makePlain();
 
 	void render_objs(Camera* camera, Shader* shader, glm::vec3 pos, float aspect, bool draw_line);
+	void render_diff_properties(Camera* camera, Shader* shader, glm::vec3 pos, float aspect);
 	void render_lights(Camera* camera, Shader* shader, glm::vec3 pos, float aspect);
 	unsigned int loadTexture(const char* path);
 	void LoadTGAFile(std::vector<std::string> faces);
@@ -79,6 +80,9 @@ public:
 	unsigned int ao = 0;
 	//physics
 	//SoftBodyPhysics& getSoftBody() { return sb; }
+	int nrRows;
+	int nrColumns;
+	float spacing;
 
 	std::vector<glm::vec3> obj_vertices;
 	std::vector<unsigned> obj_indices;

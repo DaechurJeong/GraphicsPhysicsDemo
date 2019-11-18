@@ -33,7 +33,7 @@ End Header --------------------------------------------------------*/
 Object::Object(ObjectShape shape, glm::vec3 pos, glm::vec3 scale_, int dim)
 	: position(pos), scale(scale_), color(glm::vec3(1.0f, 1.0f, 1.0f)), rotation(0.f),
       xMax(0), xMin(0), yMax(0), yMin(0), zMax(0), zMin(0), width(512), height(512), m_shape(shape), dimension(dim), d(0),
-	  m_textype(PLASTIC), axis(glm::vec3(0.f,0.f,1.f))
+	  m_textype(PLASTIC), axis(glm::vec3(0.f,0.f,1.f)), nrRows(10), nrColumns(10), spacing(4.0f)
 {
 	if (m_shape == O_PLANE)
 		makePlain();
@@ -450,6 +450,43 @@ void Object::render_objs(Camera* camera, Shader* shader, glm::vec3 pos, float as
 	else
 		glDrawElements(GL_TRIANGLE_STRIP, m_elementSize, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
+}
+void Object::render_diff_properties(Camera* camera, Shader* shader, glm::vec3 pos, float aspect)
+{
+	glm::mat4 identity_translate(1.0);
+	glm::mat4 identity_scale(1.0);
+	glm::mat4 identity_rotation(1.0);
+
+	// glm::vec3(0.f,0.f,1.f)
+	glm::mat4 projection = glm::perspective(glm::radians(camera->zoom), aspect, 0.1f, 100.0f); // zoom = fov;
+	glm::mat4 view = camera->GetViewMatrix();
+
+	shader->SetMat4("projection", projection);
+	shader->SetMat4("view", view);
+
+	glBindVertexArray(m_vao);
+
+	for (int row = 0; row < nrRows; ++row)
+	{
+		shader->SetFloat("metallic_val", (float)row / (float)nrRows);
+		for (int col = 0; col < nrColumns; ++col)
+		{
+			// we clamp the roughness to 0.025 - 1.0 as perfectly smooth surfaces (roughness of 0.0) tend to look a bit off
+			// on direct lighting.
+			shader->SetFloat("roughness_val", glm::clamp((float)col / (float)nrColumns, 0.05f, 1.0f));
+
+			m_model = glm::translate(identity_translate, pos) * glm::scale(identity_scale, scale) * glm::rotate(identity_rotation, rotation, axis);
+			m_model = glm::translate(m_model, glm::vec3(
+				(float)(col - (nrColumns / 2)) * spacing,
+				(float)(row - (nrRows / 2)) * spacing,
+				-2.0f
+			));
+			shader->SetMat4("model", m_model);
+			glDrawElements(GL_TRIANGLE_STRIP, m_elementSize, GL_UNSIGNED_INT, 0);
+		}
+	}
+	glBindVertexArray(0);
+
 }
 void Object::render_lights(Camera* camera, Shader* shader, glm::vec3 pos, float aspect)
 {

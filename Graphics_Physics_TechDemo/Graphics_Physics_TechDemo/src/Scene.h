@@ -15,14 +15,14 @@
 #include "GLFW\glfw3.h"
 
 const unsigned pbr_number = 11;
-const unsigned light_num = 8;
+const unsigned light_num = 20;
 
 class Scene {
 public:
 	Scene(int sceneNum) : curr_scene(sceneNum), width(1280), height(800), aspect(1280.f/800.f),
 		roughness_status(false), metallic_status(false), dimension_(64), met(0.f), rou(0.f),
 		second_imgui(true), third_imgui(true), forth_imgui(true), deltaTime(0.f), lastFrame(0.f), draw_line(false),
-		textIndex(0) {};
+		textIndex(0), cam_num(5), cam_move(false){};
 	~Scene() {};
 	void Init(GLFWwindow* window, Camera* camera);
 	void Update(GLFWwindow* window, Camera* camera, float dt);
@@ -41,7 +41,7 @@ public:
 
 	void ShutDown();
 
-	void DrawObjs(Camera* camera);
+	void DrawObjs(Camera* camera, unsigned scene_num);
 
 	void InitAllPBRTexture();
 	int ChangePBRTexture(TextureType type, unsigned index);
@@ -90,15 +90,17 @@ private:
 
 	int dimension_;
 
-	float orbit_speed = 0.003f;
+	float orbit_speed = 0.0003f;
 	float angle = 0.f;
-	float magnitude = 7.f;
+	float magnitude = 10.f;
 
 	float met = 0.f;
 	float rou = 0.f;
+	float time = 0.f;
 
 	bool roughness_status;
 	bool metallic_status;
+	bool cam_move;
 
 	bool second_imgui;
 	bool third_imgui;
@@ -108,6 +110,7 @@ private:
 	float lastFrame;
 
 	unsigned textIndex;
+	unsigned cam_num;
 
 	bool draw_line;
 };
