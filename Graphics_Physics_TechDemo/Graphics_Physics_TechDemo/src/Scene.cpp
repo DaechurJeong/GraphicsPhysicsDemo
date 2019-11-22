@@ -7,8 +7,6 @@ const float PI = 4.0f * atan(1.0f);
 
 void Scene::Init(GLFWwindow* window, Camera* camera)
 {
-	InitAllPBRTexture();
-
 	pbr_texture_shader.CreateShader("ShaderCodes\\pbr_texture.vs", "ShaderCodes\\pbr_texture.fs", nullptr);
 	equirectangularToCubmapShader.CreateShader("ShaderCodes\\cubemap.vs", "ShaderCodes\\equirectangular_to_cubemap.fs", nullptr);
 	irradianceShader.CreateShader("ShaderCodes\\cubemap.vs", "ShaderCodes\\irradiance_convolution.fs", nullptr);
@@ -294,6 +292,7 @@ void Scene::Scene3Init(Camera* camera)
 }
 void Scene::Scene4Init(Camera* camera)
 {
+	InitAllPBRTexture();
 	time = 0.f;
 	// camera setting
 	camera->yaw = -90.f;
@@ -329,23 +328,19 @@ void Scene::Scene4Init(Camera* camera)
 	{
 		Light m_light;
 		if(i % 4 == 0)
-			m_light.color = glm::vec3(300.f, 300.f, 30.f);
+			m_light.color = glm::vec3(500.f, 500.f, 50.f);
 		else if(i % 4 == 1)
-			m_light.color = glm::vec3(300.f, 30.f, 300.f);
+			m_light.color = glm::vec3(500.f, 50.f, 500.f);
 		else if(i % 4 == 2)
-			m_light.color = glm::vec3(30.f, 30.f, 300.f);
+			m_light.color = glm::vec3(50.f, 50.f, 500.f);
 		else if(i % 4 == 3)
-			m_light.color = glm::vec3(300.f, 300.f, 300.f);
+			m_light.color = glm::vec3(500.f, 500.f, 500.f);
+		int x_rand = rand() % 20 - 10;
+		int y_rand = rand() % 20 - 10;
+		int z_rand = rand() % 20 - 10;
+		m_light.position = glm::vec3(x_rand, y_rand, z_rand);
 		light.push_back(m_light);
 	}
-	light[0].position = glm::vec3(10.f, 10.f, 10.f);
-	light[1].position = glm::vec3(-10.f, 10.f, -10.f);
-	light[2].position = glm::vec3(10.f, -10.f, 10.f);
-	light[3].position = glm::vec3(-10.f, -10.f, 10.f);
-	light[4].position = glm::vec3(10.f, 10.f, -10.f);
-	light[5].position = glm::vec3(-10.f, 10.f, 10.f);
-	light[6].position = glm::vec3(10.f, -10.f, 10.f);
-	light[7].position = glm::vec3(0.f, 0.f, 10.f);
 	for (int i = 0; i < light_num; ++i)
 	{
 		Object* light_ = new Object(O_SPHERE, light[i].position, glm::vec3(0.3f, 0.3f, 0.3f), 10);
@@ -583,6 +578,7 @@ void Scene::DrawObjs(Camera* camera, unsigned scene_num)
 		pbr_texture_shader.SetInt("aoMap", (*s_obj)->ao + 2);
 		(*s_obj)->render_objs(camera, &pbr_texture_shader, (*s_obj)->position, aspect, draw_line);
 	}
+	pbr_texture_shader.SetInt("light_num", static_cast<int>(light_obj.size()));
 }
 void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 {
@@ -596,40 +592,14 @@ void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 		ImGui::ShowDemoWindow(&show_demo_window);
 	{
 		ImGui::Begin("GUI interface");
-		ImGui::Text("Object controller");
 		ImGui::Text("Frame Per Second : %d ms", static_cast<int>(1.f / dt));
-
-		if (roughness_status)
-		{
-			if (ImGui::Button("Default roughness"))
-				roughness_status = false;
-			ImGui::SliderFloat("roughness", &rou, 0.f, 1.f);
-		}
-		else
-		{
-			if (ImGui::Button("Control roughness"))
-				roughness_status = true;
-		}
-		if (metallic_status)
-		{
-			if (ImGui::Button("Default metallic"))
-				metallic_status = false;
-			ImGui::SliderFloat("metallic", &met, 0.f, 1.f);
-		}
-		else
-		{
-			if (ImGui::Button("Control metallic"))
-				metallic_status = true;
-		}
 		ImGui::End();
 	}
 	if (second_imgui)
 	{
 		ImGui::Begin("Scene selector");
 		if (ImGui::Button("Reload"))
-		{
 			Reload(camera);
-		}
 		if (ImGui::Button("Scene0"))
 		{
 			if (curr_scene != 0)
@@ -686,35 +656,21 @@ void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 	{
 		ImGui::Begin("Select PBR texture");
 		
-		unsigned sz = softbody_obj.size() + 1;
+		unsigned sz = static_cast<unsigned>(softbody_obj.size() + 1);
 		if (ImGui::Button("Plastic"))
-		{
 			ChangePBRTexture(PLASTIC, sz);
-		}
 		if (ImGui::Button("Steel"))
-		{
 			ChangePBRTexture(STEEL, sz);
-		}
 		if (ImGui::Button("Wood"))
-		{
 			ChangePBRTexture(WOOD, sz);
-		}
 		if (ImGui::Button("Rusted-Iron"))
-		{
 			ChangePBRTexture(RUSTED_IRON, sz);
-		}
 		if (ImGui::Button("Fabric"))
-		{
 			ChangePBRTexture(FABRIC, sz);
-		}
 		if (ImGui::Button("TornFabric"))
-		{
 			ChangePBRTexture(TORN_FABRIC, sz);
-		}
 		if (ImGui::Button("Aluminium"))
-		{
 			ChangePBRTexture(ALUMINIUM, sz);
-		}
 		if (ImGui::Button("Copper"))
 			ChangePBRTexture(COPPER, sz);
 		if (ImGui::Button("Concrete"))
@@ -737,13 +693,16 @@ void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 	if (curr_scene == 4)
 	{
 		ImGui::Begin("Camera properties");
+		if (fifth_imgui)
+			fifth_imgui = false;
 		if (cam_move)
 		{
+			ImGui::Text("Current Light Num : %d out of %d", cam_num, light_num);
 			if (ImGui::Button("Ride Next Ball"))
 			{
 				++cam_num;
 				if (cam_num >= light_num)
-					cam_num = 0;
+					cam_num = 1;
 			}
 		}
 		if (!cam_move)
@@ -767,6 +726,8 @@ void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 	if (curr_scene != 4)
 	{
 		ImGui::Begin("Object Movement");
+		if (!fifth_imgui)
+			fifth_imgui = true;
 		if (move_object)
 		{
 			if (ImGui::Button("Stop"))
@@ -776,6 +737,33 @@ void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 		{
 			if (ImGui::Button("Move"))
 				move_object = true;
+		}
+		ImGui::End();
+	}
+	if (fifth_imgui)
+	{
+		ImGui::Begin("Roughness / Metalic Controller");
+		if (roughness_status)
+		{
+			if (ImGui::Button("Default roughness"))
+				roughness_status = false;
+			ImGui::SliderFloat("roughness", &rou, 0.f, 1.f);
+		}
+		else
+		{
+			if (ImGui::Button("Control roughness"))
+				roughness_status = true;
+		}
+		if (metallic_status)
+		{
+			if (ImGui::Button("Default metallic"))
+				metallic_status = false;
+			ImGui::SliderFloat("metallic", &met, 0.f, 1.f);
+		}
+		else
+		{
+			if (ImGui::Button("Control metallic"))
+				metallic_status = true;
 		}
 		ImGui::End();
 	}

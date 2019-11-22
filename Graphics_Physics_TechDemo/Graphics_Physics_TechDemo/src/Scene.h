@@ -21,8 +21,10 @@ class Scene {
 public:
 	Scene(int sceneNum) : curr_scene(sceneNum), width(1280), height(800), aspect(1280.f/800.f),
 		roughness_status(false), metallic_status(false), dimension_(64), met(0.f), rou(0.f),
-		second_imgui(true), third_imgui(true), forth_imgui(true), deltaTime(0.f), lastFrame(0.f), draw_line(false),
-		textIndex(0), cam_num(5), cam_move(false), move_object(true){};
+		second_imgui(true), third_imgui(true), forth_imgui(true), fifth_imgui(true), deltaTime(0.f), lastFrame(0.f), draw_line(false),
+		textIndex(0), cam_num(1), cam_move(false), move_object(true){
+		InitAllPBRTexture();
+	};
 	~Scene() {};
 	void Init(GLFWwindow* window, Camera* camera);
 	void Update(GLFWwindow* window, Camera* camera, float dt);
@@ -106,6 +108,7 @@ private:
 	bool second_imgui;
 	bool third_imgui;
 	bool forth_imgui;
+	bool fifth_imgui;
 
 	float deltaTime;
 	float lastFrame;
