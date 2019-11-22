@@ -33,7 +33,7 @@ public:
 	void Scene3Init(Camera* camera);
 	void Scene4Init(Camera* camera);
 
-	void Scene0Draw(Camera* camera, float dt);
+	void Scene0Draw(GLFWwindow* window, Camera* camera, float dt);
 	void Scene1Draw(Camera* camera, float dt);
 	void Scene2Draw(Camera* camera, float dt);
 	void Scene3Draw(Camera* camera, float dt);
@@ -81,6 +81,7 @@ private:
 	unsigned int irradianceMap = 0;
 	unsigned int prefilterMap = 0;
 	unsigned int brdfLUTTexture = 0;
+	unsigned int hdrTexture = 0;
 
 	unsigned int albedo[pbr_number] = { 0 };
 	unsigned int normal[pbr_number] = { 0 };

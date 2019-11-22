@@ -30,7 +30,7 @@ void Scene::Init(GLFWwindow* window, Camera* camera)
 
 	// pbr: setup framebuffer
 	InitFrameBuffer(&equirectangularToCubmapShader, &irradianceShader, &prefilterShader, &brdfShader,
-		captureFBO, captureRBO, envCubemap, irradianceMap, prefilterMap, brdfLUTTexture);
+		captureFBO, captureRBO, envCubemap, irradianceMap, prefilterMap, brdfLUTTexture, hdrTexture);
 	InitSkybox(&backgroundShader, &pbr_texture_shader, camera, (float)width, (float)height);
 
 	ResizeFrameBuffer(window);
@@ -57,7 +57,7 @@ void Scene::Update(GLFWwindow* window, Camera* camera, float dt)
 	ProcessInput(camera, window, deltaTime);
 
 	if (curr_scene == 0)
-		Scene0Draw(camera, deltaTime);
+		Scene0Draw(window, camera, deltaTime);
 	else if (curr_scene == 1)
 		Scene1Draw(camera, deltaTime);
 	else if (curr_scene == 2)
@@ -353,7 +353,7 @@ void Scene::Scene4Init(Camera* camera)
 	}
 	camera->position = glm::vec3(0.f, -30.f, 30.f);
 }
-void Scene::Scene0Draw(Camera* camera, float dt)
+void Scene::Scene0Draw(GLFWwindow* window, Camera* camera, float dt)
 {
 	if (dt <= FRAME_LIMIT)
 	{
@@ -364,6 +364,11 @@ void Scene::Scene0Draw(Camera* camera, float dt)
 				(*obj)->Describe();
 		}
 	}
+	UpdateFrameBuffer(&equirectangularToCubmapShader, &irradianceShader, &prefilterShader, &brdfShader,
+		captureFBO, captureRBO, envCubemap, irradianceMap, prefilterMap, brdfLUTTexture, hdrTexture);
+	//InitSkybox(&backgroundShader, &pbr_texture_shader, camera, (float)width, (float)height);
+
+	ResizeFrameBuffer(window);
 	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -374,9 +379,6 @@ void Scene::Scene0Draw(Camera* camera, float dt)
 	// Draw objs
 	DrawObjs(camera, curr_scene);
 
-	pbr_texture_shader.Use();
-	camera->Update(&pbr_texture_shader);
-	pbr_texture_shader.SetVec3("camPos", camera->position);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
 

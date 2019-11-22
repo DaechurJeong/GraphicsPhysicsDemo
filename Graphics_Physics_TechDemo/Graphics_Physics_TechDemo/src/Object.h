@@ -121,7 +121,9 @@ void simulate_prefilter(Shader* prefilterShader, unsigned prefilterMap, unsigned
 	unsigned envCubemap, glm::mat4* captureViews);
 
 void InitFrameBuffer(Shader* equirectangularToCubmapShader, Shader* irradianceShader, Shader* prefilterShader, Shader* brdfShader,
-	unsigned& captureFBO, unsigned& captureRBO,	unsigned& envCubemap, unsigned& irradianceMap, unsigned& prefilterMap, unsigned& brdfLUTTexture);
+	unsigned& captureFBO, unsigned& captureRBO,	unsigned& envCubemap, unsigned& irradianceMap, unsigned& prefilterMap, unsigned& brdfLUTTexture, unsigned& hdrTexture);
+void UpdateFrameBuffer(Shader* equirectangularToCubmapShader, Shader* irradianceShader, Shader* prefilterShader, Shader* brdfShader,
+	unsigned& captureFBO, unsigned& captureRBO, unsigned& envCubemap, unsigned& irradianceMap, unsigned& prefilterMap, unsigned& brdfLUTTexture, unsigned& hdrTexture);
 void InitSkybox(Shader* backgroundShader, Shader* pbrshader, Camera* camera, float width, float height);
 void renderCube();
 void renderQuad();
