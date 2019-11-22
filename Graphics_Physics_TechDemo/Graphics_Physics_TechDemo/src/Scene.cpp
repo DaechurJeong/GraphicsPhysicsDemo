@@ -355,7 +355,7 @@ void Scene::Scene4Init(Camera* camera)
 }
 void Scene::Scene0Draw(GLFWwindow* window, Camera* camera, float dt)
 {
-	if (dt <= FRAME_LIMIT)
+	if (dt <= FRAME_LIMIT && move_object)
 	{
 		if (!softbody_obj.empty())
 		{
@@ -364,11 +364,11 @@ void Scene::Scene0Draw(GLFWwindow* window, Camera* camera, float dt)
 				(*obj)->Describe();
 		}
 	}
-	UpdateFrameBuffer(&equirectangularToCubmapShader, &irradianceShader, &prefilterShader, &brdfShader,
-		captureFBO, captureRBO, envCubemap, irradianceMap, prefilterMap, brdfLUTTexture, hdrTexture);
+	//UpdateFrameBuffer(&equirectangularToCubmapShader, &irradianceShader, &prefilterShader, &brdfShader,
+	//	captureFBO, captureRBO, envCubemap, irradianceMap, prefilterMap, brdfLUTTexture, hdrTexture);
 	//InitSkybox(&backgroundShader, &pbr_texture_shader, camera, (float)width, (float)height);
 
-	ResizeFrameBuffer(window);
+	//ResizeFrameBuffer(window);
 	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -393,7 +393,7 @@ void Scene::Scene0Draw(GLFWwindow* window, Camera* camera, float dt)
 }
 void Scene::Scene1Draw(Camera* camera, float dt)
 {
-	if (dt <= FRAME_LIMIT)
+	if (dt <= FRAME_LIMIT && move_object)
 	{
 		if (!softbody_obj.empty())
 		{
@@ -430,7 +430,7 @@ void Scene::Scene1Draw(Camera* camera, float dt)
 
 void Scene::Scene2Draw(Camera* camera, float dt)
 {
-	if (dt <= FRAME_LIMIT)
+	if (dt <= FRAME_LIMIT && move_object)
 	{
 		if (!softbody_obj.empty())
 		{
@@ -761,6 +761,21 @@ void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 				camera->position = glm::vec3(0.f, -30.f, 30.f);
 				cam_move = false;
 			}
+		}
+		ImGui::End();
+	}
+	if (curr_scene != 4)
+	{
+		ImGui::Begin("Object Movement");
+		if (move_object)
+		{
+			if (ImGui::Button("Stop"))
+				move_object = false;
+		}
+		else
+		{
+			if (ImGui::Button("Move"))
+				move_object = true;
 		}
 		ImGui::End();
 	}

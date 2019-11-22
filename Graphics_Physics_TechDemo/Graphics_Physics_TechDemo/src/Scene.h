@@ -22,7 +22,7 @@ public:
 	Scene(int sceneNum) : curr_scene(sceneNum), width(1280), height(800), aspect(1280.f/800.f),
 		roughness_status(false), metallic_status(false), dimension_(64), met(0.f), rou(0.f),
 		second_imgui(true), third_imgui(true), forth_imgui(true), deltaTime(0.f), lastFrame(0.f), draw_line(false),
-		textIndex(0), cam_num(5), cam_move(false){};
+		textIndex(0), cam_num(5), cam_move(false), move_object(true){};
 	~Scene() {};
 	void Init(GLFWwindow* window, Camera* camera);
 	void Update(GLFWwindow* window, Camera* camera, float dt);
@@ -114,6 +114,7 @@ private:
 	unsigned cam_num;
 
 	bool draw_line;
+	bool move_object;
 };
 
 
