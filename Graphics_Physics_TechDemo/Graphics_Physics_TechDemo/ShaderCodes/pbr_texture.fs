@@ -25,6 +25,7 @@ uniform vec3 lightPositions[8];
 uniform vec3 lightColors[8];
 
 uniform vec3 camPos;
+uniform int light_num;
 
 const float PI = 3.14159265359;
 
@@ -76,11 +77,11 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
 
     return ggx1 * ggx2;
 }
-vec3 fresnelSchlick(float cosTheta, vec3 F0)
+vec3 fresnel(float cosTheta, vec3 F0)
 {
     return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
 }
-vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
+vec3 fresnelRoughness(float cosTheta, vec3 F0, float roughness)
 {
     return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(1.0 - cosTheta, 5.0);
 }
@@ -104,7 +105,7 @@ void main()
 
     // reflectance equation
     vec3 rad_L = vec3(0.0);
-    for(int i = 0; i < 8; ++i) 
+    for(int i = 0; i < light_num; ++i) 
     {
         // calculate radiance
         vec3 L = normalize(lightPositions[i] - WorldPos);
@@ -116,7 +117,7 @@ void main()
         // BRDF
         float NDF = DistributionGGX(N, H, roughness);
         float G   = GeometrySmith(N, V, L, roughness);
-        vec3  F   = fresnelSchlick(max(dot(H, V), 0.0), F0);
+        vec3  F   = fresnel(max(dot(H, V), 0.0), F0);
            
         vec3 nominator    = NDF * G * F;
         float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001; // to prevent divide by zero.
@@ -134,7 +135,7 @@ void main()
         rad_L += (kD * albedo / PI + specular) * radiance * NdotL;
     }
     // ambient lighting (we now use IBL as the ambient term)
-    vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
+    vec3 F = fresnelRoughness(max(dot(N, V), 0.0), F0, roughness);
 
     vec3 kS = F;
     vec3 kD = 1.0 - kS;

@@ -1,23 +1,12 @@
 #include "Scene.h"
 #include "input.h"
+#include "glm/gtc/matrix_transform.hpp"
 
 const float FRAME_LIMIT = 1.f / 59.f;
 const float PI = 4.0f * atan(1.0f);
 
 void Scene::Init(GLFWwindow* window, Camera* camera)
 {
-	InitAllPBRTexture();
-	if (curr_scene == 0)
-		Scene0Init(camera);
-	else if (curr_scene == 1)
-		Scene1Init(camera);
-	else if (curr_scene == 2)
-		Scene2Init(camera);
-	else if (curr_scene == 3)
-		Scene3Init(camera);
-	else if (curr_scene == 4)
-		Scene4Init(camera);
-
 	pbr_texture_shader.CreateShader("ShaderCodes\\pbr_texture.vs", "ShaderCodes\\pbr_texture.fs", nullptr);
 	equirectangularToCubmapShader.CreateShader("ShaderCodes\\cubemap.vs", "ShaderCodes\\equirectangular_to_cubemap.fs", nullptr);
 	irradianceShader.CreateShader("ShaderCodes\\cubemap.vs", "ShaderCodes\\irradiance_convolution.fs", nullptr);
@@ -31,12 +20,6 @@ void Scene::Init(GLFWwindow* window, Camera* camera)
 	pbr_texture_shader.SetInt("prefilterMap", 1);
 	pbr_texture_shader.SetInt("brdfLUT", 2);
 
-	/*pbr_texture_shader.SetInt("albedoMap", 3);
-	pbr_texture_shader.SetInt("normalMap", 4);
-	pbr_texture_shader.SetInt("metallicMap", 5);
-	pbr_texture_shader.SetInt("roughnessMap", 6);
-	pbr_texture_shader.SetInt("aoMap", 7);*/
-
 	backgroundShader.Use();
 	backgroundShader.SetInt("environmentMap", 0);
 
@@ -45,10 +28,21 @@ void Scene::Init(GLFWwindow* window, Camera* camera)
 
 	// pbr: setup framebuffer
 	InitFrameBuffer(&equirectangularToCubmapShader, &irradianceShader, &prefilterShader, &brdfShader,
-		captureFBO, captureRBO, envCubemap, irradianceMap, prefilterMap, brdfLUTTexture);
+		captureFBO, captureRBO, envCubemap, irradianceMap, prefilterMap, brdfLUTTexture, hdrTexture);
 	InitSkybox(&backgroundShader, &pbr_texture_shader, camera, (float)width, (float)height);
 
 	ResizeFrameBuffer(window);
+
+	if (curr_scene == 0)
+		Scene0Init(camera);
+	else if (curr_scene == 1)
+		Scene1Init(camera);
+	else if (curr_scene == 2)
+		Scene2Init(camera);
+	else if (curr_scene == 3)
+		Scene3Init(camera);
+	else if (curr_scene == 4)
+		Scene4Init(camera);
 }
 void Scene::Update(GLFWwindow* window, Camera* camera, float dt)
 {
@@ -61,7 +55,7 @@ void Scene::Update(GLFWwindow* window, Camera* camera, float dt)
 	ProcessInput(camera, window, deltaTime);
 
 	if (curr_scene == 0)
-		Scene0Draw(camera, deltaTime);
+		Scene0Draw(window, camera, deltaTime);
 	else if (curr_scene == 1)
 		Scene1Draw(camera, deltaTime);
 	else if (curr_scene == 2)
@@ -125,18 +119,6 @@ void Scene::Scene0Init(Camera* camera)
 		softbody_obj[i]->ao = ao[2];
 		softbody_obj[i]->m_textype = STEEL;
 	}
-
-	// light properties
-	for (int i = 0; i < 4; ++i)
-	{
-		Light m_light;
-		m_light.color = glm::vec3(300.f, 300.f, 300.f);
-		light.push_back(m_light);
-	}
-	light[0].position = glm::vec3(10.f, 10.f, 10.f);
-	light[1].position = glm::vec3(-10.f, 10.f, 10.f);
-	light[2].position = glm::vec3(-10.f, -10.f, 10.f);
-	light[3].position = glm::vec3(10.f, -10.f, 10.f);
 }
 void Scene::Scene1Init(Camera* camera)
 {
@@ -197,16 +179,6 @@ void Scene::Scene1Init(Camera* camera)
 		softbody_obj[i]->ao = ao[2];
 		softbody_obj[i]->m_textype = WOOD;
 	}
-
-	// light properties
-	for (int i = 0; i < 2; ++i)
-	{
-		Light m_light;
-		m_light.color = glm::vec3(300.f, 300.f, 300.f);
-		light.push_back(m_light);
-	}
-	light[0].position = glm::vec3(10.f, 10.f, 10.f);
-	light[1].position = glm::vec3(-10.f, 10.f, 10.f);
 }
 void Scene::Scene2Init(Camera* camera)
 {
@@ -282,16 +254,6 @@ void Scene::Scene2Init(Camera* camera)
 	softbody_obj[2]->roughness = roughness[3];
 	softbody_obj[2]->ao = ao[3];
 	softbody_obj[2]->m_textype = RUSTED_IRON;
-	
-	// light properties
-	for (int i = 0; i < 2; ++i)
-	{
-		Light m_light;
-		m_light.color = glm::vec3(300.f, 300.f, 300.f);
-		light.push_back(m_light);
-	}
-	light[0].position = glm::vec3(10.f, 10.f, 10.f);
-	light[1].position = glm::vec3(-10.f, 10.f, 10.f);
 }
 void Scene::Scene3Init(Camera* camera)
 {
@@ -327,30 +289,21 @@ void Scene::Scene3Init(Camera* camera)
 	softbody_obj[0]->roughness = roughness[1];
 	softbody_obj[0]->ao = ao[1];
 	softbody_obj[0]->m_textype = STEEL;
-
-	// light properties
-	for (int i = 0; i < 2; ++i)
-	{
-		Light m_light;
-		m_light.color = glm::vec3(300.f, 300.f, 300.f);
-		light.push_back(m_light);
-	}
-	light[0].position = glm::vec3(10.f, 10.f, 10.f);
-	light[1].position = glm::vec3(-10.f, 10.f, 10.f);
 }
 void Scene::Scene4Init(Camera* camera)
 {
+	InitAllPBRTexture();
+	time = 0.f;
 	// camera setting
-	camera->position = glm::vec3(0.f, 0.f, 20.0f);
 	camera->yaw = -90.f;
 	camera->pitch = 0.0f;
 	camera->zoom = 45.0f;
-
-	glm::vec3 temp_pos = glm::vec3(-10.f, -10.f, -10.f);
+	
+	glm::vec3 temp_pos = glm::vec3(-80.f, -80.f, -80.f);
 	int x_count = 1, y_count = 1, z_count = 1;
 	for (unsigned i = 0; i < pbr_number; ++i, ++x_count)
 	{
-		glm::vec3 this_pos = glm::vec3(temp_pos.x + x_count * 10.f, temp_pos.y + y_count * 10.f, temp_pos.z + z_count * 10.f);
+		glm::vec3 this_pos = glm::vec3(temp_pos.x + x_count * 40.f, temp_pos.y + y_count * 40.f, temp_pos.z + z_count * 40.f);
 		Object* pbr_sphere = new Object(O_SPHERE, this_pos, glm::vec3(1.f, 1.f, 1.f), dimension_);
 		pbr_sphere->albedo = albedo[i];
 		pbr_sphere->normal = normal[i];
@@ -375,32 +328,29 @@ void Scene::Scene4Init(Camera* camera)
 	{
 		Light m_light;
 		if(i % 4 == 0)
-			m_light.color = glm::vec3(100.f, 100.f, 10.f);
+			m_light.color = glm::vec3(500.f, 500.f, 50.f);
 		else if(i % 4 == 1)
-			m_light.color = glm::vec3(100.f, 10.f, 100.f);
+			m_light.color = glm::vec3(500.f, 50.f, 500.f);
 		else if(i % 4 == 2)
-			m_light.color = glm::vec3(10.f, 10.f, 100.f);
+			m_light.color = glm::vec3(50.f, 50.f, 500.f);
 		else if(i % 4 == 3)
-			m_light.color = glm::vec3(100.f, 100.f, 100.f);
+			m_light.color = glm::vec3(500.f, 500.f, 500.f);
+		int x_rand = rand() % 20 - 10;
+		int y_rand = rand() % 20 - 10;
+		int z_rand = rand() % 20 - 10;
+		m_light.position = glm::vec3(x_rand, y_rand, z_rand);
 		light.push_back(m_light);
 	}
-	light[0].position = glm::vec3(10.f, 10.f, 10.f);
-	light[1].position = glm::vec3(-10.f, 10.f, -10.f);
-	light[2].position = glm::vec3(10.f, -10.f, 10.f);
-	light[3].position = glm::vec3(-10.f, -10.f, 10.f);
-	light[4].position = glm::vec3(10.f, 10.f, -10.f);
-	light[5].position = glm::vec3(-10.f, 10.f, 10.f);
-	light[6].position = glm::vec3(10.f, -10.f, 10.f);
-	light[7].position = glm::vec3(0.f, 0.f, 10.f);
 	for (int i = 0; i < light_num; ++i)
 	{
 		Object* light_ = new Object(O_SPHERE, light[i].position, glm::vec3(0.3f, 0.3f, 0.3f), 10);
 		light_obj.push_back(light_);
 	}
+	camera->position = glm::vec3(0.f, -30.f, 30.f);
 }
-void Scene::Scene0Draw(Camera* camera, float dt)
+void Scene::Scene0Draw(GLFWwindow* window, Camera* camera, float dt)
 {
-	if (dt <= FRAME_LIMIT)
+	if (dt <= FRAME_LIMIT && move_object)
 	{
 		if (!softbody_obj.empty())
 		{
@@ -409,6 +359,11 @@ void Scene::Scene0Draw(Camera* camera, float dt)
 				(*obj)->Describe();
 		}
 	}
+	//UpdateFrameBuffer(&equirectangularToCubmapShader, &irradianceShader, &prefilterShader, &brdfShader,
+	//	captureFBO, captureRBO, envCubemap, irradianceMap, prefilterMap, brdfLUTTexture, hdrTexture);
+	//InitSkybox(&backgroundShader, &pbr_texture_shader, camera, (float)width, (float)height);
+
+	//ResizeFrameBuffer(window);
 	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -417,36 +372,23 @@ void Scene::Scene0Draw(Camera* camera, float dt)
 	pbr_texture_shader.SetVec3("camPos", camera->position);
 
 	// Draw objs
-	DrawObjs(camera);
+	DrawObjs(camera, curr_scene);
 
-	pbr_texture_shader.Use();
-	camera->Update(&pbr_texture_shader);
-	pbr_texture_shader.SetVec3("camPos", camera->position);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
-	//glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);
 
 	// main object metallic, roughness
 	pbr_texture_shader.SetFloat("roughness_val", rou);
 	pbr_texture_shader.SetBool("roughness_status", roughness_status);
 	pbr_texture_shader.SetBool("metallic_status", metallic_status);
 	pbr_texture_shader.SetFloat("metallic_val", met);
-
-	// lighting
-	for (unsigned int i = 0; i < sizeof(light) / sizeof(light[0]); ++i)
-	{
-		glm::vec3 newPos = light[i].position + glm::vec3(sin(dt * 5.0) * 5.0, 0.0, 0.0);
-		newPos = light[i].position;
-		pbr_texture_shader.SetVec3("lightPositions[" + std::to_string(i) + "]", newPos);
-		pbr_texture_shader.SetVec3("lightColors[" + std::to_string(i) + "]", light[i].color);
-	}
 
 	// render skybox (render as last to prevent overdraw)
 	renderSkybox(&backgroundShader, camera, envCubemap, irradianceMap);
 }
 void Scene::Scene1Draw(Camera* camera, float dt)
 {
-	if (dt <= FRAME_LIMIT)
+	if (dt <= FRAME_LIMIT && move_object)
 	{
 		if (!softbody_obj.empty())
 		{
@@ -463,38 +405,19 @@ void Scene::Scene1Draw(Camera* camera, float dt)
 	pbr_texture_shader.SetVec3("camPos", camera->position);
 
 	// Draw objs
-	DrawObjs(camera);
-
-	// lighting
-	for (unsigned int i = 0; i < sizeof(light) / sizeof(light[0]); ++i)
-	{
-		glm::vec3 newPos = light[i].position + glm::vec3(sin(dt * 5.0) * 5.0, 0.0, 0.0);
-		newPos = light[i].position;
-		pbr_texture_shader.SetVec3("lightPositions[" + std::to_string(i) + "]", newPos);
-		pbr_texture_shader.SetVec3("lightColors[" + std::to_string(i) + "]", light[i].color);
-	}
+	DrawObjs(camera, curr_scene);
 
 	pbr_texture_shader.Use();
 	camera->Update(&pbr_texture_shader);
 	pbr_texture_shader.SetVec3("camPos", camera->position);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
-	//glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);
 
 	// main object metallic, roughness
 	pbr_texture_shader.SetFloat("roughness_val", rou);
 	pbr_texture_shader.SetBool("roughness_status", roughness_status);
 	pbr_texture_shader.SetBool("metallic_status", metallic_status);
 	pbr_texture_shader.SetFloat("metallic_val", met);
-
-	// lighting
-	for (unsigned int i = 0; i < sizeof(light) / sizeof(light[0]); ++i)
-	{
-		glm::vec3 newPos = light[i].position + glm::vec3(0.5f, 0.0f, 0.0f);
-		newPos = light[i].position;
-		pbr_texture_shader.SetVec3("lightPositions[" + std::to_string(i) + "]", newPos);
-		pbr_texture_shader.SetVec3("lightColors[" + std::to_string(i) + "]", light[i].color);
-	}
 
 	// render skybox (render as last to prevent overdraw)
 	renderSkybox(&backgroundShader, camera, envCubemap, irradianceMap);
@@ -502,7 +425,7 @@ void Scene::Scene1Draw(Camera* camera, float dt)
 
 void Scene::Scene2Draw(Camera* camera, float dt)
 {
-	if (dt <= FRAME_LIMIT)
+	if (dt <= FRAME_LIMIT && move_object)
 	{
 		if (!softbody_obj.empty())
 		{
@@ -519,38 +442,19 @@ void Scene::Scene2Draw(Camera* camera, float dt)
 	pbr_texture_shader.SetVec3("camPos", camera->position);
 
 	// Draw objs
-	DrawObjs(camera);
-
-	// lighting
-	for (unsigned int i = 0; i < sizeof(light) / sizeof(light[0]); ++i)
-	{
-		glm::vec3 newPos = light[i].position + glm::vec3(sin(dt * 5.0) * 5.0, 0.0, 0.0);
-		newPos = light[i].position;
-		pbr_texture_shader.SetVec3("lightPositions[" + std::to_string(i) + "]", newPos);
-		pbr_texture_shader.SetVec3("lightColors[" + std::to_string(i) + "]", light[i].color);
-	}
+	DrawObjs(camera, curr_scene);
 
 	pbr_texture_shader.Use();
 	camera->Update(&pbr_texture_shader);
 	pbr_texture_shader.SetVec3("camPos", camera->position);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
-	//glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);
 
 	// main object metallic, roughness
 	pbr_texture_shader.SetFloat("roughness_val", rou);
 	pbr_texture_shader.SetBool("roughness_status", roughness_status);
 	pbr_texture_shader.SetBool("metallic_status", metallic_status);
 	pbr_texture_shader.SetFloat("metallic_val", met);
-
-	// lighting
-	for (unsigned int i = 0; i < sizeof(light) / sizeof(light[0]); ++i)
-	{
-		glm::vec3 newPos = light[i].position + glm::vec3(sin(dt * 5.0) * 5.0, 0.0, 0.0);
-		newPos = light[i].position;
-		pbr_texture_shader.SetVec3("lightPositions[" + std::to_string(i) + "]", newPos);
-		pbr_texture_shader.SetVec3("lightColors[" + std::to_string(i) + "]", light[i].color);
-	}
 
 	// render skybox (render as last to prevent overdraw)
 	renderSkybox(&backgroundShader, camera, envCubemap, irradianceMap);
@@ -561,15 +465,6 @@ void Scene::Scene3Draw(Camera* camera, float dt)
 }
 void Scene::Scene4Draw(Camera* camera, float dt)
 {
-	if (dt <= FRAME_LIMIT)
-	{
-		if (!softbody_obj.empty())
-		{
-			m_physics.update(dt);
-			for (std::vector<SoftBodyPhysics*>::iterator obj = softbody_obj.begin(); obj != softbody_obj.end(); ++obj)
-				(*obj)->Describe();
-		}
-	}
 	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -578,7 +473,7 @@ void Scene::Scene4Draw(Camera* camera, float dt)
 	pbr_texture_shader.SetVec3("camPos", camera->position);
 
 	// Draw objs
-	DrawObjs(camera);
+	DrawObjs(camera, curr_scene);
 
 	// lighting
 	for (unsigned int i = 0; i < light_num; ++i)
@@ -587,39 +482,45 @@ void Scene::Scene4Draw(Camera* camera, float dt)
 		pbr_texture_shader.SetVec3("lightColors[" + std::to_string(i) + "]", light[i].color);
 	}
 
-	pbr_texture_shader.Use();
-	camera->Update(&pbr_texture_shader);
-	pbr_texture_shader.SetVec3("camPos", camera->position);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
-	//glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);
 
 	// main object metallic, roughness
-	pbr_texture_shader.SetFloat("roughness_val", rou);
-	pbr_texture_shader.SetBool("roughness_status", roughness_status);
-	pbr_texture_shader.SetBool("metallic_status", metallic_status);
-	pbr_texture_shader.SetFloat("metallic_val", met);
+	pbr_texture_shader.SetBool("roughness_status", true);
+	pbr_texture_shader.SetBool("metallic_status", true);
 
 	// lighting
 	lightShader.Use();
+	glm::vec3 prev = light_obj[cam_num]->position;
 	for (unsigned int i = 1; i < light_num; ++i)
 	{
-		light_obj[i]->position.x = (i * (1 + sin(i * 2 * PI / 25 * angle * 3)) * sin(PI / (4 + i) * (2 + sin(2 * i * PI / 35 * angle * 3))) * cos(i * PI * (1 + sin(2 * PI / 35 * angle * 3))) * 0.5f) * magnitude;
-		light_obj[i]->position.y = ((4 + sin(i * PI / 25 * angle * 3)) * cos(PI / 4 * (2 + sin(i * 2 * PI / 35 * angle * 3)))) * magnitude + 5.f;
-		light_obj[i]->position.z = ((4 + sin(i * PI / 25 * angle * 3)) * sin(PI / (4 + i) * (2 + sin(2 * PI / 35 * angle * 3))) * sin(i * PI * (1 + sin(2 * PI / 35 * angle * 3))) * 0.5f) * magnitude;
-		light_obj[i]->color = light[i].color * 0.01f;
+		light_obj[i]->position.x = (i * (1 + sin(i * 2 * PI / 25 * angle * 3)) * sin(PI / (10 + i) * (2 + sin(2 * i * PI / 35 * angle * 3))) * cos(i * PI * (1 + sin(2 * PI / 35 * angle * 3)))) * magnitude;
+		light_obj[i]->position.y = (10 + sin(i * PI / 25 * angle * 3)) * cos(PI / 4 * (2 + sin(i * 2 * PI / 35 * angle * 3))) * magnitude;
+		light_obj[i]->position.z = (10 + sin(i * PI / 25 * angle * 3)) * sin(PI / (10 + i) * (2 + sin(2 * PI / 35 * angle * 3))) * sin(i * PI * (1 + sin(2 * PI / 35 * angle * 3)))* magnitude;
+
+		light_obj[i]->color = light[i].color / 300.f;
 		angle += (orbit_speed / light_num);
 		lightShader.SetVec3("lightPosition", light_obj[i]->position);
 		lightShader.SetVec3("lightColor", light_obj[i]->color);
 		light[i].position = light_obj[i]->position;
 
-		light_obj[i]->render_lights(camera, &lightShader, light_obj[i]->position, aspect);
+		if(i != cam_num)
+			light_obj[i]->render_lights(camera, &lightShader, light_obj[i]->position, aspect);
 	}
+	if (cam_move)
+	{
+		glm::vec3 look_vec = light_obj[cam_num]->position - prev;
+		float dist = glm::distance(light_obj[cam_num]->position, prev);
+		camera->pitch = glm::degrees(asinf(look_vec.y / dist));
+		camera->yaw = glm::degrees(asinf(look_vec.z / dist));
 
+		camera->position = prev;
+	}
 	// render skybox (render as last to prevent overdraw)
 	renderSkybox(&backgroundShader, camera, envCubemap, irradianceMap);
+	time += dt;
 }
-void Scene::DrawObjs(Camera* camera)
+void Scene::DrawObjs(Camera* camera, unsigned scene_num)
 {
 	// bind pre-computed IBL data
 	glActiveTexture(GL_TEXTURE0);
@@ -649,7 +550,10 @@ void Scene::DrawObjs(Camera* camera)
 		pbr_texture_shader.SetInt("metallicMap", (*p_obj)->metallic + 2);
 		pbr_texture_shader.SetInt("roughnessMap", (*p_obj)->roughness + 2);
 		pbr_texture_shader.SetInt("aoMap", (*p_obj)->ao + 2);
-		(*p_obj)->render_objs(camera, &pbr_texture_shader, (*p_obj)->position, aspect, false);
+		if (scene_num == 4)
+			(*p_obj)->render_diff_properties(camera, &pbr_texture_shader, (*p_obj)->position, aspect);
+		else
+			(*p_obj)->render_objs(camera, &pbr_texture_shader, (*p_obj)->position, aspect, false);
 	}
 	for(unsigned i = 0; i < softbody_obj.size(); ++i)
 	{
@@ -674,6 +578,7 @@ void Scene::DrawObjs(Camera* camera)
 		pbr_texture_shader.SetInt("aoMap", (*s_obj)->ao + 2);
 		(*s_obj)->render_objs(camera, &pbr_texture_shader, (*s_obj)->position, aspect, draw_line);
 	}
+	pbr_texture_shader.SetInt("light_num", static_cast<int>(light_obj.size()));
 }
 void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 {
@@ -683,32 +588,18 @@ void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 
 	bool show_demo_window = false;
 
-	if (show_demo_window)
+	if (show_demo_window && curr_scene != 4)
 		ImGui::ShowDemoWindow(&show_demo_window);
 	{
 		ImGui::Begin("GUI interface");
-		ImGui::Text("Object controller");
 		ImGui::Text("Frame Per Second : %d ms", static_cast<int>(1.f / dt));
-		ImGui::SliderFloat("metallic", &met, 0.f, 1.f);
-		ImGui::SliderFloat("roughness", &rou, 0.f, 1.f);
-
-		if (ImGui::Button("Default roughness"))
-			roughness_status = false;
-		if (ImGui::Button("Control roughness"))
-			roughness_status = true;
-		if (ImGui::Button("Default metallic"))
-			metallic_status = false;
-		if (ImGui::Button("Control metallic"))
-			metallic_status = true;
 		ImGui::End();
 	}
 	if (second_imgui)
 	{
 		ImGui::Begin("Scene selector");
 		if (ImGui::Button("Reload"))
-		{
 			Reload(camera);
-		}
 		if (ImGui::Button("Scene0"))
 		{
 			if (curr_scene != 0)
@@ -716,7 +607,7 @@ void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 				ShutDown();
 				m_physics.clear_objects();
 				curr_scene = 0;
-				Scene0Init(camera);
+				Init(window, camera);
 			}
 		}
 		if (ImGui::Button("Scene1"))
@@ -726,7 +617,7 @@ void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 				ShutDown();
 				m_physics.clear_objects();
 				curr_scene = 1;
-				Scene1Init(camera);
+				Init(window, camera);
 			}
 		}
 		if (ImGui::Button("Scene2"))
@@ -736,7 +627,7 @@ void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 				ShutDown();
 				m_physics.clear_objects();
 				curr_scene = 2;
-				Scene2Init(camera);
+				Init(window, camera);
 			}
 		}
 		if (ImGui::Button("Scene3"))
@@ -746,7 +637,7 @@ void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 				ShutDown();
 				m_physics.clear_objects();
 				curr_scene = 3;
-				Scene3Init(camera);
+				Init(window, camera);
 			}
 		}
 		if (ImGui::Button("Scene4"))
@@ -756,44 +647,30 @@ void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 				ShutDown();
 				// no physics obj
 				curr_scene = 4;
-				Scene4Init(camera);
+				Init(window, camera);
 			}
 		}
 		ImGui::End();
 	}
-	if (third_imgui)
+	if (third_imgui && curr_scene != 4)
 	{
 		ImGui::Begin("Select PBR texture");
 		
-		unsigned sz = softbody_obj.size() + 1;
+		unsigned sz = static_cast<unsigned>(softbody_obj.size() + 1);
 		if (ImGui::Button("Plastic"))
-		{
 			ChangePBRTexture(PLASTIC, sz);
-		}
 		if (ImGui::Button("Steel"))
-		{
 			ChangePBRTexture(STEEL, sz);
-		}
 		if (ImGui::Button("Wood"))
-		{
 			ChangePBRTexture(WOOD, sz);
-		}
 		if (ImGui::Button("Rusted-Iron"))
-		{
 			ChangePBRTexture(RUSTED_IRON, sz);
-		}
 		if (ImGui::Button("Fabric"))
-		{
 			ChangePBRTexture(FABRIC, sz);
-		}
 		if (ImGui::Button("TornFabric"))
-		{
 			ChangePBRTexture(TORN_FABRIC, sz);
-		}
 		if (ImGui::Button("Aluminium"))
-		{
 			ChangePBRTexture(ALUMINIUM, sz);
-		}
 		if (ImGui::Button("Copper"))
 			ChangePBRTexture(COPPER, sz);
 		if (ImGui::Button("Concrete"))
@@ -804,13 +681,90 @@ void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 			ChangePBRTexture(GOLD, sz);
 		ImGui::End();
 	}
-	if (forth_imgui)
+	if (forth_imgui && curr_scene != 4)
 	{
 		ImGui::Begin("Draw by Texture / Line");
 		if (ImGui::Button("Draw Line"))
 			draw_line = true;
 		if (ImGui::Button("Draw Texture"))
 			draw_line = false;
+		ImGui::End();
+	}
+	if (curr_scene == 4)
+	{
+		ImGui::Begin("Camera properties");
+		if (fifth_imgui)
+			fifth_imgui = false;
+		if (cam_move)
+		{
+			ImGui::Text("Current Light Num : %d out of %d", cam_num, light_num);
+			if (ImGui::Button("Ride Next Ball"))
+			{
+				++cam_num;
+				if (cam_num >= light_num)
+					cam_num = 1;
+			}
+		}
+		if (!cam_move)
+		{
+			if (ImGui::Button("Hang the camera on thel light"))
+				cam_move = true;
+		}
+		else
+		{
+			if (ImGui::Button("Camera stick to the point"))
+			{
+				camera->yaw = -90.f;
+				camera->pitch = 0.0f;
+				camera->zoom = 45.0f;
+				camera->position = glm::vec3(0.f, -30.f, 30.f);
+				cam_move = false;
+			}
+		}
+		ImGui::End();
+	}
+	if (curr_scene != 4)
+	{
+		ImGui::Begin("Object Movement");
+		if (!fifth_imgui)
+			fifth_imgui = true;
+		if (move_object)
+		{
+			if (ImGui::Button("Stop"))
+				move_object = false;
+		}
+		else
+		{
+			if (ImGui::Button("Move"))
+				move_object = true;
+		}
+		ImGui::End();
+	}
+	if (fifth_imgui)
+	{
+		ImGui::Begin("Roughness / Metalic Controller");
+		if (roughness_status)
+		{
+			if (ImGui::Button("Default roughness"))
+				roughness_status = false;
+			ImGui::SliderFloat("roughness", &rou, 0.f, 1.f);
+		}
+		else
+		{
+			if (ImGui::Button("Control roughness"))
+				roughness_status = true;
+		}
+		if (metallic_status)
+		{
+			if (ImGui::Button("Default metallic"))
+				metallic_status = false;
+			ImGui::SliderFloat("metallic", &met, 0.f, 1.f);
+		}
+		else
+		{
+			if (ImGui::Button("Control metallic"))
+				metallic_status = true;
+		}
 		ImGui::End();
 	}
 }
@@ -858,6 +812,13 @@ void Scene::ShutDown()
 	m_physics.clear_objects();
 	if(!light.empty())
 		light.clear();
+	for (auto l_obj : light_obj)
+	{
+		delete l_obj;
+		l_obj = NULL;
+	}
+	if (!light_obj.empty())
+		light_obj.clear();
 }
 void Scene::ResizeFrameBuffer(GLFWwindow* window)
 {

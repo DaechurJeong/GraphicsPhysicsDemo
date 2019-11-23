@@ -15,14 +15,16 @@
 #include "GLFW\glfw3.h"
 
 const unsigned pbr_number = 11;
-const unsigned light_num = 8;
+const unsigned light_num = 20;
 
 class Scene {
 public:
 	Scene(int sceneNum) : curr_scene(sceneNum), width(1280), height(800), aspect(1280.f/800.f),
 		roughness_status(false), metallic_status(false), dimension_(64), met(0.f), rou(0.f),
-		second_imgui(true), third_imgui(true), forth_imgui(true), deltaTime(0.f), lastFrame(0.f), draw_line(false),
-		textIndex(0) {};
+		second_imgui(true), third_imgui(true), forth_imgui(true), fifth_imgui(true), deltaTime(0.f), lastFrame(0.f), draw_line(false),
+		textIndex(0), cam_num(1), cam_move(false), move_object(true){
+		InitAllPBRTexture();
+	};
 	~Scene() {};
 	void Init(GLFWwindow* window, Camera* camera);
 	void Update(GLFWwindow* window, Camera* camera, float dt);
@@ -33,7 +35,7 @@ public:
 	void Scene3Init(Camera* camera);
 	void Scene4Init(Camera* camera);
 
-	void Scene0Draw(Camera* camera, float dt);
+	void Scene0Draw(GLFWwindow* window, Camera* camera, float dt);
 	void Scene1Draw(Camera* camera, float dt);
 	void Scene2Draw(Camera* camera, float dt);
 	void Scene3Draw(Camera* camera, float dt);
@@ -41,7 +43,7 @@ public:
 
 	void ShutDown();
 
-	void DrawObjs(Camera* camera);
+	void DrawObjs(Camera* camera, unsigned scene_num);
 
 	void InitAllPBRTexture();
 	int ChangePBRTexture(TextureType type, unsigned index);
@@ -81,6 +83,7 @@ private:
 	unsigned int irradianceMap = 0;
 	unsigned int prefilterMap = 0;
 	unsigned int brdfLUTTexture = 0;
+	unsigned int hdrTexture = 0;
 
 	unsigned int albedo[pbr_number] = { 0 };
 	unsigned int normal[pbr_number] = { 0 };
@@ -90,26 +93,31 @@ private:
 
 	int dimension_;
 
-	float orbit_speed = 0.003f;
+	float orbit_speed = 0.0003f;
 	float angle = 0.f;
-	float magnitude = 7.f;
+	float magnitude = 10.f;
 
 	float met = 0.f;
 	float rou = 0.f;
+	float time = 0.f;
 
 	bool roughness_status;
 	bool metallic_status;
+	bool cam_move;
 
 	bool second_imgui;
 	bool third_imgui;
 	bool forth_imgui;
+	bool fifth_imgui;
 
 	float deltaTime;
 	float lastFrame;
 
 	unsigned textIndex;
+	unsigned cam_num;
 
 	bool draw_line;
+	bool move_object;
 };
 
 
