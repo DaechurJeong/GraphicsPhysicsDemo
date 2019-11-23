@@ -8,7 +8,7 @@
 #include <set>
 //#include <vector>
 
-#define GRAVITY -6.0f
+#define GRAVITY -9.8f
 
 struct constraints {
 	constraints() { p1 = 0; p2 = 0; restlen = 0; }
@@ -20,6 +20,13 @@ struct constraints {
 			return p2 < op2.p2;
 		return (p1 < op2.p1);
 	}
+};
+
+struct Node {
+	glm::vec3 center;
+	float halfwidth;
+	Node* pChild[8];
+
 };
 
 class SoftBodyPhysics : public Object

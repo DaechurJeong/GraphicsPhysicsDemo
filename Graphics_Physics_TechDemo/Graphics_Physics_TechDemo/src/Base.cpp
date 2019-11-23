@@ -12,7 +12,7 @@ void SoftBodyPhysics::Init()
 	for (unsigned i = 0; i < ver-1; ++i)
 		m_scaled_ver[i] = position + m_scaled_ver[i]*scale;
 	m_old_ver = m_scaled_ver;
-	stiffness = 0.5f;
+	stiffness = 0.3f;
 	damping = 1.f;
 
 	isCollided = false;
@@ -281,9 +281,13 @@ void SoftBodyPhysics::KeepConstraint()
 		{
 			glm::vec3& point1 = m_scaled_ver[j.first.p1];
 			glm::vec3& point2 = m_scaled_ver[j.first.p2];
+			glm::vec3& old_1 = m_old_ver[j.first.p1];
+			glm::vec3& old_2 = m_old_ver[j.first.p2];
 
 			glm::vec3& point3 = m_scaled_ver[j.second.p1];
 			glm::vec3& point4 = m_scaled_ver[j.second.p2];
+			glm::vec3& old_3 = m_old_ver[j.second.p1];
+			glm::vec3& old_4 = m_old_ver[j.second.p2];
 
 			glm::vec3 delta1 = point2 - point1;
 			glm::vec3 delta2 = point4 - point3;
@@ -291,12 +295,12 @@ void SoftBodyPhysics::KeepConstraint()
 			float len = glm::distance(point2, point1) + glm::distance(point4, point3);
 			float diff = (len - j.first.restlen - j.second.restlen) / len;
 
-			glm::vec3 force1 = stiffness * delta1 * diff * 0.5f;// -damping * glm::dot(point2 - old_2, point1 - old_1) * diff;
+			glm::vec3 force1 = stiffness * delta1 * diff * 0.5f;// -0.8f * glm::dot(point2 - old_2, point1 - old_1) * diff;
 
 			point1 += force1;
 			point2 -= force1;
 
-			glm::vec3 force2 = stiffness * delta2 * diff * 0.5f;
+			glm::vec3 force2 = stiffness * delta2 * diff * 0.5f;// -0.8f * glm::dot(point4 - old_4, point3 - old_3) * diff;
 
 			point3 += force2;
 			point4 -= force2;
