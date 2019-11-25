@@ -14,13 +14,16 @@
 #include "imgui-master\imgui_impl_opengl3.h"
 #include "GLFW\glfw3.h"
 
+#define S_DIMENSION 12
+#define P_DIMENSION 64
+
 const unsigned pbr_number = 11;
 const unsigned light_num = 20;
 
 class Scene {
 public:
 	Scene(int sceneNum) : curr_scene(sceneNum), width(1280), height(800), aspect(1280.f/800.f),
-		roughness_status(false), metallic_status(false), dimension_(64), met(0.f), rou(0.f),
+		roughness_status(false), metallic_status(false), dimension_(S_DIMENSION), met(0.f), rou(0.f),
 		second_imgui(true), third_imgui(true), forth_imgui(true), fifth_imgui(true), deltaTime(0.f), lastFrame(0.f), draw_line(false),
 		textIndex(0), cam_num(1), cam_move(false), move_object(true){
 		InitAllPBRTexture();

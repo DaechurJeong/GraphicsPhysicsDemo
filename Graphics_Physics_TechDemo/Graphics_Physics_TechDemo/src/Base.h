@@ -45,6 +45,10 @@ public:
 	std::vector<glm::vec3> m_scaled_ver;
 	glm::vec3 m_min;
 	glm::vec3 m_max;
+
+	float m_mass;
+	float stiffness;
+	float damping;
 private:
 	void Verlet(float dt);
 	void Move(float dt);
@@ -72,9 +76,7 @@ private:
 	std::vector<glm::vec3> m_velocity;
 	bool isCollided;
 
-	float m_mass;
-	float stiffness;
-	float damping;
+
 	//temp
 	std::vector <std::pair<unsigned, glm::vec3>> m_edge;
 

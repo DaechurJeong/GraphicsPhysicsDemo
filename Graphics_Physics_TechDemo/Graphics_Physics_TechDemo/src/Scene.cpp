@@ -76,27 +76,27 @@ void Scene::Scene0Init(Camera* camera)
 	camera->pitch = 0.0f;
 	camera->zoom = 45.0f;
 
-	Object* rigid_plane = new Object(O_PLANE, glm::vec3(4.f, -4.f, 1.f), glm::vec3(7.f, 1.f, 0.5f), dimension_);
+	Object* rigid_plane = new Object(O_PLANE, glm::vec3(4.f, -4.f, 1.f), glm::vec3(7.f, 1.f, 0.5f), P_DIMENSION);
 	rigid_plane->rotation = 1.f;
 	m_physics.push_object(rigid_plane);
 	pbr_obj.push_back(rigid_plane);
 
-	Object* rigid_plane_4 = new Object(O_PLANE, glm::vec3(4.f, -4.f, 2.f), glm::vec3(7.f, 1.f, 0.5f), dimension_);
+	Object* rigid_plane_4 = new Object(O_PLANE, glm::vec3(4.f, -4.f, 2.f), glm::vec3(7.f, 1.f, 0.5f), P_DIMENSION);
 	rigid_plane_4->rotation = 1.f;
 	m_physics.push_object(rigid_plane_4);
 	pbr_obj.push_back(rigid_plane_4);
 
-	Object* rigid_plane_2 = new Object(O_PLANE, glm::vec3(1.3f, -7.f, 0.5f), glm::vec3(4.f, 1.f, 4.f), dimension_);
+	Object* rigid_plane_2 = new Object(O_PLANE, glm::vec3(1.3f, -7.f, 0.5f), glm::vec3(4.f, 1.f, 4.f), P_DIMENSION);
 	rigid_plane_2->rotation = -1.f;
 	m_physics.push_object(rigid_plane_2);
 	pbr_obj.push_back(rigid_plane_2);
 
-	Object* rigid_plane_3 = new Object(O_PLANE, glm::vec3(4.f, -10.3f, 0.5f), glm::vec3(4.f, 1.f, 4.f), dimension_);
+	Object* rigid_plane_3 = new Object(O_PLANE, glm::vec3(4.f, -10.3f, 0.5f), glm::vec3(4.f, 1.f, 4.f), P_DIMENSION);
 	rigid_plane_3->rotation = 1.f;
 	m_physics.push_object(rigid_plane_3);
 	pbr_obj.push_back(rigid_plane_3);
 
-	SoftBodyPhysics* sb_sphere = new SoftBodyPhysics(O_SPHERE, glm::vec3(6.5f, 0.f, 2.f), glm::vec3(1.f, 1.f, 1.f), dimension_);
+	SoftBodyPhysics* sb_sphere = new SoftBodyPhysics(O_SPHERE, glm::vec3(6.5f, 0.f, 2.f), glm::vec3(1.f, 1.f, 1.f), S_DIMENSION);
 	m_physics.push_object(sb_sphere);
 	softbody_obj.push_back(sb_sphere);
 
@@ -130,19 +130,19 @@ void Scene::Scene1Init(Camera* camera)
 	camera->zoom = 45.0f;
 
 	// Generate objects for scene0
-	Object* main_obj_texture = new Object(O_SPHERE, glm::vec3(1.2f,  -2.5f, 4.0f), glm::vec3(1.f, 1.f, 1.f), dimension_);
+	Object* main_obj_texture = new Object(O_SPHERE, glm::vec3(1.2f,  -2.5f, 4.0f), glm::vec3(1.f, 1.f, 1.f), S_DIMENSION);
 	m_physics.push_object(main_obj_texture);
 	pbr_obj.push_back(main_obj_texture);
 
-	Object* main_obj_texture2 = new Object(O_SPHERE, glm::vec3(1.2f, -0.5f, 2.0f), glm::vec3(1.f, 1.f, 1.f), dimension_);
+	Object* main_obj_texture2 = new Object(O_SPHERE, glm::vec3(1.2f, -0.5f, 2.0f), glm::vec3(1.f, 1.f, 1.f), S_DIMENSION);
 	m_physics.push_object(main_obj_texture2);
 	pbr_obj.push_back(main_obj_texture2);
 
-	Object* main_obj_texture3 = new Object(O_SPHERE, glm::vec3(1.2f, -4.5f, 6.0f), glm::vec3(1.f, 1.f, 1.f), dimension_);
+	Object* main_obj_texture3 = new Object(O_SPHERE, glm::vec3(1.2f, -4.5f, 6.0f), glm::vec3(1.f, 1.f, 1.f), S_DIMENSION);
 	m_physics.push_object(main_obj_texture3);
 	pbr_obj.push_back(main_obj_texture3);
 
-	SoftBodyPhysics* plane = new SoftBodyPhysics(O_PLANE, glm::vec3(0, 1.5f, 1.f), glm::vec3(6.f, 1.f, 10.f), dimension_);
+	SoftBodyPhysics* plane = new SoftBodyPhysics(O_PLANE, glm::vec3(0, 1.5f, 1.f), glm::vec3(6.f, 1.f, 10.f), P_DIMENSION);
 	m_physics.push_object(plane);
 	softbody_obj.push_back(plane);
 
@@ -183,50 +183,43 @@ void Scene::Scene1Init(Camera* camera)
 }
 void Scene::Scene2Init(Camera* camera)
 {
-	//test
-	sp = new Object(O_SPHERE, glm::vec3(0), glm::vec3(1), 8);
-	sp->albedo = albedo[1];
-	sp->normal = normal[1];
-	sp->metallic = metallic[1];
-	sp->roughness = roughness[1];
-	sp->ao = ao[1];
-	sp->m_textype = STEEL;
+
 	// camera setting
 	camera->position = glm::vec3(2.f, 3.f, 20.0f);
 	camera->yaw = -90.f;
 	camera->pitch = 0.0f;
 	camera->zoom = 45.0f;
 
-	Object* rigid_plane = new Object(O_PLANE, glm::vec3(4.f, 0.5f, -2.f), glm::vec3(10.f, 10.f, 4.f), dimension_);
+	Object* rigid_plane = new Object(O_PLANE, glm::vec3(4.f, 0.5f, -2.f), glm::vec3(10.f, 10.f, 4.f), P_DIMENSION);
 	rigid_plane->rotation = 0.5f;
 	m_physics.push_object(rigid_plane);
 	pbr_obj.push_back(rigid_plane);
 
-	Object* rigid_plane_2 = new Object(O_PLANE, glm::vec3(0.f, 5.f, -10.f), glm::vec3(4.f, 10.f, 10.f), dimension_);
+	Object* rigid_plane_2 = new Object(O_PLANE, glm::vec3(0.f, 5.f, -10.f), glm::vec3(4.f, 10.f, 10.f), P_DIMENSION);
 	rigid_plane_2->axis = glm::vec3(1.f, 0.f, 0.f);
 	rigid_plane_2->rotation = 0.5f;
 	m_physics.push_object(rigid_plane_2);
 	pbr_obj.push_back(rigid_plane_2);
 
-	Object* rigid_plane_3 = new Object(O_PLANE, glm::vec3(-9.f, 5.f, -2.f), glm::vec3(10.f, 10.f, 4.f), dimension_);
+	Object* rigid_plane_3 = new Object(O_PLANE, glm::vec3(-9.f, 5.f, -2.f), glm::vec3(10.f, 10.f, 4.f), P_DIMENSION);
 	rigid_plane_3->axis = glm::vec3(0.f, 0.f, -1.f);
 	rigid_plane_3->rotation = 0.5f;
 	m_physics.push_object(rigid_plane_3);
 	pbr_obj.push_back(rigid_plane_3);
 
-	Object* rigid_plane_4 = new Object(O_PLANE, glm::vec3(-3.f, -3.f, -5.f), glm::vec3(10.f, 10.f, 10.f), dimension_);
+	Object* rigid_plane_4 = new Object(O_PLANE, glm::vec3(-3.f, -3.f, -5.f), glm::vec3(10.f, 10.f, 10.f), P_DIMENSION);
 	m_physics.push_object(rigid_plane_4);
 	pbr_obj.push_back(rigid_plane_4);
 
-	SoftBodyPhysics* sb_sphere = new SoftBodyPhysics(O_SPHERE, glm::vec3(10.f, 6.8f, 0.f), glm::vec3(1.f, 1.f, 1.f), dimension_);
+	SoftBodyPhysics* sb_sphere = new SoftBodyPhysics(O_SPHERE, glm::vec3(10.f, 6.8f, 0.f), glm::vec3(1.f, 1.f, 1.f), S_DIMENSION);
 	m_physics.push_object(sb_sphere);
 	softbody_obj.push_back(sb_sphere);
 
-	SoftBodyPhysics* sb_sphere2 = new SoftBodyPhysics(O_SPHERE, glm::vec3(2.f, 7.f, -8.f), glm::vec3(1.f, 1.f, 1.f), dimension_);
+	SoftBodyPhysics* sb_sphere2 = new SoftBodyPhysics(O_SPHERE, glm::vec3(2.f, 7.f, -8.f), glm::vec3(1.f, 1.f, 1.f), S_DIMENSION);
 	m_physics.push_object(sb_sphere2);
 	softbody_obj.push_back(sb_sphere2);
 
-	SoftBodyPhysics* sb_sphere3 = new SoftBodyPhysics(O_SPHERE, glm::vec3(-8.f, 7.f, 0.f), glm::vec3(1.f, 1.f, 1.f), dimension_);
+	SoftBodyPhysics* sb_sphere3 = new SoftBodyPhysics(O_SPHERE, glm::vec3(-8.f, 7.f, 0.f), glm::vec3(1.f, 1.f, 1.f), S_DIMENSION);
 	m_physics.push_object(sb_sphere3);
 	softbody_obj.push_back(sb_sphere3);
 
@@ -267,19 +260,51 @@ void Scene::Scene2Init(Camera* camera)
 void Scene::Scene3Init(Camera* camera)
 {
 	// camera setting
-	camera->position = glm::vec3(4.f, 4.f, 10.0f);
+	camera->position = glm::vec3(0.f, 0.f, 20.0f);
 	camera->yaw = -90.f;
 	camera->pitch = -10.0f;
 	camera->zoom = 45.0f;
 
-	SoftBodyPhysics* rigid_plane = new SoftBodyPhysics(O_PLANE, glm::vec3(-1.f, 1.5f, -2.f), glm::vec3(10.f, 10.f, 10.f), dimension_);
-	m_physics.push_object(rigid_plane);
-	softbody_obj.push_back(rigid_plane);
+	SoftBodyPhysics* sphere[10];
+	for (int i = 0; i < 10; ++i)
+	{
+		sphere[i] = new SoftBodyPhysics(O_SPHERE, glm::vec3(3.f, 3.f+(float)i*5.f, 2.f), glm::vec3(1.f, 1.f, 1.f), 12);
+		sphere[i]->stiffness = 0.13f;
+		m_physics.push_object(sphere[i]);
+		softbody_obj.push_back(sphere[i]);
+	}
 
-	Object* rigid_sphere = new Object(O_SPHERE, glm::vec3(4.f, 2.5f, 2.f), glm::vec3(1.f, 1.f, 1.f), dimension_);
-	m_physics.push_object(rigid_sphere);
-	pbr_obj.push_back(rigid_sphere);
-	rigid_sphere->phy = true;
+	//front
+	Object* rigid_cube_0 = new Object(O_PLANE, glm::vec3(0.f, -10.f, 7.f), glm::vec3(7.f, 2.f, 2.f), P_DIMENSION);
+	rigid_cube_0->axis = glm::vec3(1.f, 0.f, 0.f); 
+	rigid_cube_0->rotation = -1.5708f;
+	m_physics.push_object(rigid_cube_0);
+	pbr_obj.push_back(rigid_cube_0);
+
+	//right
+	Object* rigid_cube_1 = new Object(O_PLANE, glm::vec3(7.f, -10.f, 0.f), glm::vec3(2.f, 2.f, 7.f), P_DIMENSION);
+	rigid_cube_1->axis = glm::vec3(0.f, 0.f, 1.f);
+	rigid_cube_1->rotation = 1.5708f;
+	m_physics.push_object(rigid_cube_1);
+	pbr_obj.push_back(rigid_cube_1);
+
+	//left
+	Object* rigid_cube_2 = new Object(O_PLANE, glm::vec3(0.f, -8.f, 0.f), glm::vec3(2.f, 2.f, 7.f), P_DIMENSION);
+	rigid_cube_2->axis = glm::vec3(0.f, 0.f, 1.f);
+	rigid_cube_2->rotation = -1.5708f;
+	m_physics.push_object(rigid_cube_2);
+	pbr_obj.push_back(rigid_cube_2);
+
+	//back
+	Object* rigid_cube_3 = new Object(O_PLANE, glm::vec3(0.f, -8.f, 0.f), glm::vec3(7.f, 2.f, 2.f), P_DIMENSION);
+	rigid_cube_3->axis = glm::vec3(1.f, 0.f, 0.f);
+	rigid_cube_3->rotation = 1.5708f;
+	m_physics.push_object(rigid_cube_3);
+	pbr_obj.push_back(rigid_cube_3);
+
+	Object* rigid_plane = new Object(O_PLANE, glm::vec3(0.f, -10.f, 0.f), glm::vec3(7.f, 7.f, 7.f), P_DIMENSION);
+	m_physics.push_object(rigid_plane);
+	pbr_obj.push_back(rigid_plane);
 
 	// load PBR material textures
 	for (unsigned i = 0; i < pbr_obj.size(); ++i)

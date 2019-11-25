@@ -13,8 +13,6 @@ End Header --------------------------------------------------------*/
 
 #define PI 3.141592654
 #define TWOPI 6.283185308
-#define S_DIMENSION 12
-#define P_DIMENSION 64
 #define STB_IMAGE_IMPLEMENTATION
 #define WIDTH 1280
 #define HEIGHT 800
@@ -328,10 +326,9 @@ void Object::makeSphere()
 
 	GenerateBuffers();
 
-	const unsigned int X_SEGMENTS = S_DIMENSION;
-	const unsigned int Y_SEGMENTS = S_DIMENSION;
+	const unsigned int X_SEGMENTS = dimension;
+	const unsigned int Y_SEGMENTS = dimension;
 
-	dimension = S_DIMENSION;
 	for (unsigned int y = 0; y <= Y_SEGMENTS; ++y)
 	{
 		for (unsigned int x = 0; x <= X_SEGMENTS; ++x)
@@ -418,9 +415,8 @@ void Object::makePlain()
 	GenerateBuffers();
 
 	///original
-	const unsigned int X_SEGMENTS = P_DIMENSION;
-	const unsigned int Y_SEGMENTS = P_DIMENSION;
-	dimension = P_DIMENSION;
+	const unsigned int X_SEGMENTS = dimension;
+	const unsigned int Y_SEGMENTS = dimension;
 
 	for (unsigned int y = 0; y <= Y_SEGMENTS; ++y)
 	{
