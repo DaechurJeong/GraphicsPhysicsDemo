@@ -189,6 +189,14 @@ void Scene::Scene1Init(Camera* camera)
 }
 void Scene::Scene2Init(Camera* camera)
 {
+	//test
+	sp = new Object(O_SPHERE, glm::vec3(0), glm::vec3(1), 8);
+	sp->albedo = albedo[1];
+	sp->normal = normal[1];
+	sp->metallic = metallic[1];
+	sp->roughness = roughness[1];
+	sp->ao = ao[1];
+	sp->m_textype = STEEL;
 	// camera setting
 	camera->position = glm::vec3(2.f, 3.f, 20.0f);
 	camera->yaw = -90.f;
@@ -394,6 +402,10 @@ void Scene::Scene0Draw(GLFWwindow* window, Camera* camera, float dt)
 	camera->Update(&pbr_texture_shader);
 	pbr_texture_shader.SetVec3("camPos", camera->position);
 
+	std::cout << camera->position.x << " , "
+				<<camera->position.y << " , "
+				<< camera->position.z << std::endl;
+
 	// Draw objs
 	DrawObjs(camera, curr_scene);
 	
@@ -448,6 +460,7 @@ void Scene::Scene1Draw(Camera* camera, float dt)
 
 void Scene::Scene2Draw(Camera* camera, float dt)
 {
+
 	if (dt <= FRAME_LIMIT && move_object)
 	{
 		if (!softbody_obj.empty())

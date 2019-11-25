@@ -3,8 +3,8 @@
 
 void Physics::update(float dt)
 {
-	std::vector<SoftBodyPhysics*>::iterator it_soft;
-	for (it_soft = softbody_objs.begin(); it_soft != softbody_objs.end(); ++it_soft)
+	std::vector<SoftBodyPhysics*>::iterator it_soft = softbody_objs.begin();
+	for (; it_soft != softbody_objs.end(); ++it_soft)
 		(*it_soft)->Update(dt);
 
 	for (it_soft = softbody_objs.begin(); it_soft != softbody_objs.end(); ++it_soft)
@@ -36,3 +36,6 @@ void Physics::update(float dt)
 	//	(*it_soft)->KeepConstraint();
 
 }
+
+
+

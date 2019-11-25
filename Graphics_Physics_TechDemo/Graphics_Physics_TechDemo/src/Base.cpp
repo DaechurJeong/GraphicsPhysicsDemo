@@ -12,63 +12,12 @@ void SoftBodyPhysics::Init()
 	for (unsigned i = 0; i < ver-1; ++i)
 		m_scaled_ver[i] = position + m_scaled_ver[i]*scale;
 	m_old_ver = m_scaled_ver;
-	stiffness = 0.5f;
+	stiffness = 0.3f;
 	damping = 1.f;
 
 	isCollided = false;
 
-	if (m_shape == O_SPHERE)
-	{
-		for (int i = 1; i <= dimension; ++i)
-		{
-			constraints up_cons;
-			up_cons.p1 = 0;
-			up_cons.p2 = i;
-			up_cons.restlen = 0;
-			m_const.insert(up_cons);
-
-			constraints down_cons;
-			down_cons.p1 = ver - 2;
-			down_cons.p2 = down_cons.p1 - i-1;
-			down_cons.restlen = 0;
-			m_const.insert(down_cons);
-		}
-	}
-
-	int curr = 0;
-	for (int i = 1; i < obj_indices.size()-1; ++i)
-	{
-		constraints cons;
-		cons.p1 = obj_indices[curr];
-		cons.p2 = obj_indices[i];
-		cons.restlen = glm::distance(m_scaled_ver[cons.p1], m_scaled_ver[cons.p2]);
-		m_const.insert(cons);
-
-		curr = i;
-	}
-
-	unsigned unit = dimension / 2;
-	//vertical
-	for (unsigned i = 0; i < unit; ++i)
-	{
-		//horizontal
-		for (unsigned j = 0; j < unit; ++j)
-		{
-			constraints vol_cons1;
-			constraints vol_cons2;
-
-			vol_cons1.p1 = i * (dimension + 1) + j;
-			vol_cons2.p1 = vol_cons1.p1 + unit;
-
-			vol_cons2.p2 = (dimension + 1) * (unit + i) + j;
-			vol_cons1.p2 = vol_cons2.p2 + unit;
-
-			vol_cons1.restlen = glm::distance(m_scaled_ver[vol_cons1.p1], m_scaled_ver[vol_cons1.p2]);
-			vol_cons2.restlen = glm::distance(m_scaled_ver[vol_cons2.p1], m_scaled_ver[vol_cons2.p2]);
-
-			m_volume_cons.insert(std::make_pair(vol_cons1, vol_cons2));
-		}
-	}
+	
 
 
 	if(m_shape == ObjShape::O_PLANE)
@@ -86,38 +35,37 @@ void SoftBodyPhysics::Init()
 		for(int i = 0; i <= dimension; ++i)
 			m_edge.push_back(std::make_pair(i, m_scaled_ver[i]));
 
-		////set constraints
-		////horizontal
-		//for (int i = 0; i < dimension; ++i)
-		//{
-		//
-		//	for (int j = 0; j <= dimension; ++j)
-		//	{
-		//		constraints h_cons;
-		//		h_cons.p1 = j * (dimension +1) + i;
-		//		h_cons.p2 = h_cons.p1 + 1;
+		//set constraints
+		//horizontal
+		for (int i = 0; i < dimension; ++i)
+		{
+		
+			for (int j = 0; j <= dimension; ++j)
+			{
+				constraints h_cons;
+				h_cons.p1 = j * (dimension +1) + i;
+				h_cons.p2 = h_cons.p1 + 1;
 
-		//		h_cons.restlen = scale.x / dimension;
+				h_cons.restlen = scale.x / dimension;
 
-		//		m_cons.push_back(h_cons);
-		//	}
-		//}
+				m_const.insert(h_cons);
+			}
+		}
 
-		////vertical
-		//for (int i = 0; i <= dimension; ++i)
-		//{
-		//	for (int j = 0; j < dimension; ++j)
-		//	{
-		//		constraints v_cons;
-		//		v_cons.p1 = j * (dimension +1) + i;
-		//		v_cons.p2 = v_cons.p1 + (dimension +1);
-		//		v_cons.restlen = scale.z / (dimension);
+		//vertical
+		for (int i = 0; i <= dimension; ++i)
+		{
+			for (int j = 0; j < dimension; ++j)
+			{
+				constraints v_cons;
+				v_cons.p1 = j * (dimension +1) + i;
+				v_cons.p2 = v_cons.p1 + (dimension +1);
+				v_cons.restlen = scale.z / (dimension);
 
-		//		m_cons.push_back(v_cons);
-		//	}
-		//}
+				m_const.insert(v_cons);
+			}
+		}
 
-		//m_init_cons = m_cons;
 
 	}
 	else if (m_shape == ObjShape::O_SPHERE)
@@ -126,76 +74,58 @@ void SoftBodyPhysics::Init()
 		m_acceleration = std::vector<glm::vec3>(ver, glm::vec3(0, m_gravity * m_mass, 0));
 		m_velocity = std::vector<glm::vec3>(ver, glm::vec3(0));
 
-		//int last_index = static_cast<int>(m_scaled_ver.size())-1;
-		////set constraints
-		//
-		//for (int i = 0; i <= dimension; ++i)
-		//{//horizontal
-		//	for (int j = 0; j <= dimension; ++j)
-		//	{
-		//		constraints h_cons;
-		//		h_cons.p1 = j * (dimension + 1) + i;
-		//		h_cons.p2 = h_cons.p1 + 1;
 
-		//		if (i == dimension)
-		//			h_cons.p2 = j * (dimension + 1);
+		for (int i = 1; i <= dimension; ++i)
+		{
+			constraints up_cons;
+			up_cons.p1 = 0;
+			up_cons.p2 = i;
+			up_cons.restlen = 0;
+			m_const.insert(up_cons);
 
-		//		if (j == 0)
-		//			h_cons.restlen = 0;
-		//		else
-		//			h_cons.restlen = glm::distance(m_scaled_ver[h_cons.p1], m_scaled_ver[h_cons.p2]);
+			constraints down_cons;
+			down_cons.p1 = ver - 2;
+			down_cons.p2 = down_cons.p1 - i - 1;
+			down_cons.restlen = 0;
+			m_const.insert(down_cons);
+		}
+		
 
-		//		m_cons.push_back(h_cons);
+		int curr = 0;
+		for (int i = 1; i < obj_indices.size() - 1; ++i)
+		{
+			constraints cons;
+			cons.p1 = obj_indices[curr];
+			cons.p2 = obj_indices[i];
+			cons.restlen = glm::distance(m_scaled_ver[cons.p1], m_scaled_ver[cons.p2]);
+			m_const.insert(cons);
 
-		//		if (j != dimension)
-		//		{
-		//			constraints d_cons;
-		//			d_cons.p1 = h_cons.p1;
-		//			d_cons.p2 = h_cons.p2 + dimension + 1;
-		//			d_cons.restlen = glm::distance(m_scaled_ver[d_cons.p1], m_scaled_ver[d_cons.p2]);
+			curr = i;
+		}
 
-		//			m_cons.push_back(d_cons);
-		//		}
+		unsigned unit = dimension / 2;
+		//vertical
+		for (unsigned i = 0; i < unit; ++i)
+		{
+			//horizontal
+			for (unsigned j = 0; j < unit; ++j)
+			{
+				constraints vol_cons1;
+				constraints vol_cons2;
 
-		//		if (j != 0)
-		//		{
-		//			constraints d_cons;
-		//			d_cons.p1 = h_cons.p1;
-		//			d_cons.p2 = h_cons.p2 -( dimension + 1);
-		//			d_cons.restlen = glm::distance(m_scaled_ver[d_cons.p1], m_scaled_ver[d_cons.p2]);
+				vol_cons1.p1 = i * (dimension + 1) + j;
+				vol_cons2.p1 = vol_cons1.p1 + unit;
 
-		//			m_cons.push_back(d_cons);
-		//		}
+				vol_cons2.p2 = (dimension + 1) * (unit + i) + j;
+				vol_cons1.p2 = vol_cons2.p2 + unit;
 
+				vol_cons1.restlen = glm::distance(m_scaled_ver[vol_cons1.p1], m_scaled_ver[vol_cons1.p2]);
+				vol_cons2.restlen = glm::distance(m_scaled_ver[vol_cons2.p1], m_scaled_ver[vol_cons2.p2]);
 
-		//	}
+				m_volume_cons.insert(std::make_pair(vol_cons1, vol_cons2));
+			}
+		}
 
-
-		//	//vertical
-		//	for (int j = 0; j < dimension; ++j)
-		//	{
-		//		constraints v_cons;
-		//		v_cons.p1 = j * (dimension + 1) + i;
-		//		v_cons.p2 = v_cons.p1 + (dimension + 1);
-		//		v_cons.restlen = glm::distance(m_scaled_ver[v_cons.p1], m_scaled_ver[v_cons.p2]);
-
-		//		m_cons.push_back(v_cons);
-
-		//	}
-
-		//}
-
-		//for (int i = 0; i <= m_scaled_ver.size()/2; ++i)
-		//{
-		//	constraints d_cons;
-		//	d_cons.p1 = i;
-		//	d_cons.p2 = last_index-i;
-		//	d_cons.restlen = glm::distance(m_scaled_ver[d_cons.p1], m_scaled_ver[d_cons.p2]);
-
-		//	m_cons.push_back(d_cons);
-		//}
-
-		//m_init_cons = m_cons;
 	}
 
 
@@ -209,13 +139,46 @@ void SoftBodyPhysics::Update(float dt)
 
 	Verlet(dt);
 
-	if(!isCollided)
+	//if(!isCollided)
 		KeepConstraint();
 
 
 	position = m_scaled_ver[m_scaled_ver.size() - 1];
-	for (unsigned i = 0; i < m_scaled_ver.size()-1; ++i)
+	glm::vec3 center = glm::vec3(0);
+	m_min = m_scaled_ver[0];
+	m_max = m_scaled_ver[0];
+	
+	center += m_scaled_ver[right];
+	center += m_scaled_ver[left];
+	center += m_scaled_ver[front];
+	center += m_scaled_ver[back];
+	center += m_scaled_ver[up];
+	center += m_scaled_ver[bottom];
+
+	position = center;
+	position.x /= 6;
+	position.y /= 6;
+	position.z /= 6;
+
+	for (unsigned i = 0; i < m_scaled_ver.size() - 1; ++i)
+	{
+		if (m_min.x > m_scaled_ver[i].x)
+			m_min.x = m_scaled_ver[i].x;
+		if (m_max.x < m_scaled_ver[i].x)
+			m_max.x = m_scaled_ver[i].x;
+		if (m_min.y > m_scaled_ver[i].y)
+			m_min.y = m_scaled_ver[i].y;
+		if (m_max.y < m_scaled_ver[i].y)
+			m_max.y = m_scaled_ver[i].y;
+		if (m_min.z > m_scaled_ver[i].z)
+			m_min.z = m_scaled_ver[i].z;
+		if (m_max.z < m_scaled_ver[i].z)
+			m_max.z = m_scaled_ver[i].z;
+
 		obj_vertices[i] = (m_scaled_ver[i] - position) / scale;
+		
+	}
+
 
 
 	
@@ -281,9 +244,13 @@ void SoftBodyPhysics::KeepConstraint()
 		{
 			glm::vec3& point1 = m_scaled_ver[j.first.p1];
 			glm::vec3& point2 = m_scaled_ver[j.first.p2];
+			glm::vec3& old_1 = m_old_ver[j.first.p1];
+			glm::vec3& old_2 = m_old_ver[j.first.p2];
 
 			glm::vec3& point3 = m_scaled_ver[j.second.p1];
 			glm::vec3& point4 = m_scaled_ver[j.second.p2];
+			glm::vec3& old_3 = m_old_ver[j.second.p1];
+			glm::vec3& old_4 = m_old_ver[j.second.p2];
 
 			glm::vec3 delta1 = point2 - point1;
 			glm::vec3 delta2 = point4 - point3;
@@ -291,12 +258,12 @@ void SoftBodyPhysics::KeepConstraint()
 			float len = glm::distance(point2, point1) + glm::distance(point4, point3);
 			float diff = (len - j.first.restlen - j.second.restlen) / len;
 
-			glm::vec3 force1 = stiffness * delta1 * diff * 0.5f;// -damping * glm::dot(point2 - old_2, point1 - old_1) * diff;
+			glm::vec3 force1 = stiffness * delta1 * diff * 0.5f;// -0.8f * glm::dot(point2 - old_2, point1 - old_1) * diff;
 
 			point1 += force1;
 			point2 -= force1;
 
-			glm::vec3 force2 = stiffness * delta2 * diff * 0.5f;
+			glm::vec3 force2 = stiffness * delta2 * diff * 0.5f;// -0.8f * glm::dot(point4 - old_4, point3 - old_3) * diff;
 
 			point3 += force2;
 			point4 -= force2;
@@ -423,11 +390,15 @@ void SoftBodyPhysics::CollisionResponseSoft(SoftBodyPhysics* _rhs)
 	if (glm::distance(position, _rhs->position) > scale[0] + _rhs->scale[0])
 		return;
 
+	glm::vec3 direction = _rhs->position - position;
 	for (unsigned j = 0; j < _rhs->obj_indices.size() - 3; j += 3)
 	{
 		glm::vec3 point0 = _rhs->m_scaled_ver[_rhs->obj_indices[j]];
 		glm::vec3 point1 = _rhs->m_scaled_ver[_rhs->obj_indices[j+2]];
 		glm::vec3 point2 = _rhs->m_scaled_ver[_rhs->obj_indices[j+1]];
+		
+		if (glm::dot(-direction, point0 - _rhs->position) < 0)
+			continue;
 
 		glm::vec3 v = point1 - point0;
 		glm::vec3 w = point2 - point0;
@@ -445,6 +416,10 @@ void SoftBodyPhysics::CollisionResponseSoft(SoftBodyPhysics* _rhs)
 		for (unsigned i = 0; i < m_scaled_ver.size(); ++i)
 		{
 			glm::vec3& point = m_scaled_ver[i];
+			
+			if (glm::dot(direction, point - position) < 0)
+				continue;
+
 			float distance = 0;
 			glm::vec3 moved = m_scaled_ver[i];
 

@@ -5,11 +5,17 @@
 
 //#include "Base.h"
 //#include "Object.h"
-
+#include "glm/glm.hpp"
 #include <vector>
+
+
+#define MIN_LEAF_SIZE 300
 
 class Object;
 class SoftBodyPhysics;
+
+
+
 
 class Physics {
 public:
@@ -34,8 +40,10 @@ public:
 		//}
 		softbody_objs.clear();
 	};
+
+
 private:
-	
+
 	std::vector<Object*> physics_objs;
 	std::vector<SoftBodyPhysics*> softbody_objs;
 

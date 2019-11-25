@@ -78,6 +78,8 @@ public:
 	unsigned int metallic = 0;
 	unsigned int roughness = 0;
 	unsigned int ao = 0;
+
+	unsigned right, left, front, back, up, bottom; // indexes
 	//physics
 	//SoftBodyPhysics& getSoftBody() { return sb; }
 	int nrRows;
