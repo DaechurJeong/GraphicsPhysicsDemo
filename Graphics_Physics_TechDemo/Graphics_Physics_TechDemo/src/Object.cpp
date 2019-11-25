@@ -33,7 +33,8 @@ End Header --------------------------------------------------------*/
 Object::Object(ObjectShape shape, glm::vec3 pos, glm::vec3 scale_, int dim)
 	: position(pos), scale(scale_), color(glm::vec3(1.0f, 1.0f, 1.0f)), rotation(0.f),
       xMax(0), xMin(0), yMax(0), yMin(0), zMax(0), zMin(0), width(512), height(512), m_shape(shape), dimension(dim), d(0),
-	  m_textype(PLASTIC), axis(glm::vec3(0.f,0.f,1.f)), nrRows(9), nrColumns(9), spacing(4.0f)
+	  m_textype(PLASTIC), axis(glm::vec3(0.f,0.f,1.f)), nrRows(9), nrColumns(9), spacing(4.0f),
+	right(0), left(0), up(0), bottom(0), front(0), back(0)
 {
 	if (m_shape == O_PLANE)
 		makePlain();
@@ -344,6 +345,37 @@ void Object::makeSphere()
 			obj_vertices.push_back(glm::vec3(xPos, yPos, zPos));
 			textureUV.push_back(glm::vec2(xSegment, ySegment));
 			vertexNormals.push_back(glm::vec3(xPos, yPos, zPos));
+
+			if (xPos < xMin)
+			{
+				xMin = xPos;
+				right = y * Y_SEGMENTS + x;
+			}
+			if (xPos > xMax)
+			{
+				xMax = xPos;
+				left = y * Y_SEGMENTS + x;
+			}
+			if (yPos < yMin)
+			{
+				yMin = yPos;
+				bottom = y * Y_SEGMENTS + x;
+			}
+			if (yPos > yMax)
+			{
+				yMax = yPos;
+				up = y * Y_SEGMENTS + x;
+			}
+			if (zPos < zMin)
+			{
+				zMin = zPos;
+				back = y * Y_SEGMENTS + x;
+			}
+			if (zPos > zMax)
+			{
+				zMax = zPos;
+				front = y * Y_SEGMENTS + x;
+			}
 		}
 	}
 	int k1, k2 = 0;

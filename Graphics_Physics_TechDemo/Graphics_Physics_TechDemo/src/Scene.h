@@ -60,6 +60,9 @@ private:
 	std::vector<SoftBodyPhysics*> softbody_obj;
 	std::vector<Light> light;
 
+	//test
+	Object* sp;
+
 	void push_object(Object* _obj) { pbr_obj.push_back(_obj); }
 	void push_softbody_object(SoftBodyPhysics* _obj) { softbody_obj.push_back(_obj); }
 	unsigned curr_scene;
