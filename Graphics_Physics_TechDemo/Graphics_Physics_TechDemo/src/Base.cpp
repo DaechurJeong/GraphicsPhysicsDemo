@@ -17,9 +17,6 @@ void SoftBodyPhysics::Init()
 
 	isCollided = false;
 
-	
-
-
 	if(m_shape == ObjShape::O_PLANE)
 	{ 
 		m_mass = 0.3f;
@@ -65,8 +62,6 @@ void SoftBodyPhysics::Init()
 				m_const.insert(v_cons);
 			}
 		}
-
-
 	}
 	else if (m_shape == ObjShape::O_SPHERE)
 	{
@@ -89,7 +84,6 @@ void SoftBodyPhysics::Init()
 			down_cons.restlen = 0;
 			m_const.insert(down_cons);
 		}
-		
 
 		int curr = 0;
 		for (int i = 1; i < obj_indices.size() - 1; ++i)
@@ -125,10 +119,7 @@ void SoftBodyPhysics::Init()
 				m_volume_cons.insert(std::make_pair(vol_cons1, vol_cons2));
 			}
 		}
-
 	}
-
-
 }
 
 void SoftBodyPhysics::Update(float dt)
@@ -141,7 +132,6 @@ void SoftBodyPhysics::Update(float dt)
 
 	//if(!isCollided)
 		KeepConstraint();
-
 
 	position = m_scaled_ver[m_scaled_ver.size() - 1];
 	glm::vec3 center = glm::vec3(0);
@@ -176,12 +166,7 @@ void SoftBodyPhysics::Update(float dt)
 			m_max.z = m_scaled_ver[i].z;
 
 		obj_vertices[i] = (m_scaled_ver[i] - position) / scale;
-		
 	}
-
-
-
-	
 }
 
 void SoftBodyPhysics::Verlet(float dt)
@@ -270,8 +255,6 @@ void SoftBodyPhysics::KeepConstraint()
 
 		}
 
-
-
 		//for (unsigned j = 0; j < m_cons.size(); ++j)
 		//{
 		//	constraints& c = m_cons[j];
@@ -301,10 +284,8 @@ void SoftBodyPhysics::KeepConstraint()
 		//	point2 -= force;
 		//}
 	}
-
 	//unsigned last = m_scaled_ver.size() - 1;
 	//position = (m_scaled_ver[0] + m_scaled_ver[last]) / 2.f;
-
 }
 
 void SoftBodyPhysics::Acceleration()
@@ -330,7 +311,6 @@ void SoftBodyPhysics::CollisionResponseRigid(Object* _rhs)
 				normal = glm::normalize(normal);
 
 				m_scaled_ver[i] = center + normal * radius;
-
 			}
 		}
 	}
@@ -372,13 +352,9 @@ void SoftBodyPhysics::CollisionResponseRigid(Object* _rhs)
 				isCollided = true;
 			}
 		}
-
 		if (!collision)
 			isCollided = false;
-
-	
 	}
-
 }
 
 void SoftBodyPhysics::CollisionResponseSoft(SoftBodyPhysics* _rhs)
@@ -434,11 +410,8 @@ void SoftBodyPhysics::CollisionResponseSoft(SoftBodyPhysics* _rhs)
 			}
 		}
 	}
-
 	if (!collision)
 		isCollided = false;
-
-
 }
 
 bool SoftBodyPhysics::IsCollided(glm::vec3& point, glm::vec3& center, float& radius)

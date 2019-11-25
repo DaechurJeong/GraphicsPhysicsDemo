@@ -102,7 +102,8 @@ void Scene::Scene0Init(Camera* camera)
 	m_physics.push_object(rigid_plane_3);
 	pbr_obj.push_back(rigid_plane_3);
 
-	SoftBodyPhysics* sb_sphere = new SoftBodyPhysics(O_SPHERE, glm::vec3(6.5f, 0.f, 2.f), glm::vec3(1.f, 1.f, 1.f), S_DIMENSION);
+	SoftBodyPhysics* sb_sphere = new SoftBodyPhysics(O_SPHERE, glm::vec3(6.5f, 0.f, 2.f), glm::vec3(1.f, 1.f, 1.f), HIGH_S_DIMENSION);
+	sb_sphere->stiffness = 0.5f;
 	m_physics.push_object(sb_sphere);
 	softbody_obj.push_back(sb_sphere);
 
@@ -136,19 +137,21 @@ void Scene::Scene1Init(Camera* camera)
 	camera->zoom = 45.0f;
 
 	// Generate objects for scene0
-	Object* main_obj_texture = new Object(O_SPHERE, glm::vec3(1.2f,  -2.5f, 4.0f), glm::vec3(1.f, 1.f, 1.f), S_DIMENSION);
+	Object* main_obj_texture = new Object(O_SPHERE, glm::vec3(1.2f,  -2.5f, 4.0f), glm::vec3(1.f, 1.f, 1.f), MID_S_DIMENSION);
 	m_physics.push_object(main_obj_texture);
 	pbr_obj.push_back(main_obj_texture);
 
-	Object* main_obj_texture2 = new Object(O_SPHERE, glm::vec3(1.2f, -0.5f, 2.0f), glm::vec3(1.f, 1.f, 1.f), S_DIMENSION);
+	Object* main_obj_texture2 = new Object(O_SPHERE, glm::vec3(1.2f, -0.5f, 2.0f), glm::vec3(1.f, 1.f, 1.f), MID_S_DIMENSION);
 	m_physics.push_object(main_obj_texture2);
 	pbr_obj.push_back(main_obj_texture2);
 
-	Object* main_obj_texture3 = new Object(O_SPHERE, glm::vec3(1.2f, -4.5f, 6.0f), glm::vec3(1.f, 1.f, 1.f), S_DIMENSION);
+	Object* main_obj_texture3 = new Object(O_SPHERE, glm::vec3(1.2f, -4.5f, 6.0f), glm::vec3(1.f, 1.f, 1.f), MID_S_DIMENSION);
 	m_physics.push_object(main_obj_texture3);
 	pbr_obj.push_back(main_obj_texture3);
 
 	SoftBodyPhysics* plane = new SoftBodyPhysics(O_PLANE, glm::vec3(0, 1.5f, 1.f), glm::vec3(6.f, 1.f, 10.f), P_DIMENSION);
+	plane->m_mass = 0.15f;
+	plane->stiffness = 0.8f;
 	m_physics.push_object(plane);
 	softbody_obj.push_back(plane);
 
@@ -179,17 +182,16 @@ void Scene::Scene1Init(Camera* camera)
 	for (unsigned i = 0; i < softbody_obj.size(); ++i)
 	{
 		// wood
-		softbody_obj[i]->albedo = albedo[2];
-		softbody_obj[i]->normal = normal[2];
-		softbody_obj[i]->metallic = metallic[2];
-		softbody_obj[i]->roughness = roughness[2];
-		softbody_obj[i]->ao = ao[2];
-		softbody_obj[i]->m_textype = WOOD;
+		softbody_obj[i]->albedo = albedo[7];
+		softbody_obj[i]->normal = normal[7];
+		softbody_obj[i]->metallic = metallic[7];
+		softbody_obj[i]->roughness = roughness[7];
+		softbody_obj[i]->ao = ao[7];
+		softbody_obj[i]->m_textype = COPPER;
 	}
 }
 void Scene::Scene2Init(Camera* camera)
 {
-
 	// camera setting
 	camera->position = glm::vec3(2.f, 3.f, 20.0f);
 	camera->yaw = -90.f;
@@ -213,7 +215,7 @@ void Scene::Scene2Init(Camera* camera)
 	m_physics.push_object(rigid_plane_3);
 	pbr_obj.push_back(rigid_plane_3);
 
-	Object* rigid_plane_4 = new Object(O_PLANE, glm::vec3(-3.f, -3.f, -5.f), glm::vec3(10.f, 10.f, 10.f), P_DIMENSION);
+	Object* rigid_plane_4 = new Object(O_PLANE, glm::vec3(-13.f, -5.f, -13.f), glm::vec3(30.f, 30.f, 30.f), P_DIMENSION);
 	m_physics.push_object(rigid_plane_4);
 	pbr_obj.push_back(rigid_plane_4);
 
@@ -266,7 +268,7 @@ void Scene::Scene2Init(Camera* camera)
 void Scene::Scene3Init(Camera* camera)
 {
 	// camera setting
-	camera->position = glm::vec3(0.f, 0.f, 20.0f);
+	camera->position = glm::vec3(3.f, -3.f, 18.0f);
 	camera->yaw = -90.f;
 	camera->pitch = -10.0f;
 	camera->zoom = 45.0f;
@@ -274,8 +276,15 @@ void Scene::Scene3Init(Camera* camera)
 	SoftBodyPhysics* sphere[10];
 	for (int i = 0; i < 10; ++i)
 	{
-		sphere[i] = new SoftBodyPhysics(O_SPHERE, glm::vec3(3.f, 3.f+(float)i*5.f, 2.f), glm::vec3(1.f, 1.f, 1.f), 12);
+		sphere[i] = new SoftBodyPhysics(O_SPHERE, glm::vec3(3.f, 3.f+(float)i*5.f, 2.f), glm::vec3(1.f, 1.f, 1.f), S_DIMENSION);
 		sphere[i]->stiffness = 0.13f;
+		// steel
+		sphere[i]->albedo = albedo[8];
+		sphere[i]->normal = normal[8];
+		sphere[i]->metallic = metallic[8];
+		sphere[i]->roughness = roughness[8];
+		sphere[i]->ao = ao[8];
+		sphere[i]->m_textype = CONCRETE;
 		m_physics.push_object(sphere[i]);
 		softbody_obj.push_back(sphere[i]);
 	}
@@ -322,13 +331,7 @@ void Scene::Scene3Init(Camera* camera)
 		pbr_obj[i]->roughness = roughness[2];
 		pbr_obj[i]->ao = ao[2];
 	}
-	// steel
-	softbody_obj[0]->albedo = albedo[1];
-	softbody_obj[0]->normal = normal[1];
-	softbody_obj[0]->metallic = metallic[1];
-	softbody_obj[0]->roughness = roughness[1];
-	softbody_obj[0]->ao = ao[1];
-	softbody_obj[0]->m_textype = STEEL;
+	
 }
 void Scene::Scene4Init(Camera* camera)
 {
