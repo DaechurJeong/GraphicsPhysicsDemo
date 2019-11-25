@@ -13,7 +13,7 @@ End Header --------------------------------------------------------*/
 
 #define PI 3.141592654
 #define TWOPI 6.283185308
-#define S_DIMENSION 16
+#define S_DIMENSION 12
 #define P_DIMENSION 64
 #define STB_IMAGE_IMPLEMENTATION
 #define WIDTH 1280

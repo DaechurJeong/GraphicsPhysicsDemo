@@ -444,7 +444,6 @@ void Scene::Scene2Draw(Camera* camera, float dt)
 		if (!softbody_obj.empty())
 		{
 			m_physics.update(dt);
-			//m_physics.OcTree->Draw(camera, &pbr_texture_shader, sp);
 			for (std::vector<SoftBodyPhysics*>::iterator obj = softbody_obj.begin(); obj != softbody_obj.end(); ++obj)
 				(*obj)->Describe();
 		}
