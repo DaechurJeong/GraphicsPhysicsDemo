@@ -95,7 +95,7 @@ private:
 
 	float orbit_speed = 0.0003f;
 	float angle = 0.f;
-	float magnitude = 10.f;
+	float magnitude = 7.f;
 
 	float met = 0.f;
 	float rou = 0.f;

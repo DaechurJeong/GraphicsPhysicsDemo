@@ -1,6 +1,7 @@
 #include "Scene.h"
 #include "input.h"
 #include "glm/gtc/matrix_transform.hpp"
+#include <iostream>
 
 const float FRAME_LIMIT = 1.f / 59.f;
 const float PI = 4.0f * atan(1.0f);
@@ -19,6 +20,12 @@ void Scene::Init(GLFWwindow* window, Camera* camera)
 	pbr_texture_shader.SetInt("irradianceMap", 0);
 	pbr_texture_shader.SetInt("prefilterMap", 1);
 	pbr_texture_shader.SetInt("brdfLUT", 2);
+
+	pbr_texture_shader.SetInt("albedo", 3);
+	pbr_texture_shader.SetInt("normal", 4);
+	pbr_texture_shader.SetInt("metallic", 5);
+	pbr_texture_shader.SetInt("roughness", 6);
+	pbr_texture_shader.SetInt("ao", 7);
 
 	backgroundShader.Use();
 	backgroundShader.SetInt("environmentMap", 0);
@@ -103,21 +110,21 @@ void Scene::Scene0Init(Camera* camera)
 	for (unsigned i = 0; i < pbr_obj.size(); ++i)
 	{
 		// Fabric
-		pbr_obj[i]->albedo = albedo[4];
-		pbr_obj[i]->normal = normal[4];
-		pbr_obj[i]->metallic = metallic[4];
-		pbr_obj[i]->roughness = roughness[4];
-		pbr_obj[i]->ao = ao[4];
+		pbr_obj[i]->albedo = albedo[2];
+		pbr_obj[i]->normal = normal[2];
+		pbr_obj[i]->metallic = metallic[2];
+		pbr_obj[i]->roughness = roughness[2];
+		pbr_obj[i]->ao = ao[2];
 	}
 	for (unsigned i = 0; i < softbody_obj.size(); ++i)
 	{
 		// wood
-		softbody_obj[i]->albedo = albedo[2];
-		softbody_obj[i]->normal = normal[2];
-		softbody_obj[i]->metallic = metallic[2];
-		softbody_obj[i]->roughness = roughness[2];
-		softbody_obj[i]->ao = ao[2];
-		softbody_obj[i]->m_textype = STEEL;
+		softbody_obj[i]->albedo = albedo[4];
+		softbody_obj[i]->normal = normal[4];
+		softbody_obj[i]->metallic = metallic[4];
+		softbody_obj[i]->roughness = roughness[4];
+		softbody_obj[i]->ao = ao[4];
+		softbody_obj[i]->m_textype = FABRIC;
 	}
 }
 void Scene::Scene1Init(Camera* camera)
@@ -299,11 +306,11 @@ void Scene::Scene4Init(Camera* camera)
 	camera->pitch = 0.0f;
 	camera->zoom = 45.0f;
 	
-	glm::vec3 temp_pos = glm::vec3(-80.f, -80.f, -80.f);
+	glm::vec3 temp_pos = glm::vec3(-60.f, -60.f, -60.f);
 	int x_count = 1, y_count = 1, z_count = 1;
 	for (unsigned i = 0; i < pbr_number; ++i, ++x_count)
 	{
-		glm::vec3 this_pos = glm::vec3(temp_pos.x + x_count * 40.f, temp_pos.y + y_count * 40.f, temp_pos.z + z_count * 40.f);
+		glm::vec3 this_pos = glm::vec3(temp_pos.x + x_count * 30.f, temp_pos.y + y_count * 30.f, temp_pos.z + z_count * 30.f);
 		Object* pbr_sphere = new Object(O_SPHERE, this_pos, glm::vec3(1.f, 1.f, 1.f), dimension_);
 		pbr_sphere->albedo = albedo[i];
 		pbr_sphere->normal = normal[i];
@@ -322,7 +329,6 @@ void Scene::Scene4Init(Camera* camera)
 			++z_count;
 		}
 	}
-
 	// light properties
 	for (int i = 0; i < light_num; ++i)
 	{
@@ -359,6 +365,9 @@ void Scene::Scene0Draw(GLFWwindow* window, Camera* camera, float dt)
 				(*obj)->Describe();
 		}
 	}
+	// Find the xMin, xMax, yMin, yMax, zMin, zMax with up vector,
+	// and capture all views of each 6 side, and update all data
+
 	//UpdateFrameBuffer(&equirectangularToCubmapShader, &irradianceShader, &prefilterShader, &brdfShader,
 	//	captureFBO, captureRBO, envCubemap, irradianceMap, prefilterMap, brdfLUTTexture, hdrTexture);
 	//InitSkybox(&backgroundShader, &pbr_texture_shader, camera, (float)width, (float)height);
@@ -367,13 +376,27 @@ void Scene::Scene0Draw(GLFWwindow* window, Camera* camera, float dt)
 	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	/*prefilterShader.Use();
+	glm::mat4 captureViews[] =
+	{
+		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)), // right
+		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)), // left
+		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  1.0f,  0.0f), glm::vec3(0.0f,  0.0f,  1.0f)), // up
+		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)), // bottom
+		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f)), // front
+		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))  // back
+	};
+
+	simulate_prefilter(&prefilterShader, prefilterMap, captureFBO, captureRBO, envCubemap, captureViews);
+	ResizeFrameBuffer(window);*/
+
 	pbr_texture_shader.Use();
 	camera->Update(&pbr_texture_shader);
 	pbr_texture_shader.SetVec3("camPos", camera->position);
 
 	// Draw objs
 	DrawObjs(camera, curr_scene);
-
+	
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
 
