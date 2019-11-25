@@ -86,13 +86,6 @@ public:
 	int nrColumns;
 	float spacing;
 
-	unsigned right;
-	unsigned left;
-	unsigned up;
-	unsigned bottom;
-	unsigned front;
-	unsigned back;
-
 	std::vector<glm::vec3> obj_vertices;
 	std::vector<unsigned> obj_indices;
 	std::vector<glm::vec2> textureUV;

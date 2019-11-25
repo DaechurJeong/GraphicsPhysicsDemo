@@ -376,35 +376,12 @@ void Scene::Scene0Draw(GLFWwindow* window, Camera* camera, float dt)
 	// Find the xMin, xMax, yMin, yMax, zMin, zMax with up vector,
 	// and capture all views of each 6 side, and update all data
 
-	//UpdateFrameBuffer(&equirectangularToCubmapShader, &irradianceShader, &prefilterShader, &brdfShader,
-	//	captureFBO, captureRBO, envCubemap, irradianceMap, prefilterMap, brdfLUTTexture, hdrTexture);
-	//InitSkybox(&backgroundShader, &pbr_texture_shader, camera, (float)width, (float)height);
-
-	//ResizeFrameBuffer(window);
 	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	/*prefilterShader.Use();
-	glm::mat4 captureViews[] =
-	{
-		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)), // right
-		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)), // left
-		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  1.0f,  0.0f), glm::vec3(0.0f,  0.0f,  1.0f)), // up
-		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)), // bottom
-		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f)), // front
-		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))  // back
-	};
-
-	simulate_prefilter(&prefilterShader, prefilterMap, captureFBO, captureRBO, envCubemap, captureViews);
-	ResizeFrameBuffer(window);*/
 
 	pbr_texture_shader.Use();
 	camera->Update(&pbr_texture_shader);
 	pbr_texture_shader.SetVec3("camPos", camera->position);
-
-	std::cout << camera->position.x << " , "
-				<<camera->position.y << " , "
-				<< camera->position.z << std::endl;
 
 	// Draw objs
 	DrawObjs(camera, curr_scene);
@@ -442,9 +419,9 @@ void Scene::Scene1Draw(Camera* camera, float dt)
 	// Draw objs
 	DrawObjs(camera, curr_scene);
 
-	pbr_texture_shader.Use();
-	camera->Update(&pbr_texture_shader);
-	pbr_texture_shader.SetVec3("camPos", camera->position);
+	//pbr_texture_shader.Use();
+	//camera->Update(&pbr_texture_shader);
+	//pbr_texture_shader.SetVec3("camPos", camera->position);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
 
@@ -480,9 +457,9 @@ void Scene::Scene2Draw(Camera* camera, float dt)
 	// Draw objs
 	DrawObjs(camera, curr_scene);
 
-	pbr_texture_shader.Use();
-	camera->Update(&pbr_texture_shader);
-	pbr_texture_shader.SetVec3("camPos", camera->position);
+	//pbr_texture_shader.Use();
+	//camera->Update(&pbr_texture_shader);
+	//pbr_texture_shader.SetVec3("camPos", camera->position);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
 
