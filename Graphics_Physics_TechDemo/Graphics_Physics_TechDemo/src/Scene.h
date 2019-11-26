@@ -50,6 +50,7 @@ public:
 
 	void ShutDown();
 	void DeleteBuffers();
+	void DeletePBRTextures();
 	void DrawObjs(Camera* camera, unsigned scene_num);
 
 	void InitAllPBRTexture();

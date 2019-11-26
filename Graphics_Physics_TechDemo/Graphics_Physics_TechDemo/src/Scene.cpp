@@ -179,6 +179,8 @@ void Scene::Scene0Init(Camera* camera)
 }
 void Scene::Scene1Init(Camera* camera)
 {
+	DeletePBRTextures();
+	InitAllPBRTexture();
 	// camera setting
 	camera->position = glm::vec3(10.f, -2.f, 7.0f);
 	camera->yaw = -160.f;
@@ -186,15 +188,36 @@ void Scene::Scene1Init(Camera* camera)
 	camera->zoom = 45.0f;
 
 	// Generate objects for scene0
-	Object* main_obj_texture = new Object(O_SPHERE, glm::vec3(1.2f,  -2.5f, 4.0f), glm::vec3(1.f, 1.f, 1.f), MID_S_DIMENSION);
+	Object* main_obj_texture = new Object(O_SPHERE, glm::vec3(1.2f,  -2.5f, 4.0f), glm::vec3(1.f, 1.f, 1.f), MID_S_DIMENSION); // mid
+	// plastic
+	main_obj_texture->albedo = albedo[2];
+	main_obj_texture->normal = normal[2];
+	main_obj_texture->metallic = metallic[2];
+	main_obj_texture->roughness = roughness[2];
+	main_obj_texture->ao = ao[2];
+	main_obj_texture->m_textype = WOOD;
 	m_physics.push_object(main_obj_texture);
 	pbr_obj.push_back(main_obj_texture);
 
-	Object* main_obj_texture2 = new Object(O_SPHERE, glm::vec3(1.2f, -0.5f, 2.0f), glm::vec3(1.f, 1.f, 1.f), MID_S_DIMENSION);
+	Object* main_obj_texture2 = new Object(O_SPHERE, glm::vec3(1.2f, -0.5f, 2.0f), glm::vec3(1.f, 1.f, 1.f), MID_S_DIMENSION); // top
+	// plastic
+	main_obj_texture2->albedo = albedo[1];
+	main_obj_texture2->normal = normal[1];
+	main_obj_texture2->metallic = metallic[1];
+	main_obj_texture2->roughness = roughness[1];
+	main_obj_texture2->ao = ao[1];
+	main_obj_texture2->m_textype = STEEL;
 	m_physics.push_object(main_obj_texture2);
 	pbr_obj.push_back(main_obj_texture2);
 
-	Object* main_obj_texture3 = new Object(O_SPHERE, glm::vec3(1.2f, -4.5f, 6.0f), glm::vec3(1.f, 1.f, 1.f), MID_S_DIMENSION);
+	Object* main_obj_texture3 = new Object(O_SPHERE, glm::vec3(1.2f, -4.5f, 6.0f), glm::vec3(1.f, 1.f, 1.f), MID_S_DIMENSION); // bottom
+	// steel
+	main_obj_texture3->albedo = albedo[10];
+	main_obj_texture3->normal = normal[10];
+	main_obj_texture3->metallic = metallic[10];
+	main_obj_texture3->roughness = roughness[10];
+	main_obj_texture3->ao = ao[10];
+	main_obj_texture3->m_textype = GOLD;
 	m_physics.push_object(main_obj_texture3);
 	pbr_obj.push_back(main_obj_texture3);
 
@@ -203,30 +226,6 @@ void Scene::Scene1Init(Camera* camera)
 	plane->stiffness = 0.8f;
 	m_physics.push_object(plane);
 	softbody_obj.push_back(plane);
-
-	// plastic
-	pbr_obj[0]->albedo = albedo[2];
-	pbr_obj[0]->normal = normal[2];
-	pbr_obj[0]->metallic = metallic[2];
-	pbr_obj[0]->roughness = roughness[2];
-	pbr_obj[0]->ao = ao[2];
-	pbr_obj[0]->m_textype = WOOD;
-
-	// torn_fabric
-	pbr_obj[1]->albedo = albedo[5];
-	pbr_obj[1]->normal = normal[5];
-	pbr_obj[1]->metallic = metallic[5];
-	pbr_obj[1]->roughness = roughness[5];
-	pbr_obj[1]->ao = ao[5];
-	pbr_obj[1]->m_textype = TORN_FABRIC;
-
-	// steel
-	pbr_obj[2]->albedo = albedo[1];
-	pbr_obj[2]->normal = normal[1];
-	pbr_obj[2]->metallic = metallic[1];
-	pbr_obj[2]->roughness = roughness[1];
-	pbr_obj[2]->ao = ao[1];
-	pbr_obj[2]->m_textype = STEEL;
 
 	for (unsigned i = 0; i < softbody_obj.size(); ++i)
 	{
@@ -384,6 +383,8 @@ void Scene::Scene3Init(Camera* camera)
 }
 void Scene::Scene4Init(Camera* camera)
 {
+	DeletePBRTextures();
+	cam_move = false;
 	InitAllPBRTexture();
 	// camera setting
 	camera->yaw = -90.f;
@@ -594,6 +595,7 @@ void Scene::Scene4Init(Camera* camera)
 }
 void Scene::Scene5Init(Camera* camera)
 {
+	DeletePBRTextures();
 	InitAllPBRTexture();
 	// camera setting
 	camera->yaw = -90.f;
@@ -934,6 +936,17 @@ void Scene::DrawObjs(Camera* camera, unsigned scene_num)
 		(*s_obj)->render_objs(camera, &pbr_texture_shader, (*s_obj)->position, aspect, draw_line);
 	}
 	pbr_texture_shader.SetInt("light_num", static_cast<int>(light_obj.size()));
+}
+void Scene::DeletePBRTextures()
+{
+	for (unsigned i = 0; i < pbr_number; ++i)
+	{
+		glDeleteTextures(1, &albedo[i]);
+		glDeleteTextures(1, &normal[i]);
+		glDeleteTextures(1, &roughness[i]);
+		glDeleteTextures(1, &metallic[i]);
+		glDeleteTextures(1, &ao[i]);
+	}
 }
 void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 {
