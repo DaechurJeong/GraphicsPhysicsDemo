@@ -16,7 +16,7 @@
 
 #define S_DIMENSION 12
 #define MID_S_DIMENSION 20
-#define HIGH_S_DIMENSION 30
+#define HIGH_S_DIMENSION 24
 #define P_DIMENSION 64
 
 const unsigned pbr_number = 11;
@@ -64,9 +64,6 @@ private:
 	std::vector<Object*> light_obj;
 	std::vector<SoftBodyPhysics*> softbody_obj;
 	std::vector<Light> light;
-
-	//test
-	Object* sp;
 
 	void push_object(Object* _obj) { pbr_obj.push_back(_obj); }
 	void push_softbody_object(SoftBodyPhysics* _obj) { softbody_obj.push_back(_obj); }

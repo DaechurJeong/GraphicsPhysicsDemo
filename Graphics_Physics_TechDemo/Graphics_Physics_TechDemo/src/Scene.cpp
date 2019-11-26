@@ -103,7 +103,7 @@ void Scene::Scene0Init(Camera* camera)
 	pbr_obj.push_back(rigid_plane_3);
 
 	SoftBodyPhysics* sb_sphere = new SoftBodyPhysics(O_SPHERE, glm::vec3(6.5f, 0.f, 2.f), glm::vec3(1.f, 1.f, 1.f), HIGH_S_DIMENSION);
-	sb_sphere->stiffness = 0.5f;
+	sb_sphere->stiffness = 0.35f;
 	m_physics.push_object(sb_sphere);
 	softbody_obj.push_back(sb_sphere);
 
@@ -268,16 +268,16 @@ void Scene::Scene2Init(Camera* camera)
 void Scene::Scene3Init(Camera* camera)
 {
 	// camera setting
-	camera->position = glm::vec3(3.f, -3.f, 18.0f);
+	camera->position = glm::vec3(3.f, -1.f, 17.0f);
 	camera->yaw = -90.f;
-	camera->pitch = -10.0f;
+	camera->pitch = -19.0f;
 	camera->zoom = 45.0f;
 
 	SoftBodyPhysics* sphere[10];
 	for (int i = 0; i < 10; ++i)
 	{
 		sphere[i] = new SoftBodyPhysics(O_SPHERE, glm::vec3(3.f, 3.f+(float)i*5.f, 2.f), glm::vec3(1.f, 1.f, 1.f), S_DIMENSION);
-		sphere[i]->stiffness = 0.13f;
+		sphere[i]->stiffness = 0.25f;
 		// steel
 		sphere[i]->albedo = albedo[8];
 		sphere[i]->normal = normal[8];
@@ -629,13 +629,10 @@ void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 
 	bool show_demo_window = false;
 
-	if (show_demo_window && curr_scene != 4)
-		ImGui::ShowDemoWindow(&show_demo_window);
-	{
-		ImGui::Begin("GUI interface");
-		ImGui::Text("Frame Per Second : %d ms", static_cast<int>(1.f / dt));
-		ImGui::End();
-	}
+	ImGui::Begin("GUI interface");
+	ImGui::Text("Frame Per Second : %d ms", static_cast<int>(1.f / dt));
+	ImGui::End();
+
 	if (second_imgui)
 	{
 		ImGui::Begin("Scene selector");
@@ -780,6 +777,27 @@ void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 				move_object = true;
 		}
 		ImGui::End();
+
+		float stiffness = softbody_obj[0]->stiffness;
+		float newstiffness = stiffness;
+		ImGui::Begin("Soft Body");
+		ImGui::SliderFloat("Stiffness", &newstiffness, 0.1f, 0.6f);
+
+		//float damping = softbody_obj[0]->damping;
+		//float newdamping = damping;
+		//ImGui::SliderFloat("Damping", &newdamping, 0.1f, 0.8f);
+		ImGui::End();
+
+		if (stiffness != newstiffness)// || damping != newdamping)
+		{
+			for (size_t i = 0; i < softbody_obj.size(); ++i)
+			{
+				softbody_obj[i]->stiffness = newstiffness;
+				//softbody_obj[i]->damping = newdamping;
+			}
+		}
+
+
 	}
 	if (fifth_imgui)
 	{
