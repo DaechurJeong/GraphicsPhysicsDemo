@@ -762,7 +762,7 @@ void Scene::Scene4Draw(Camera* camera, float dt)
 		camera->yaw = glm::degrees(asinf(look_vec.z / dist));
 		if (dist < 0.03f)
 			dist = 0.03f;
-		camera->position += (dist * glm::normalize(look_vec));//= prev;
+		camera->position += (dist * glm::normalize(look_vec));
 	}
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
