@@ -87,7 +87,7 @@ void SoftBodyPhysics::Init()
 
 		//face
 		int curr = 0;
-		for (int i = 1; i < obj_indices.size() - 1; ++i)
+		for (int i = 1; i < obj_indices.size(); ++i)
 		{
 			constraints cons;
 			cons.p1 = obj_indices[curr];
@@ -334,7 +334,7 @@ void SoftBodyPhysics::CollisionResponseRigid(Object* _rhs)
 
 		_rhs->d = -glm::dot(_rhs->normalVec, point0);
 			
-		float radius = 0.0f;
+		float radius = 0.f;
 		//float radius_sqr = radius * radius;
 		bool collision = false;
 		for (unsigned i = 0; i < m_scaled_ver.size(); ++i)
@@ -350,7 +350,7 @@ void SoftBodyPhysics::CollisionResponseRigid(Object* _rhs)
 			collision = IsCollidedPlane(point, point0, point1, radius, distance, l_norm, _rhs->d, moved);
 			if (collision)
 			{
-				m_scaled_ver[i] = moved + (radius - distance) * l_norm;
+				m_scaled_ver[i] = moved;// +(radius - distance) * l_norm;
 				isCollided = true;
 			}
 		}
@@ -407,7 +407,7 @@ void SoftBodyPhysics::CollisionResponseSoft(SoftBodyPhysics* _rhs)
 			collision = IsCollidedPlane(point, point0, point1, radius, distance, l_norm, d, moved);
 			if (collision)
 			{
-				m_scaled_ver[i] = moved + 0.5f*(radius - distance) * l_norm;
+				m_scaled_ver[i] = moved;// +0.5f * (radius - distance) * l_norm;
 				isCollided = true;
 			}
 		}
