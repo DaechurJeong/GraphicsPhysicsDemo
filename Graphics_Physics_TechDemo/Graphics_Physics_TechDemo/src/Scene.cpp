@@ -80,37 +80,81 @@ void Scene::Update(GLFWwindow* window, Camera* camera, float dt)
 }
 void Scene::Scene0Init(Camera* camera)
 {
-	// camera setting
-	camera->position = glm::vec3(10.f, -6.f, 15.0f);
-	camera->yaw = -115.f;
-	camera->pitch = 0.0f;
-	camera->zoom = 45.0f;
-
 	Object* rigid_plane = new Object(O_PLANE, glm::vec3(4.f, -4.f, 1.f), glm::vec3(7.f, 1.f, 0.5f), P_DIMENSION);
 	rigid_plane->rotation = 1.f;
 	m_physics.push_object(rigid_plane);
 	pbr_obj.push_back(rigid_plane);
 
-	Object* rigid_plane_4 = new Object(O_PLANE, glm::vec3(4.f, -4.f, 2.f), glm::vec3(7.f, 1.f, 0.5f), P_DIMENSION);
-	rigid_plane_4->rotation = 1.f;
-	m_physics.push_object(rigid_plane_4);
-	pbr_obj.push_back(rigid_plane_4);
+	Object* rigid_plane_1 = new Object(O_PLANE, glm::vec3(4.f, -4.f, 2.f), glm::vec3(7.f, 1.f, 0.5f), P_DIMENSION);
+	rigid_plane_1->rotation = 1.f;
+	m_physics.push_object(rigid_plane_1);
+	pbr_obj.push_back(rigid_plane_1);
 
-	Object* rigid_plane_2 = new Object(O_PLANE, glm::vec3(1.3f, -7.f, 0.5f), glm::vec3(4.f, 1.f, 4.f), P_DIMENSION);
+	Object* rigid_plane_2 = new Object(O_PLANE, glm::vec3(1.3f, -7.f, 0.5f), glm::vec3(4.f, 1.f, 4.f), P_DIMENSION); // 2
 	rigid_plane_2->rotation = -1.f;
 	m_physics.push_object(rigid_plane_2);
 	pbr_obj.push_back(rigid_plane_2);
 
-	Object* rigid_plane_3 = new Object(O_PLANE, glm::vec3(4.f, -10.3f, 0.5f), glm::vec3(4.f, 1.f, 4.f), P_DIMENSION);
+	Object* rigid_plane_3 = new Object(O_PLANE, glm::vec3(4.f, -10.3f, 0.5f), glm::vec3(4.f, 1.f, 4.f), P_DIMENSION); // 3
 	rigid_plane_3->rotation = 1.f;
 	m_physics.push_object(rigid_plane_3);
 	pbr_obj.push_back(rigid_plane_3);
 
-	SoftBodyPhysics* sb_sphere = new SoftBodyPhysics(O_SPHERE, glm::vec3(6.5f, 0.f, 2.f), glm::vec3(1.f, 1.f, 1.f), HIGH_S_DIMENSION);
+	Object* rigid_plane_4 = new Object(O_PLANE, glm::vec3(1.3f, -13.f, 0.5f), glm::vec3(4.f, 1.f, 4.f), P_DIMENSION); // 2
+	rigid_plane_4->rotation = -1.f;
+	m_physics.push_object(rigid_plane_4);
+	pbr_obj.push_back(rigid_plane_4);
+
+	Object* rigid_plane_5 = new Object(O_PLANE, glm::vec3(4.f, -16.3f, 0.5f), glm::vec3(4.f, 1.f, 4.f), P_DIMENSION); // 3
+	rigid_plane_5->rotation = 1.f;
+	m_physics.push_object(rigid_plane_5);
+	pbr_obj.push_back(rigid_plane_5);
+
+	Object* rigid_plane_6 = new Object(O_PLANE, glm::vec3(1.3f, -19.f, 0.5f), glm::vec3(4.f, 60.f, 4.f), P_DIMENSION); // 2
+	rigid_plane_6->rotation = -0.1f;
+	m_physics.push_object(rigid_plane_6);
+	pbr_obj.push_back(rigid_plane_6);
+
+	Object* rigid_plane_7 = new Object(O_PLANE, glm::vec3(8.f, -40.3f, 0.5f), glm::vec3(4.f, 40.f, 4.f), P_DIMENSION); // 3
+	rigid_plane_7->rotation = 0.1f;
+	m_physics.push_object(rigid_plane_7);
+	pbr_obj.push_back(rigid_plane_7);
+
+	//right
+	Object* rigid_cube_1 = new Object(O_PLANE, glm::vec3(3.5f, -52.f, 0.5f), glm::vec3(2.f, 2.f, 2.5f), P_DIMENSION);
+	rigid_cube_1->axis = glm::vec3(0.f, 0.f, 1.f);
+	rigid_cube_1->rotation = 1.5708f;
+	m_physics.push_object(rigid_cube_1);
+	pbr_obj.push_back(rigid_cube_1);
+
+	//left
+	Object* rigid_cube_2 = new Object(O_PLANE, glm::vec3(1.f, -50.f, 0.5f), glm::vec3(2.f, 2.f, 2.5f), P_DIMENSION);
+	rigid_cube_2->axis = glm::vec3(0.f, 0.f, 1.f);
+	rigid_cube_2->rotation = -1.5708f;
+	m_physics.push_object(rigid_cube_2);
+	pbr_obj.push_back(rigid_cube_2);
+
+	//back
+	Object* rigid_cube_3 = new Object(O_PLANE, glm::vec3(1.f, -50.f, 0.5f), glm::vec3(2.5f, 2.f, 2.f), P_DIMENSION);
+	rigid_cube_3->axis = glm::vec3(1.f, 0.f, 0.f);
+	rigid_cube_3->rotation = 1.5708f;
+	m_physics.push_object(rigid_cube_3);
+	pbr_obj.push_back(rigid_cube_3);
+
+	Object* rigid_plane_ = new Object(O_PLANE, glm::vec3(1.f, -52.f, 0.5f), glm::vec3(2.5f, 2.5f, 2.5f), P_DIMENSION);
+	m_physics.push_object(rigid_plane_);
+	pbr_obj.push_back(rigid_plane_);
+
+	SoftBodyPhysics* sb_sphere = new SoftBodyPhysics(O_SPHERE, glm::vec3(6.5f, 0.f, 2.f), glm::vec3(1.f, 1.f, 1.f), S_DIMENSION);
 	sb_sphere->stiffness = 0.35f;
 	m_physics.push_object(sb_sphere);
 	softbody_obj.push_back(sb_sphere);
 
+	// camera setting
+	camera->position = glm::vec3(6.5f, 0.f, 10.f);
+	camera->yaw = -90.f;
+	camera->pitch = 0.0f;
+	camera->zoom = 45.0f;
 	// load PBR material textures
 	for (unsigned i = 0; i < pbr_obj.size(); ++i)
 	{
@@ -615,12 +659,11 @@ void Scene::Scene0Draw(GLFWwindow* window, Camera* camera, float dt)
 				(*obj)->Describe();
 		}
 	}
-	// Find the xMin, xMax, yMin, yMax, zMin, zMax with up vector,
-	// and capture all views of each 6 side, and update all data
 
 	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+	
+	camera->position = softbody_obj[0]->position + glm::vec3(0.f,0.f,8.f);
 	pbr_texture_shader.Use();
 	camera->Update(&pbr_texture_shader);
 	pbr_texture_shader.SetVec3("camPos", camera->position);
