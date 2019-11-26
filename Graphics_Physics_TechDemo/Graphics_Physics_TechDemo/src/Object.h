@@ -78,6 +78,8 @@ public:
 	unsigned int metallic = 0;
 	unsigned int roughness = 0;
 	unsigned int ao = 0;
+
+	unsigned right, left, front, back, up, bottom; // indexes
 	//physics
 	//SoftBodyPhysics& getSoftBody() { return sb; }
 	int nrRows;
@@ -120,8 +122,10 @@ unsigned int loadTexture_LUT(Shader* brdfShader, unsigned captureFBO, unsigned c
 void simulate_prefilter(Shader* prefilterShader, Shader* pbr_texture_shader, unsigned prefilterMap, unsigned captureFBO, unsigned captureRBO,
 	unsigned envCubemap, glm::mat4* captureViews);
 
-void InitFrameBuffer(Shader* pbr_texture_shader, Shader* equirectangularToCubmapShader, Shader* irradianceShader, Shader* prefilterShader, Shader* brdfShader,
-	unsigned& captureFBO, unsigned& captureRBO,	unsigned& envCubemap, unsigned& irradianceMap, unsigned& prefilterMap, unsigned& brdfLUTTexture);
+void InitFrameBuffer(Shader* equirectangularToCubmapShader, Shader* irradianceShader, Shader* prefilterShader, Shader* brdfShader,
+	unsigned& captureFBO, unsigned& captureRBO,	unsigned& envCubemap, unsigned& irradianceMap, unsigned& prefilterMap, unsigned& brdfLUTTexture, unsigned& hdrTexture);
+void UpdateFrameBuffer(Shader* equirectangularToCubmapShader, Shader* irradianceShader, Shader* prefilterShader, Shader* brdfShader,
+	unsigned& captureFBO, unsigned& captureRBO, unsigned& envCubemap, unsigned& irradianceMap, unsigned& prefilterMap, unsigned& brdfLUTTexture, unsigned& hdrTexture);
 void InitSkybox(Shader* backgroundShader, Shader* pbrshader, Camera* camera, float width, float height);
 void renderCube();
 void renderQuad();

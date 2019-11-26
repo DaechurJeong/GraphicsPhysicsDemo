@@ -8,7 +8,7 @@
 #include <set>
 //#include <vector>
 
-#define GRAVITY -6.0f
+#define GRAVITY -9.8f
 
 struct constraints {
 	constraints() { p1 = 0; p2 = 0; restlen = 0; }
@@ -21,6 +21,8 @@ struct constraints {
 		return (p1 < op2.p1);
 	}
 };
+
+
 
 class SoftBodyPhysics : public Object
 {
@@ -39,6 +41,14 @@ public:
 	void SetInitConstraints() { m_cons = m_init_cons; }
 	bool colliding() { return isCollided; }
 
+
+	std::vector<glm::vec3> m_scaled_ver;
+	glm::vec3 m_min;
+	glm::vec3 m_max;
+
+	float m_mass;
+	float stiffness;
+	float damping;
 private:
 	void Verlet(float dt);
 	void Move(float dt);
@@ -50,7 +60,7 @@ private:
 	bool IsCollidedPlane(glm::vec3& point, glm::vec3& p_point0, glm::vec3& p_point1, float& radius, float& distance, glm::vec3& norm, float d
 	, glm::vec3& movedpoint);
 
-	std::vector<glm::vec3> m_scaled_ver;
+
 	std::vector<glm::vec3> m_old_ver;
 
 
@@ -66,9 +76,7 @@ private:
 	std::vector<glm::vec3> m_velocity;
 	bool isCollided;
 
-	float m_mass;
-	float stiffness;
-	float damping;
+
 	//temp
 	std::vector <std::pair<unsigned, glm::vec3>> m_edge;
 

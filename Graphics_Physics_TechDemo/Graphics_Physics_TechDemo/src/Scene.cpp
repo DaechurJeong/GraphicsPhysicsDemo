@@ -1,14 +1,13 @@
 #include "Scene.h"
 #include "input.h"
 #include "glm/gtc/matrix_transform.hpp"
+#include <iostream>
 
 const float FRAME_LIMIT = 1.f / 59.f;
 const float PI = 4.0f * atan(1.0f);
 
 void Scene::Init(GLFWwindow* window, Camera* camera)
 {
-	InitAllPBRTexture();
-
 	pbr_texture_shader.CreateShader("ShaderCodes\\pbr_texture.vs", "ShaderCodes\\pbr_texture.fs", nullptr);
 	equirectangularToCubmapShader.CreateShader("ShaderCodes\\cubemap.vs", "ShaderCodes\\equirectangular_to_cubemap.fs", nullptr);
 	irradianceShader.CreateShader("ShaderCodes\\cubemap.vs", "ShaderCodes\\irradiance_convolution.fs", nullptr);
@@ -22,10 +21,10 @@ void Scene::Init(GLFWwindow* window, Camera* camera)
 	pbr_texture_shader.SetInt("prefilterMap", 1);
 	pbr_texture_shader.SetInt("brdfLUT", 2);
 
-	pbr_texture_shader.SetInt("albedo",3);
-	pbr_texture_shader.SetInt("normal",4);
-	pbr_texture_shader.SetInt("metallic",5);
-	pbr_texture_shader.SetInt("roughness",6);
+	pbr_texture_shader.SetInt("albedo", 3);
+	pbr_texture_shader.SetInt("normal", 4);
+	pbr_texture_shader.SetInt("metallic", 5);
+	pbr_texture_shader.SetInt("roughness", 6);
 	pbr_texture_shader.SetInt("ao", 7);
 
 	backgroundShader.Use();
@@ -36,7 +35,7 @@ void Scene::Init(GLFWwindow* window, Camera* camera)
 
 	// pbr: setup framebuffer
 	InitFrameBuffer(&equirectangularToCubmapShader, &irradianceShader, &prefilterShader, &brdfShader,
-		captureFBO, captureRBO, envCubemap, irradianceMap, prefilterMap, brdfLUTTexture);
+		captureFBO, captureRBO, envCubemap, irradianceMap, prefilterMap, brdfLUTTexture, hdrTexture);
 	InitSkybox(&backgroundShader, &pbr_texture_shader, camera, (float)width, (float)height);
 
 	ResizeFrameBuffer(window);
@@ -63,7 +62,7 @@ void Scene::Update(GLFWwindow* window, Camera* camera, float dt)
 	ProcessInput(camera, window, deltaTime);
 
 	if (curr_scene == 0)
-		Scene0Draw(camera, deltaTime);
+		Scene0Draw(window, camera, deltaTime);
 	else if (curr_scene == 1)
 		Scene1Draw(camera, deltaTime);
 	else if (curr_scene == 2)
@@ -83,27 +82,28 @@ void Scene::Scene0Init(Camera* camera)
 	camera->pitch = 0.0f;
 	camera->zoom = 45.0f;
 
-	Object* rigid_plane = new Object(O_PLANE, glm::vec3(4.f, -4.f, 1.f), glm::vec3(7.f, 1.f, 0.5f), dimension_);
+	Object* rigid_plane = new Object(O_PLANE, glm::vec3(4.f, -4.f, 1.f), glm::vec3(7.f, 1.f, 0.5f), P_DIMENSION);
 	rigid_plane->rotation = 1.f;
 	m_physics.push_object(rigid_plane);
 	pbr_obj.push_back(rigid_plane);
 
-	Object* rigid_plane_4 = new Object(O_PLANE, glm::vec3(4.f, -4.f, 2.f), glm::vec3(7.f, 1.f, 0.5f), dimension_);
+	Object* rigid_plane_4 = new Object(O_PLANE, glm::vec3(4.f, -4.f, 2.f), glm::vec3(7.f, 1.f, 0.5f), P_DIMENSION);
 	rigid_plane_4->rotation = 1.f;
 	m_physics.push_object(rigid_plane_4);
 	pbr_obj.push_back(rigid_plane_4);
 
-	Object* rigid_plane_2 = new Object(O_PLANE, glm::vec3(1.3f, -7.f, 0.5f), glm::vec3(4.f, 1.f, 4.f), dimension_);
+	Object* rigid_plane_2 = new Object(O_PLANE, glm::vec3(1.3f, -7.f, 0.5f), glm::vec3(4.f, 1.f, 4.f), P_DIMENSION);
 	rigid_plane_2->rotation = -1.f;
 	m_physics.push_object(rigid_plane_2);
 	pbr_obj.push_back(rigid_plane_2);
 
-	Object* rigid_plane_3 = new Object(O_PLANE, glm::vec3(4.f, -10.3f, 0.5f), glm::vec3(4.f, 1.f, 4.f), dimension_);
+	Object* rigid_plane_3 = new Object(O_PLANE, glm::vec3(4.f, -10.3f, 0.5f), glm::vec3(4.f, 1.f, 4.f), P_DIMENSION);
 	rigid_plane_3->rotation = 1.f;
 	m_physics.push_object(rigid_plane_3);
 	pbr_obj.push_back(rigid_plane_3);
 
-	SoftBodyPhysics* sb_sphere = new SoftBodyPhysics(O_SPHERE, glm::vec3(6.5f, 0.f, 2.f), glm::vec3(1.f, 1.f, 1.f), dimension_);
+	SoftBodyPhysics* sb_sphere = new SoftBodyPhysics(O_SPHERE, glm::vec3(6.5f, 0.f, 2.f), glm::vec3(1.f, 1.f, 1.f), HIGH_S_DIMENSION);
+	sb_sphere->stiffness = 0.5f;
 	m_physics.push_object(sb_sphere);
 	softbody_obj.push_back(sb_sphere);
 
@@ -111,21 +111,21 @@ void Scene::Scene0Init(Camera* camera)
 	for (unsigned i = 0; i < pbr_obj.size(); ++i)
 	{
 		// Fabric
-		pbr_obj[i]->albedo = albedo[4];
-		pbr_obj[i]->normal = normal[4];
-		pbr_obj[i]->metallic = metallic[4];
-		pbr_obj[i]->roughness = roughness[4];
-		pbr_obj[i]->ao = ao[4];
+		pbr_obj[i]->albedo = albedo[2];
+		pbr_obj[i]->normal = normal[2];
+		pbr_obj[i]->metallic = metallic[2];
+		pbr_obj[i]->roughness = roughness[2];
+		pbr_obj[i]->ao = ao[2];
 	}
 	for (unsigned i = 0; i < softbody_obj.size(); ++i)
 	{
 		// wood
-		softbody_obj[i]->albedo = albedo[2];
-		softbody_obj[i]->normal = normal[2];
-		softbody_obj[i]->metallic = metallic[2];
-		softbody_obj[i]->roughness = roughness[2];
-		softbody_obj[i]->ao = ao[2];
-		softbody_obj[i]->m_textype = STEEL;
+		softbody_obj[i]->albedo = albedo[4];
+		softbody_obj[i]->normal = normal[4];
+		softbody_obj[i]->metallic = metallic[4];
+		softbody_obj[i]->roughness = roughness[4];
+		softbody_obj[i]->ao = ao[4];
+		softbody_obj[i]->m_textype = FABRIC;
 	}
 }
 void Scene::Scene1Init(Camera* camera)
@@ -137,19 +137,21 @@ void Scene::Scene1Init(Camera* camera)
 	camera->zoom = 45.0f;
 
 	// Generate objects for scene0
-	Object* main_obj_texture = new Object(O_SPHERE, glm::vec3(1.2f,  -2.5f, 4.0f), glm::vec3(1.f, 1.f, 1.f), dimension_);
+	Object* main_obj_texture = new Object(O_SPHERE, glm::vec3(1.2f,  -2.5f, 4.0f), glm::vec3(1.f, 1.f, 1.f), MID_S_DIMENSION);
 	m_physics.push_object(main_obj_texture);
 	pbr_obj.push_back(main_obj_texture);
 
-	Object* main_obj_texture2 = new Object(O_SPHERE, glm::vec3(1.2f, -0.5f, 2.0f), glm::vec3(1.f, 1.f, 1.f), dimension_);
+	Object* main_obj_texture2 = new Object(O_SPHERE, glm::vec3(1.2f, -0.5f, 2.0f), glm::vec3(1.f, 1.f, 1.f), MID_S_DIMENSION);
 	m_physics.push_object(main_obj_texture2);
 	pbr_obj.push_back(main_obj_texture2);
 
-	Object* main_obj_texture3 = new Object(O_SPHERE, glm::vec3(1.2f, -4.5f, 6.0f), glm::vec3(1.f, 1.f, 1.f), dimension_);
+	Object* main_obj_texture3 = new Object(O_SPHERE, glm::vec3(1.2f, -4.5f, 6.0f), glm::vec3(1.f, 1.f, 1.f), MID_S_DIMENSION);
 	m_physics.push_object(main_obj_texture3);
 	pbr_obj.push_back(main_obj_texture3);
 
-	SoftBodyPhysics* plane = new SoftBodyPhysics(O_PLANE, glm::vec3(0, 1.5f, 1.f), glm::vec3(6.f, 1.f, 10.f), dimension_);
+	SoftBodyPhysics* plane = new SoftBodyPhysics(O_PLANE, glm::vec3(0, 1.5f, 1.f), glm::vec3(6.f, 1.f, 10.f), P_DIMENSION);
+	plane->m_mass = 0.15f;
+	plane->stiffness = 0.8f;
 	m_physics.push_object(plane);
 	softbody_obj.push_back(plane);
 
@@ -180,12 +182,12 @@ void Scene::Scene1Init(Camera* camera)
 	for (unsigned i = 0; i < softbody_obj.size(); ++i)
 	{
 		// wood
-		softbody_obj[i]->albedo = albedo[2];
-		softbody_obj[i]->normal = normal[2];
-		softbody_obj[i]->metallic = metallic[2];
-		softbody_obj[i]->roughness = roughness[2];
-		softbody_obj[i]->ao = ao[2];
-		softbody_obj[i]->m_textype = WOOD;
+		softbody_obj[i]->albedo = albedo[7];
+		softbody_obj[i]->normal = normal[7];
+		softbody_obj[i]->metallic = metallic[7];
+		softbody_obj[i]->roughness = roughness[7];
+		softbody_obj[i]->ao = ao[7];
+		softbody_obj[i]->m_textype = COPPER;
 	}
 }
 void Scene::Scene2Init(Camera* camera)
@@ -196,36 +198,36 @@ void Scene::Scene2Init(Camera* camera)
 	camera->pitch = 0.0f;
 	camera->zoom = 45.0f;
 
-	Object* rigid_plane = new Object(O_PLANE, glm::vec3(4.f, 0.5f, -2.f), glm::vec3(10.f, 10.f, 4.f), dimension_);
+	Object* rigid_plane = new Object(O_PLANE, glm::vec3(4.f, 0.5f, -2.f), glm::vec3(10.f, 10.f, 4.f), P_DIMENSION);
 	rigid_plane->rotation = 0.5f;
 	m_physics.push_object(rigid_plane);
 	pbr_obj.push_back(rigid_plane);
 
-	Object* rigid_plane_2 = new Object(O_PLANE, glm::vec3(0.f, 5.f, -10.f), glm::vec3(4.f, 10.f, 10.f), dimension_);
+	Object* rigid_plane_2 = new Object(O_PLANE, glm::vec3(0.f, 5.f, -10.f), glm::vec3(4.f, 10.f, 10.f), P_DIMENSION);
 	rigid_plane_2->axis = glm::vec3(1.f, 0.f, 0.f);
 	rigid_plane_2->rotation = 0.5f;
 	m_physics.push_object(rigid_plane_2);
 	pbr_obj.push_back(rigid_plane_2);
 
-	Object* rigid_plane_3 = new Object(O_PLANE, glm::vec3(-9.f, 5.f, -2.f), glm::vec3(10.f, 10.f, 4.f), dimension_);
+	Object* rigid_plane_3 = new Object(O_PLANE, glm::vec3(-9.f, 5.f, -2.f), glm::vec3(10.f, 10.f, 4.f), P_DIMENSION);
 	rigid_plane_3->axis = glm::vec3(0.f, 0.f, -1.f);
 	rigid_plane_3->rotation = 0.5f;
 	m_physics.push_object(rigid_plane_3);
 	pbr_obj.push_back(rigid_plane_3);
 
-	Object* rigid_plane_4 = new Object(O_PLANE, glm::vec3(-3.f, -3.f, -5.f), glm::vec3(10.f, 10.f, 10.f), dimension_);
+	Object* rigid_plane_4 = new Object(O_PLANE, glm::vec3(-13.f, -5.f, -13.f), glm::vec3(30.f, 30.f, 30.f), P_DIMENSION);
 	m_physics.push_object(rigid_plane_4);
 	pbr_obj.push_back(rigid_plane_4);
 
-	SoftBodyPhysics* sb_sphere = new SoftBodyPhysics(O_SPHERE, glm::vec3(10.f, 6.8f, 0.f), glm::vec3(1.f, 1.f, 1.f), dimension_);
+	SoftBodyPhysics* sb_sphere = new SoftBodyPhysics(O_SPHERE, glm::vec3(10.f, 6.8f, 0.f), glm::vec3(1.f, 1.f, 1.f), S_DIMENSION);
 	m_physics.push_object(sb_sphere);
 	softbody_obj.push_back(sb_sphere);
 
-	SoftBodyPhysics* sb_sphere2 = new SoftBodyPhysics(O_SPHERE, glm::vec3(2.f, 7.f, -8.f), glm::vec3(1.f, 1.f, 1.f), dimension_);
+	SoftBodyPhysics* sb_sphere2 = new SoftBodyPhysics(O_SPHERE, glm::vec3(2.f, 7.f, -8.f), glm::vec3(1.f, 1.f, 1.f), S_DIMENSION);
 	m_physics.push_object(sb_sphere2);
 	softbody_obj.push_back(sb_sphere2);
 
-	SoftBodyPhysics* sb_sphere3 = new SoftBodyPhysics(O_SPHERE, glm::vec3(-8.f, 7.f, 0.f), glm::vec3(1.f, 1.f, 1.f), dimension_);
+	SoftBodyPhysics* sb_sphere3 = new SoftBodyPhysics(O_SPHERE, glm::vec3(-8.f, 7.f, 0.f), glm::vec3(1.f, 1.f, 1.f), S_DIMENSION);
 	m_physics.push_object(sb_sphere3);
 	softbody_obj.push_back(sb_sphere3);
 
@@ -266,19 +268,58 @@ void Scene::Scene2Init(Camera* camera)
 void Scene::Scene3Init(Camera* camera)
 {
 	// camera setting
-	camera->position = glm::vec3(4.f, 4.f, 10.0f);
+	camera->position = glm::vec3(3.f, -3.f, 18.0f);
 	camera->yaw = -90.f;
 	camera->pitch = -10.0f;
 	camera->zoom = 45.0f;
 
-	SoftBodyPhysics* rigid_plane = new SoftBodyPhysics(O_PLANE, glm::vec3(-1.f, 1.5f, -2.f), glm::vec3(10.f, 10.f, 10.f), dimension_);
-	m_physics.push_object(rigid_plane);
-	softbody_obj.push_back(rigid_plane);
+	SoftBodyPhysics* sphere[10];
+	for (int i = 0; i < 10; ++i)
+	{
+		sphere[i] = new SoftBodyPhysics(O_SPHERE, glm::vec3(3.f, 3.f+(float)i*5.f, 2.f), glm::vec3(1.f, 1.f, 1.f), S_DIMENSION);
+		sphere[i]->stiffness = 0.13f;
+		// steel
+		sphere[i]->albedo = albedo[8];
+		sphere[i]->normal = normal[8];
+		sphere[i]->metallic = metallic[8];
+		sphere[i]->roughness = roughness[8];
+		sphere[i]->ao = ao[8];
+		sphere[i]->m_textype = CONCRETE;
+		m_physics.push_object(sphere[i]);
+		softbody_obj.push_back(sphere[i]);
+	}
 
-	Object* rigid_sphere = new Object(O_SPHERE, glm::vec3(4.f, 2.5f, 2.f), glm::vec3(1.f, 1.f, 1.f), dimension_);
-	m_physics.push_object(rigid_sphere);
-	pbr_obj.push_back(rigid_sphere);
-	rigid_sphere->phy = true;
+	//front
+	Object* rigid_cube_0 = new Object(O_PLANE, glm::vec3(0.f, -10.f, 7.f), glm::vec3(7.f, 2.f, 2.f), P_DIMENSION);
+	rigid_cube_0->axis = glm::vec3(1.f, 0.f, 0.f); 
+	rigid_cube_0->rotation = -1.5708f;
+	m_physics.push_object(rigid_cube_0);
+	pbr_obj.push_back(rigid_cube_0);
+
+	//right
+	Object* rigid_cube_1 = new Object(O_PLANE, glm::vec3(7.f, -10.f, 0.f), glm::vec3(2.f, 2.f, 7.f), P_DIMENSION);
+	rigid_cube_1->axis = glm::vec3(0.f, 0.f, 1.f);
+	rigid_cube_1->rotation = 1.5708f;
+	m_physics.push_object(rigid_cube_1);
+	pbr_obj.push_back(rigid_cube_1);
+
+	//left
+	Object* rigid_cube_2 = new Object(O_PLANE, glm::vec3(0.f, -8.f, 0.f), glm::vec3(2.f, 2.f, 7.f), P_DIMENSION);
+	rigid_cube_2->axis = glm::vec3(0.f, 0.f, 1.f);
+	rigid_cube_2->rotation = -1.5708f;
+	m_physics.push_object(rigid_cube_2);
+	pbr_obj.push_back(rigid_cube_2);
+
+	//back
+	Object* rigid_cube_3 = new Object(O_PLANE, glm::vec3(0.f, -8.f, 0.f), glm::vec3(7.f, 2.f, 2.f), P_DIMENSION);
+	rigid_cube_3->axis = glm::vec3(1.f, 0.f, 0.f);
+	rigid_cube_3->rotation = 1.5708f;
+	m_physics.push_object(rigid_cube_3);
+	pbr_obj.push_back(rigid_cube_3);
+
+	Object* rigid_plane = new Object(O_PLANE, glm::vec3(0.f, -10.f, 0.f), glm::vec3(7.f, 7.f, 7.f), P_DIMENSION);
+	m_physics.push_object(rigid_plane);
+	pbr_obj.push_back(rigid_plane);
 
 	// load PBR material textures
 	for (unsigned i = 0; i < pbr_obj.size(); ++i)
@@ -290,27 +331,22 @@ void Scene::Scene3Init(Camera* camera)
 		pbr_obj[i]->roughness = roughness[2];
 		pbr_obj[i]->ao = ao[2];
 	}
-	// steel
-	softbody_obj[0]->albedo = albedo[1];
-	softbody_obj[0]->normal = normal[1];
-	softbody_obj[0]->metallic = metallic[1];
-	softbody_obj[0]->roughness = roughness[1];
-	softbody_obj[0]->ao = ao[1];
-	softbody_obj[0]->m_textype = STEEL;
+	
 }
 void Scene::Scene4Init(Camera* camera)
 {
+	InitAllPBRTexture();
 	time = 0.f;
 	// camera setting
 	camera->yaw = -90.f;
 	camera->pitch = 0.0f;
 	camera->zoom = 45.0f;
 	
-	glm::vec3 temp_pos = glm::vec3(-80.f, -80.f, -80.f);
+	glm::vec3 temp_pos = glm::vec3(-60.f, -60.f, -60.f);
 	int x_count = 1, y_count = 1, z_count = 1;
 	for (unsigned i = 0; i < pbr_number; ++i, ++x_count)
 	{
-		glm::vec3 this_pos = glm::vec3(temp_pos.x + x_count * 40.f, temp_pos.y + y_count * 40.f, temp_pos.z + z_count * 40.f);
+		glm::vec3 this_pos = glm::vec3(temp_pos.x + x_count * 30.f, temp_pos.y + y_count * 30.f, temp_pos.z + z_count * 30.f);
 		Object* pbr_sphere = new Object(O_SPHERE, this_pos, glm::vec3(1.f, 1.f, 1.f), dimension_);
 		pbr_sphere->albedo = albedo[i];
 		pbr_sphere->normal = normal[i];
@@ -329,29 +365,24 @@ void Scene::Scene4Init(Camera* camera)
 			++z_count;
 		}
 	}
-
 	// light properties
 	for (int i = 0; i < light_num; ++i)
 	{
 		Light m_light;
 		if(i % 4 == 0)
-			m_light.color = glm::vec3(300.f, 300.f, 30.f);
+			m_light.color = glm::vec3(500.f, 500.f, 50.f);
 		else if(i % 4 == 1)
-			m_light.color = glm::vec3(300.f, 30.f, 300.f);
+			m_light.color = glm::vec3(500.f, 50.f, 500.f);
 		else if(i % 4 == 2)
-			m_light.color = glm::vec3(30.f, 30.f, 300.f);
+			m_light.color = glm::vec3(50.f, 50.f, 500.f);
 		else if(i % 4 == 3)
-			m_light.color = glm::vec3(300.f, 300.f, 300.f);
+			m_light.color = glm::vec3(500.f, 500.f, 500.f);
+		int x_rand = rand() % 20 - 10;
+		int y_rand = rand() % 20 - 10;
+		int z_rand = rand() % 20 - 10;
+		m_light.position = glm::vec3(x_rand, y_rand, z_rand);
 		light.push_back(m_light);
 	}
-	light[0].position = glm::vec3(10.f, 10.f, 10.f);
-	light[1].position = glm::vec3(-10.f, 10.f, -10.f);
-	light[2].position = glm::vec3(10.f, -10.f, 10.f);
-	light[3].position = glm::vec3(-10.f, -10.f, 10.f);
-	light[4].position = glm::vec3(10.f, 10.f, -10.f);
-	light[5].position = glm::vec3(-10.f, 10.f, 10.f);
-	light[6].position = glm::vec3(10.f, -10.f, 10.f);
-	light[7].position = glm::vec3(0.f, 0.f, 10.f);
 	for (int i = 0; i < light_num; ++i)
 	{
 		Object* light_ = new Object(O_SPHERE, light[i].position, glm::vec3(0.3f, 0.3f, 0.3f), 10);
@@ -359,9 +390,9 @@ void Scene::Scene4Init(Camera* camera)
 	}
 	camera->position = glm::vec3(0.f, -30.f, 30.f);
 }
-void Scene::Scene0Draw(Camera* camera, float dt)
+void Scene::Scene0Draw(GLFWwindow* window, Camera* camera, float dt)
 {
-	if (dt <= FRAME_LIMIT)
+	if (dt <= FRAME_LIMIT && move_object)
 	{
 		if (!softbody_obj.empty())
 		{
@@ -370,6 +401,9 @@ void Scene::Scene0Draw(Camera* camera, float dt)
 				(*obj)->Describe();
 		}
 	}
+	// Find the xMin, xMax, yMin, yMax, zMin, zMax with up vector,
+	// and capture all views of each 6 side, and update all data
+
 	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -379,10 +413,7 @@ void Scene::Scene0Draw(Camera* camera, float dt)
 
 	// Draw objs
 	DrawObjs(camera, curr_scene);
-
-	pbr_texture_shader.Use();
-	camera->Update(&pbr_texture_shader);
-	pbr_texture_shader.SetVec3("camPos", camera->position);
+	
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
 
@@ -397,7 +428,7 @@ void Scene::Scene0Draw(Camera* camera, float dt)
 }
 void Scene::Scene1Draw(Camera* camera, float dt)
 {
-	if (dt <= FRAME_LIMIT)
+	if (dt <= FRAME_LIMIT && move_object)
 	{
 		if (!softbody_obj.empty())
 		{
@@ -416,9 +447,9 @@ void Scene::Scene1Draw(Camera* camera, float dt)
 	// Draw objs
 	DrawObjs(camera, curr_scene);
 
-	pbr_texture_shader.Use();
-	camera->Update(&pbr_texture_shader);
-	pbr_texture_shader.SetVec3("camPos", camera->position);
+	//pbr_texture_shader.Use();
+	//camera->Update(&pbr_texture_shader);
+	//pbr_texture_shader.SetVec3("camPos", camera->position);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
 
@@ -434,7 +465,8 @@ void Scene::Scene1Draw(Camera* camera, float dt)
 
 void Scene::Scene2Draw(Camera* camera, float dt)
 {
-	if (dt <= FRAME_LIMIT)
+
+	if (dt <= FRAME_LIMIT && move_object)
 	{
 		if (!softbody_obj.empty())
 		{
@@ -453,9 +485,9 @@ void Scene::Scene2Draw(Camera* camera, float dt)
 	// Draw objs
 	DrawObjs(camera, curr_scene);
 
-	pbr_texture_shader.Use();
-	camera->Update(&pbr_texture_shader);
-	pbr_texture_shader.SetVec3("camPos", camera->position);
+	//pbr_texture_shader.Use();
+	//camera->Update(&pbr_texture_shader);
+	//pbr_texture_shader.SetVec3("camPos", camera->position);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
 
@@ -587,6 +619,7 @@ void Scene::DrawObjs(Camera* camera, unsigned scene_num)
 		pbr_texture_shader.SetInt("aoMap", (*s_obj)->ao + 2);
 		(*s_obj)->render_objs(camera, &pbr_texture_shader, (*s_obj)->position, aspect, draw_line);
 	}
+	pbr_texture_shader.SetInt("light_num", static_cast<int>(light_obj.size()));
 }
 void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 {
@@ -600,40 +633,14 @@ void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 		ImGui::ShowDemoWindow(&show_demo_window);
 	{
 		ImGui::Begin("GUI interface");
-		ImGui::Text("Object controller");
 		ImGui::Text("Frame Per Second : %d ms", static_cast<int>(1.f / dt));
-
-		if (roughness_status)
-		{
-			if (ImGui::Button("Default roughness"))
-				roughness_status = false;
-			ImGui::SliderFloat("roughness", &rou, 0.f, 1.f);
-		}
-		else
-		{
-			if (ImGui::Button("Control roughness"))
-				roughness_status = true;
-		}
-		if (metallic_status)
-		{
-			if (ImGui::Button("Default metallic"))
-				metallic_status = false;
-			ImGui::SliderFloat("metallic", &met, 0.f, 1.f);
-		}
-		else
-		{
-			if (ImGui::Button("Control metallic"))
-				metallic_status = true;
-		}
 		ImGui::End();
 	}
 	if (second_imgui)
 	{
 		ImGui::Begin("Scene selector");
 		if (ImGui::Button("Reload"))
-		{
 			Reload(camera);
-		}
 		if (ImGui::Button("Scene0"))
 		{
 			if (curr_scene != 0)
@@ -690,35 +697,21 @@ void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 	{
 		ImGui::Begin("Select PBR texture");
 		
-		unsigned sz = softbody_obj.size() + 1;
+		unsigned sz = static_cast<unsigned>(softbody_obj.size() + 1);
 		if (ImGui::Button("Plastic"))
-		{
 			ChangePBRTexture(PLASTIC, sz);
-		}
 		if (ImGui::Button("Steel"))
-		{
 			ChangePBRTexture(STEEL, sz);
-		}
 		if (ImGui::Button("Wood"))
-		{
 			ChangePBRTexture(WOOD, sz);
-		}
 		if (ImGui::Button("Rusted-Iron"))
-		{
 			ChangePBRTexture(RUSTED_IRON, sz);
-		}
 		if (ImGui::Button("Fabric"))
-		{
 			ChangePBRTexture(FABRIC, sz);
-		}
 		if (ImGui::Button("TornFabric"))
-		{
 			ChangePBRTexture(TORN_FABRIC, sz);
-		}
 		if (ImGui::Button("Aluminium"))
-		{
 			ChangePBRTexture(ALUMINIUM, sz);
-		}
 		if (ImGui::Button("Copper"))
 			ChangePBRTexture(COPPER, sz);
 		if (ImGui::Button("Concrete"))
@@ -741,13 +734,16 @@ void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 	if (curr_scene == 4)
 	{
 		ImGui::Begin("Camera properties");
+		if (fifth_imgui)
+			fifth_imgui = false;
 		if (cam_move)
 		{
+			ImGui::Text("Current Light Num : %d out of %d", cam_num, light_num);
 			if (ImGui::Button("Ride Next Ball"))
 			{
 				++cam_num;
 				if (cam_num >= light_num)
-					cam_num = 0;
+					cam_num = 1;
 			}
 		}
 		if (!cam_move)
@@ -765,6 +761,50 @@ void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 				camera->position = glm::vec3(0.f, -30.f, 30.f);
 				cam_move = false;
 			}
+		}
+		ImGui::End();
+	}
+	if (curr_scene != 4)
+	{
+		ImGui::Begin("Object Movement");
+		if (!fifth_imgui)
+			fifth_imgui = true;
+		if (move_object)
+		{
+			if (ImGui::Button("Stop"))
+				move_object = false;
+		}
+		else
+		{
+			if (ImGui::Button("Move"))
+				move_object = true;
+		}
+		ImGui::End();
+	}
+	if (fifth_imgui)
+	{
+		ImGui::Begin("Roughness / Metalic Controller");
+		if (roughness_status)
+		{
+			if (ImGui::Button("Default roughness"))
+				roughness_status = false;
+			ImGui::SliderFloat("roughness", &rou, 0.f, 1.f);
+		}
+		else
+		{
+			if (ImGui::Button("Control roughness"))
+				roughness_status = true;
+		}
+		if (metallic_status)
+		{
+			if (ImGui::Button("Default metallic"))
+				metallic_status = false;
+			ImGui::SliderFloat("metallic", &met, 0.f, 1.f);
+		}
+		else
+		{
+			if (ImGui::Button("Control metallic"))
+				metallic_status = true;
 		}
 		ImGui::End();
 	}

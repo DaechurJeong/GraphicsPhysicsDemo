@@ -25,8 +25,10 @@ uniform vec3 lightPositions[8];
 uniform vec3 lightColors[8];
 
 uniform vec3 camPos;
+uniform int light_num;
 
 const float PI = 3.14159265359;
+#define TWOPI  6.283185308
 
 vec3 getNormalFromMap()
 {
@@ -76,16 +78,26 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
 
     return ggx1 * ggx2;
 }
-vec3 fresnelSchlick(float cosTheta, vec3 F0)
+vec3 fresnel(float cosTheta, vec3 F0)
 {
     return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
 }
-vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
+vec3 fresnelRoughness(float cosTheta, vec3 F0, float roughness)
 {
     return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(1.0 - cosTheta, 5.0);
 }
+vec2 Projection(vec3 pos)
+{
+    vec2 resultCoord = vec2(0,0);
+    float radius = sqrt(pos.x * pos.x + pos.y * pos.y + pos.z * pos.z);
+    float theta = atan(pos.y / pos.x);
+    float phi = acos(pos.z / radius);
+
+    resultCoord = vec2(theta / TWOPI, phi / PI);
+    return resultCoord;
+}
 void main()
-{		
+{
     vec3 albedo     = pow(texture(albedoMap, TexCoords).rgb, vec3(2.2));
     float metallic  = texture(metallicMap, TexCoords).r;
     float roughness = texture(roughnessMap, TexCoords).r;
@@ -97,14 +109,14 @@ void main()
 	FragColor = texture(prefilterMap, TexCoords);
     /*vec3 N = getNormalFromMap();
     vec3 V = normalize(camPos - WorldPos);
-    vec3 R = reflect(-V, N);
+    vec3 R = 2 * dot(V, N) * N - V;
 
     vec3 F0 = vec3(0.04); 
     F0 = mix(F0, albedo, metallic);
 
     // reflectance equation
     vec3 rad_L = vec3(0.0);
-    for(int i = 0; i < 8; ++i) 
+    for(int i = 0; i < light_num; ++i) 
     {
         // calculate radiance
         vec3 L = normalize(lightPositions[i] - WorldPos);
@@ -116,12 +128,12 @@ void main()
         // BRDF
         float NDF = DistributionGGX(N, H, roughness);
         float G   = GeometrySmith(N, V, L, roughness);
-        vec3  F   = fresnelSchlick(max(dot(H, V), 0.0), F0);
-           
+        vec3  F   = fresnel(max(dot(H, V), 0.0), F0);
+
         vec3 nominator    = NDF * G * F;
         float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001; // to prevent divide by zero.
         vec3 specular = nominator / denominator;
-        
+
         // kS is equal to Fresnel
         vec3 kS = F;
         vec3 kD = vec3(1.0) - kS;
@@ -133,18 +145,18 @@ void main()
         // outgoing radiance rad_L
         rad_L += (kD * albedo / PI + specular) * radiance * NdotL;
     }
-    // ambient lighting (we now use IBL as the ambient term)
-    vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
-
+    // ambient lighting (IBL as ambient)
+    vec3 F = fresnelRoughness(max(dot(N, V), 0.0), F0, roughness);
+    
     vec3 kS = F;
     vec3 kD = 1.0 - kS;
-    kD *= 1.0 - metallic;     
+    kD *= 1.0 - metallic;
     
     vec3 irradiance = texture(irradianceMap, N).rgb;
-    vec3 diffuse      = irradiance * albedo;
-    
+    vec3 diffuse    = irradiance * albedo;
+
     const float MAX_REFLECTION_LOD = 4.0;
-    vec3 prefilteredColor = textureLod(prefilterMap, R,  roughness * MAX_REFLECTION_LOD).rgb;    
+    vec3 prefilteredColor = textureLod(prefilterMap, R,  roughness * MAX_REFLECTION_LOD).rgb;
     vec2 brdf  = texture(brdfLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
     vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
 
@@ -152,9 +164,9 @@ void main()
     
     vec3 color = ambient + rad_L;
 
-    // HDR tone
+    // HDR tonemapping
     color = color / (color + vec3(1.0));
-    // gamma correction
+    // gamma correct
     color = pow(color, vec3(1.0/2.2)); 
 
     FragColor = vec4(color, 1.0);*/
