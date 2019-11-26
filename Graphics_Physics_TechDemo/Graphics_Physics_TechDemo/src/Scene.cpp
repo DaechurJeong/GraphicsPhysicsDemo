@@ -824,8 +824,9 @@ void Scene::Scene5Draw(Camera* camera, float dt)
 		float dist = glm::distance(light_obj[cam_num]->position, prev);
 		camera->pitch = glm::degrees(asinf(look_vec.y / dist));
 		camera->yaw = glm::degrees(asinf(look_vec.z / dist));
-
-		camera->position = prev;
+		if (dist < 0.03f)
+			dist = 0.03f;
+		camera->position += (dist * glm::normalize(look_vec));
 	}
 	// render skybox (render as last to prevent overdraw)
 	renderSkybox(&backgroundShader, camera, envCubemap, irradianceMap);
@@ -1044,7 +1045,7 @@ void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 		}
 		ImGui::End();
 	}
-	if (curr_scene == 1 || curr_scene == 2 || curr_scene == 3)
+	if (curr_scene == 0 || curr_scene == 1 || curr_scene == 2 || curr_scene == 3)
 	{
 		ImGui::Begin("Object Movement");
 		if (!fifth_imgui)
@@ -1066,9 +1067,6 @@ void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 		ImGui::Begin("Soft Body");
 		ImGui::SliderFloat("Stiffness", &newstiffness, 0.1f, 0.6f);
 
-		//float damping = softbody_obj[0]->damping;
-		//float newdamping = damping;
-		//ImGui::SliderFloat("Damping", &newdamping, 0.1f, 0.8f);
 		ImGui::End();
 
 		if (stiffness != newstiffness)// || damping != newdamping)
@@ -1079,8 +1077,6 @@ void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 				//softbody_obj[i]->damping = newdamping;
 			}
 		}
-
-
 	}
 	if (fifth_imgui)
 	{
