@@ -281,7 +281,7 @@ void Scene::Scene3Init(Camera* camera)
 	for (int i = 0; i < 10; ++i)
 	{
 		sphere[i] = new SoftBodyPhysics(O_SPHERE, glm::vec3(3.f, 3.f+(float)i*5.f, 2.f), glm::vec3(1.f, 1.f, 1.f), S_DIMENSION);
-		sphere[i]->stiffness = 0.25f;
+		sphere[i]->stiffness = 0.35f;
 		// steel
 		sphere[i]->albedo = albedo[8];
 		sphere[i]->normal = normal[8];
