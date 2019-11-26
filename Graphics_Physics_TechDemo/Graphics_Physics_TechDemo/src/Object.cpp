@@ -970,6 +970,17 @@ void renderQuad()
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);
 }
+void DeleteBuffers()
+{
+	if (quadVAO)
+		glDeleteVertexArrays(1, &quadVAO);
+	if (quadVBO)
+		glDeleteBuffers(1, &quadVBO);
+	if (cubeVAO)
+		glDeleteVertexArrays(1, &cubeVAO);
+	if (cubeVBO)
+		glDeleteBuffers(1, &cubeVBO);
+}
 void renderSkybox(Shader* backgroundShader, Camera* camera, unsigned& envCubemap, unsigned& irradianceMap)
 {
 	backgroundShader->Use();

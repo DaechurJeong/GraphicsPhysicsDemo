@@ -40,7 +40,7 @@ public:
 	void Scene4Draw(Camera* camera, float dt);
 
 	void ShutDown();
-
+	void DeleteBuffers();
 	void DrawObjs(Camera* camera, unsigned scene_num);
 
 	void InitAllPBRTexture();

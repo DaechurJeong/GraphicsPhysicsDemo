@@ -22,6 +22,12 @@ void Scene::Init(GLFWwindow* window, Camera* camera)
 	pbr_texture_shader.SetInt("prefilterMap", 1);
 	pbr_texture_shader.SetInt("brdfLUT", 2);
 
+	pbr_texture_shader.SetInt("albedo",3);
+	pbr_texture_shader.SetInt("normal",4);
+	pbr_texture_shader.SetInt("metallic",5);
+	pbr_texture_shader.SetInt("roughness",6);
+	pbr_texture_shader.SetInt("ao", 7);
+
 	backgroundShader.Use();
 	backgroundShader.SetInt("environmentMap", 0);
 
@@ -814,6 +820,29 @@ void Scene::ShutDown()
 	}
 	if (!light_obj.empty())
 		light_obj.clear();
+}
+void Scene::DeleteBuffers()
+{
+	if (captureFBO)
+		glDeleteFramebuffers(1, &captureFBO);
+	if (captureRBO)
+		glDeleteRenderbuffers(1, &captureRBO);
+	if (envCubemap)
+		glDeleteTextures(1, &envCubemap);
+	if (irradianceMap)
+		glDeleteTextures(1, &irradianceMap);
+	if (prefilterMap)
+		glDeleteTextures(1, &prefilterMap);
+	if (brdfLUTTexture)
+		glDeleteTextures(1, &brdfLUTTexture);
+	for (unsigned i = 0; i < pbr_number; ++i)
+	{
+		glDeleteTextures(1, &albedo[i]);
+		glDeleteTextures(1, &normal[i]);
+		glDeleteTextures(1, &metallic[i]);
+		glDeleteTextures(1, &roughness[i]);
+		glDeleteTextures(1, &ao[i]);
+	}
 }
 void Scene::ResizeFrameBuffer(GLFWwindow* window)
 {

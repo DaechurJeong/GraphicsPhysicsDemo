@@ -94,8 +94,8 @@ void main()
         roughness = roughness_val;
     if(metallic_status)
         metallic = metallic_val;
-
-    vec3 N = getNormalFromMap();
+	FragColor = texture(prefilterMap, TexCoords);
+    /*vec3 N = getNormalFromMap();
     vec3 V = normalize(camPos - WorldPos);
     vec3 R = reflect(-V, N);
 
@@ -157,5 +157,5 @@ void main()
     // gamma correction
     color = pow(color, vec3(1.0/2.2)); 
 
-    FragColor = vec4(color, 1.0);
+    FragColor = vec4(color, 1.0);*/
 }

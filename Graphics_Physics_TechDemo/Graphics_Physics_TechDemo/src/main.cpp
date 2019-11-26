@@ -85,8 +85,10 @@ int main(void)
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
+	m_scene.DeleteBuffers();
 	m_scene.ShutDown();
 	m_scene.ImGuiShutdown();
+	DeleteBuffers();
 
 	glfwTerminate();
 	return 0;
