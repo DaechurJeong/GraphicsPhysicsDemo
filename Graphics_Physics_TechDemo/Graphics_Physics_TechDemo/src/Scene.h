@@ -39,12 +39,14 @@ public:
 	void Scene2Init(Camera* camera);
 	void Scene3Init(Camera* camera);
 	void Scene4Init(Camera* camera);
+	void Scene5Init(Camera* camera);
 
 	void Scene0Draw(GLFWwindow* window, Camera* camera, float dt);
 	void Scene1Draw(Camera* camera, float dt);
 	void Scene2Draw(Camera* camera, float dt);
 	void Scene3Draw(Camera* camera, float dt);
 	void Scene4Draw(Camera* camera, float dt);
+	void Scene5Draw(Camera* camera, float dt);
 
 	void ShutDown();
 	void DeleteBuffers();
@@ -104,7 +106,6 @@ private:
 
 	float met = 0.f;
 	float rou = 0.f;
-	float time = 0.f;
 
 	bool roughness_status;
 	bool metallic_status;
