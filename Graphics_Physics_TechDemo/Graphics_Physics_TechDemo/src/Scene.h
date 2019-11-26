@@ -15,7 +15,7 @@
 #include "GLFW\glfw3.h"
 
 #define S_DIMENSION 12
-#define MID_S_DIMENSION 20
+#define MID_S_DIMENSION 16
 #define HIGH_S_DIMENSION 24
 #define P_DIMENSION 64
 

@@ -80,7 +80,7 @@ void SoftBodyPhysics::Init()
 
 			constraints down_cons;
 			down_cons.p1 = ver - 2;
-			down_cons.p2 = down_cons.p1 - i - 1;
+			down_cons.p2 = down_cons.p1 - i;
 			down_cons.restlen = 0;
 			m_const.insert(down_cons);
 		}
