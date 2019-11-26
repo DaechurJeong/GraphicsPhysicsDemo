@@ -121,27 +121,27 @@ void Scene::Scene0Init(Camera* camera)
 	pbr_obj.push_back(rigid_plane_7);
 
 	//right
-	Object* rigid_cube_1 = new Object(O_PLANE, glm::vec3(5.f, -52.f, 0.5f), glm::vec3(2.f, 2.f, 2.5f), P_DIMENSION);
+	Object* rigid_cube_1 = new Object(O_PLANE, glm::vec3(4.5f, -52.f, 0.5f), glm::vec3(2.f, 2.f, 3.0f), P_DIMENSION);
 	rigid_cube_1->axis = glm::vec3(0.f, 0.f, 1.f);
 	rigid_cube_1->rotation = 1.5708f;
 	m_physics.push_object(rigid_cube_1);
 	pbr_obj.push_back(rigid_cube_1);
 
 	//left
-	Object* rigid_cube_2 = new Object(O_PLANE, glm::vec3(2.5f, -50.f, 0.5f), glm::vec3(2.f, 2.f, 2.5f), P_DIMENSION);
+	Object* rigid_cube_2 = new Object(O_PLANE, glm::vec3(1.5f, -50.f, 0.5f), glm::vec3(2.f, 2.f, 3.0f), P_DIMENSION);
 	rigid_cube_2->axis = glm::vec3(0.f, 0.f, 1.f);
 	rigid_cube_2->rotation = -1.5708f;
 	m_physics.push_object(rigid_cube_2);
 	pbr_obj.push_back(rigid_cube_2);
 
 	//back
-	Object* rigid_cube_3 = new Object(O_PLANE, glm::vec3(2.5f, -50.f, 0.5f), glm::vec3(2.5f, 2.f, 2.f), P_DIMENSION);
+	Object* rigid_cube_3 = new Object(O_PLANE, glm::vec3(1.5f, -50.f, 0.5f), glm::vec3(3.0f, 2.f, 2.f), P_DIMENSION);
 	rigid_cube_3->axis = glm::vec3(1.f, 0.f, 0.f);
 	rigid_cube_3->rotation = 1.5708f;
 	m_physics.push_object(rigid_cube_3);
 	pbr_obj.push_back(rigid_cube_3);
 
-	Object* rigid_plane_ = new Object(O_PLANE, glm::vec3(2.5f, -52.f, 0.5f), glm::vec3(2.5f, 2.5f, 2.5f), P_DIMENSION);
+	Object* rigid_plane_ = new Object(O_PLANE, glm::vec3(1.5f, -52.f, 0.5f), glm::vec3(3.0f, 3.0f, 3.0f), P_DIMENSION);
 	m_physics.push_object(rigid_plane_);
 	pbr_obj.push_back(rigid_plane_);
 
@@ -1109,7 +1109,7 @@ void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 		float stiffness = softbody_obj[0]->stiffness;
 		float newstiffness = stiffness;
 		ImGui::Begin("Soft Body");
-		ImGui::SliderFloat("Stiffness", &newstiffness, 0.1f, 0.6f);
+		ImGui::SliderFloat("Stiffness", &newstiffness, 0.1f, 0.5f);
 
 		ImGui::End();
 
