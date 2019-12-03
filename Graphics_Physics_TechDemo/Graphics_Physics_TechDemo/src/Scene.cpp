@@ -179,8 +179,6 @@ void Scene::Scene0Init(Camera* camera)
 }
 void Scene::Scene1Init(Camera* camera)
 {
-	DeletePBRTextures();
-	InitAllPBRTexture();
 	// camera setting
 	camera->position = glm::vec3(10.f, -2.f, 7.0f);
 	camera->yaw = -160.f;
@@ -379,13 +377,10 @@ void Scene::Scene3Init(Camera* camera)
 		pbr_obj[i]->roughness = roughness[2];
 		pbr_obj[i]->ao = ao[2];
 	}
-	
 }
-void Scene::Scene4Init(Camera* camera)
+void Scene::Scene5Init(Camera* camera)
 {
-	DeletePBRTextures();
 	cam_move = false;
-	InitAllPBRTexture();
 	// camera setting
 	camera->yaw = -90.f;
 	camera->pitch = 0.0f;
@@ -593,16 +588,24 @@ void Scene::Scene4Init(Camera* camera)
 	}
 	magnitude = 3.5f;
 }
-void Scene::Scene5Init(Camera* camera)
+void Scene::Scene4Init(Camera* camera)
 {
-	DeletePBRTextures();
-	InitAllPBRTexture();
 	// camera setting
 	camera->yaw = -90.f;
 	camera->pitch = 0.0f;
 	camera->zoom = 45.0f;
+	camera->position = glm::vec3(0.f, 0.f, 4.f);
 
-	glm::vec3 temp_pos = glm::vec3(-60.f, -60.f, -60.f);
+	glm::vec3 obj_pos = glm::vec3(0.f, 0.f, 0.f);
+	Object* pbr_sphere = new Object(O_SPHERE, obj_pos, glm::vec3(1.f, 1.f, 1.f), P_DIMENSION);
+	pbr_sphere->albedo = albedo[0];
+	pbr_sphere->normal = normal[0];
+	pbr_sphere->metallic = metallic[0];
+	pbr_sphere->roughness = roughness[0];
+	pbr_sphere->ao = ao[0];
+	pbr_obj.push_back(pbr_sphere);
+
+	/*glm::vec3 temp_pos = glm::vec3(-60.f, -60.f, -60.f);
 	int x_count = 1, y_count = 1, z_count = 1;
 	for (unsigned i = 0; i < pbr_number; ++i, ++x_count)
 	{
@@ -649,7 +652,7 @@ void Scene::Scene5Init(Camera* camera)
 		light_obj.push_back(light_);
 	}
 	camera->position = glm::vec3(0.f, 0.f, 0.f);
-	magnitude = 7.f;
+	magnitude = 7.f;*/
 }
 void Scene::Scene0Draw(GLFWwindow* window, Camera* camera, float dt)
 {
@@ -764,7 +767,7 @@ void Scene::Scene3Draw(Camera* camera, float dt)
 {
 	Scene2Draw(camera, dt);
 }
-void Scene::Scene4Draw(Camera* camera, float dt)
+void Scene::Scene5Draw(Camera* camera, float dt)
 {
 	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -820,7 +823,7 @@ void Scene::Scene4Draw(Camera* camera, float dt)
 	// render skybox (render as last to prevent overdraw)
 	renderSkybox(&backgroundShader, camera, envCubemap, irradianceMap);
 }
-void Scene::Scene5Draw(Camera* camera, float dt)
+void Scene::Scene4Draw(Camera* camera, float dt)
 {
 	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -833,11 +836,11 @@ void Scene::Scene5Draw(Camera* camera, float dt)
 	DrawObjs(camera, curr_scene);
 
 	// lighting
-	for (unsigned int i = 0; i < light_num; ++i)
+	/*r (unsigned int i = 0; i < light_num; ++i)
 	{
 		pbr_texture_shader.SetVec3("lightPositions[" + std::to_string(i) + "]", light[i].position);
 		pbr_texture_shader.SetVec3("lightColors[" + std::to_string(i) + "]", light[i].color);
-	}
+	}*/
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
@@ -846,34 +849,6 @@ void Scene::Scene5Draw(Camera* camera, float dt)
 	pbr_texture_shader.SetBool("roughness_status", true);
 	pbr_texture_shader.SetBool("metallic_status", true);
 
-	// lighting
-	lightShader.Use();
-	glm::vec3 prev = light_obj[cam_num]->position;
-	for (unsigned int i = 1; i < light_num; ++i)
-	{
-		light_obj[i]->position.x = (i * (1 + sin(i * 2 * PI / 25 * angle * 3)) * sin(PI / (10 + i) * (2 + sin(2 * i * PI / 35 * angle * 3))) * cos(i * PI * (1 + sin(2 * PI / 35 * angle * 3)))) * magnitude;
-		light_obj[i]->position.y = (10 + sin(i * PI / 25 * angle * 3)) * cos(PI / 4 * (2 + sin(i * 2 * PI / 35 * angle * 3))) * magnitude;
-		light_obj[i]->position.z = (10 + sin(i * PI / 25 * angle * 3)) * sin(PI / (10 + i) * (2 + sin(2 * PI / 35 * angle * 3))) * sin(i * PI * (1 + sin(2 * PI / 35 * angle * 3))) * magnitude;
-
-		light_obj[i]->color = light[i].color / 300.f;
-		angle += (orbit_speed / light_num);
-		lightShader.SetVec3("lightPosition", light_obj[i]->position);
-		lightShader.SetVec3("lightColor", light_obj[i]->color);
-		light[i].position = light_obj[i]->position;
-
-		if (i != cam_num)
-			light_obj[i]->render_lights(camera, &lightShader, light_obj[i]->position, aspect);
-	}
-	if (cam_move)
-	{
-		glm::vec3 look_vec = light_obj[cam_num]->position - prev;
-		float dist = glm::distance(light_obj[cam_num]->position, prev);
-		camera->pitch = glm::degrees(asinf(look_vec.y / dist));
-		camera->yaw = glm::degrees(asinf(look_vec.z / dist));
-		if (dist < 0.03f)
-			dist = 0.03f;
-		camera->position += (dist * glm::normalize(look_vec));
-	}
 	// render skybox (render as last to prevent overdraw)
 	renderSkybox(&backgroundShader, camera, envCubemap, irradianceMap);
 }
@@ -907,10 +882,7 @@ void Scene::DrawObjs(Camera* camera, unsigned scene_num)
 		pbr_texture_shader.SetInt("metallicMap", (*p_obj)->metallic + 2);
 		pbr_texture_shader.SetInt("roughnessMap", (*p_obj)->roughness + 2);
 		pbr_texture_shader.SetInt("aoMap", (*p_obj)->ao + 2);
-		if (scene_num == 5)
-			(*p_obj)->render_diff_properties(camera, &pbr_texture_shader, (*p_obj)->position, aspect);
-		else
-			(*p_obj)->render_objs(camera, &pbr_texture_shader, (*p_obj)->position, aspect, false);
+		(*p_obj)->render_objs(camera, &pbr_texture_shader, (*p_obj)->position, aspect, false);
 	}
 	for(unsigned i = 0; i < softbody_obj.size(); ++i)
 	{
@@ -1065,7 +1037,7 @@ void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 			draw_line = false;
 		ImGui::End();
 	}
-	if (curr_scene == 4 || curr_scene == 5)
+	if (curr_scene == 4)
 	{
 		ImGui::Begin("Camera properties");
 		if (fifth_imgui)
@@ -1162,11 +1134,17 @@ void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 		}
 		ImGui::End();
 	}
-	if (curr_scene == 4 || curr_scene == 5)
+	if (curr_scene == 4)
 	{
 		third_imgui = false;
 		forth_imgui = false;
 		fifth_imgui = false;
+	}
+	if (curr_scene == 5)
+	{
+		third_imgui = true;
+		forth_imgui = false;
+		fifth_imgui = true;
 	}
 	else
 	{
