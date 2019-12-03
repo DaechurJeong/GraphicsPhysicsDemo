@@ -378,8 +378,35 @@ void Scene::Scene3Init(Camera* camera)
 		pbr_obj[i]->ao = ao[2];
 	}
 }
+void Scene::Scene4Init(Camera* camera)
+{
+	// camera setting
+	camera->yaw = -90.f;
+	camera->pitch = 0.0f;
+	camera->zoom = 45.0f;
+	camera->position = glm::vec3(0.f, 0.f, 4.f);
+
+	glm::vec3 obj_pos = glm::vec3(0.f, 0.f, 0.f);
+	Object* pbr_sphere = new Object(O_SPHERE, obj_pos, glm::vec3(1.f, 1.f, 1.f), P_DIMENSION);
+	pbr_sphere->albedo = albedo[0];
+	pbr_sphere->normal = normal[0];
+	pbr_sphere->metallic = metallic[0];
+	pbr_sphere->roughness = roughness[0];
+	pbr_sphere->ao = ao[0];
+	pbr_obj.push_back(pbr_sphere);
+
+	Light m_light;
+	m_light.color = glm::vec3(100.f, 100.f, 100.f);
+	m_light.position = glm::vec3(0.f, 0.f, -3.f);
+	light.push_back(m_light);
+	Object* light_ = new Object(O_SPHERE, m_light.position, glm::vec3(0.3f, 0.3f, 0.3f), 10);
+	light_obj.push_back(light_);
+
+	angle = 0.f;
+}
 void Scene::Scene5Init(Camera* camera)
 {
+	angle = 0.f;
 	cam_move = false;
 	// camera setting
 	camera->yaw = -90.f;
@@ -588,72 +615,7 @@ void Scene::Scene5Init(Camera* camera)
 	}
 	magnitude = 3.5f;
 }
-void Scene::Scene4Init(Camera* camera)
-{
-	// camera setting
-	camera->yaw = -90.f;
-	camera->pitch = 0.0f;
-	camera->zoom = 45.0f;
-	camera->position = glm::vec3(0.f, 0.f, 4.f);
 
-	glm::vec3 obj_pos = glm::vec3(0.f, 0.f, 0.f);
-	Object* pbr_sphere = new Object(O_SPHERE, obj_pos, glm::vec3(1.f, 1.f, 1.f), P_DIMENSION);
-	pbr_sphere->albedo = albedo[0];
-	pbr_sphere->normal = normal[0];
-	pbr_sphere->metallic = metallic[0];
-	pbr_sphere->roughness = roughness[0];
-	pbr_sphere->ao = ao[0];
-	pbr_obj.push_back(pbr_sphere);
-
-	/*glm::vec3 temp_pos = glm::vec3(-60.f, -60.f, -60.f);
-	int x_count = 1, y_count = 1, z_count = 1;
-	for (unsigned i = 0; i < pbr_number; ++i, ++x_count)
-	{
-		glm::vec3 this_pos = glm::vec3(temp_pos.x + x_count * 30.f, temp_pos.y + y_count * 30.f, temp_pos.z + z_count * 30.f);
-		Object* pbr_sphere = new Object(O_SPHERE, this_pos, glm::vec3(1.f, 1.f, 1.f), dimension_);
-		pbr_sphere->albedo = albedo[i];
-		pbr_sphere->normal = normal[i];
-		pbr_sphere->metallic = metallic[i];
-		pbr_sphere->roughness = roughness[i];
-		pbr_sphere->ao = ao[i];
-		pbr_obj.push_back(pbr_sphere);
-		if (x_count >= 3)
-		{
-			x_count = 0;
-			++y_count;
-		}
-		if (y_count >= 3)
-		{
-			y_count = 0;
-			++z_count;
-		}
-	}
-	// light properties
-	for (int i = 0; i < light_num; ++i)
-	{
-		Light m_light;
-		if (i % 4 == 0)
-			m_light.color = glm::vec3(500.f, 500.f, 50.f);
-		else if (i % 4 == 1)
-			m_light.color = glm::vec3(500.f, 50.f, 500.f);
-		else if (i % 4 == 2)
-			m_light.color = glm::vec3(50.f, 50.f, 500.f);
-		else if (i % 4 == 3)
-			m_light.color = glm::vec3(500.f, 500.f, 500.f);
-		int x_rand = rand() % 20 - 10;
-		int y_rand = rand() % 20 - 10;
-		int z_rand = rand() % 20 - 10;
-		m_light.position = glm::vec3(x_rand, y_rand, z_rand);
-		light.push_back(m_light);
-	}
-	for (int i = 0; i < light_num; ++i)
-	{
-		Object* light_ = new Object(O_SPHERE, light[i].position, glm::vec3(0.3f, 0.3f, 0.3f), 10);
-		light_obj.push_back(light_);
-	}
-	camera->position = glm::vec3(0.f, 0.f, 0.f);
-	magnitude = 7.f;*/
-}
 void Scene::Scene0Draw(GLFWwindow* window, Camera* camera, float dt)
 {
 	if (dt <= FRAME_LIMIT && move_object)
@@ -767,6 +729,44 @@ void Scene::Scene3Draw(Camera* camera, float dt)
 {
 	Scene2Draw(camera, dt);
 }
+
+void Scene::Scene4Draw(Camera* camera, float dt)
+{
+	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	pbr_texture_shader.Use();
+	camera->Update(&pbr_texture_shader);
+	pbr_texture_shader.SetVec3("camPos", camera->position);
+
+	// Draw objs
+	DrawObjs(camera, curr_scene);
+	pbr_texture_shader.SetVec3("lightPositions[" + std::to_string(0) + "]", light_obj[0]->position);
+	pbr_texture_shader.SetVec3("lightColors[" + std::to_string(0) + "]", light_obj[0]->color);
+	std::cout << "Light color : " << light_obj[0]->color.x << light_obj[0]->color.y << light_obj[0]->color.z << std::endl;
+	//std::cout << "Light color : " << temp.x << temp.y << temp.z << std::endl;
+	// update Lighting
+	lightShader.Use();
+	light_obj[0]->position.x = sinf(angle) * 3.f;
+	light_obj[0]->position.z = cosf(angle) * 3.f;
+	angle += dt;
+	lightShader.SetVec3("lightPosition", light_obj[0]->position);
+	lightShader.SetVec3("lightColor", light_obj[0]->color);
+	light_obj[0]->render_lights(camera, &lightShader, light_obj[0]->position, aspect);
+	
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
+
+	pbr_texture_shader.Use();
+	// main object metallic, roughness
+	pbr_texture_shader.SetFloat("roughness_val", rou);
+	pbr_texture_shader.SetBool("roughness_status", roughness_status);
+	pbr_texture_shader.SetBool("metallic_status", metallic_status);
+	pbr_texture_shader.SetFloat("metallic_val", met);
+	
+	// render skybox (render as last to prevent overdraw)
+	renderSkybox(&backgroundShader, camera, envCubemap, irradianceMap);
+}
 void Scene::Scene5Draw(Camera* camera, float dt)
 {
 	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
@@ -823,35 +823,6 @@ void Scene::Scene5Draw(Camera* camera, float dt)
 	// render skybox (render as last to prevent overdraw)
 	renderSkybox(&backgroundShader, camera, envCubemap, irradianceMap);
 }
-void Scene::Scene4Draw(Camera* camera, float dt)
-{
-	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	pbr_texture_shader.Use();
-	camera->Update(&pbr_texture_shader);
-	pbr_texture_shader.SetVec3("camPos", camera->position);
-
-	// Draw objs
-	DrawObjs(camera, curr_scene);
-
-	// lighting
-	/*r (unsigned int i = 0; i < light_num; ++i)
-	{
-		pbr_texture_shader.SetVec3("lightPositions[" + std::to_string(i) + "]", light[i].position);
-		pbr_texture_shader.SetVec3("lightColors[" + std::to_string(i) + "]", light[i].color);
-	}*/
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
-
-	// main object metallic, roughness
-	pbr_texture_shader.SetBool("roughness_status", true);
-	pbr_texture_shader.SetBool("metallic_status", true);
-
-	// render skybox (render as last to prevent overdraw)
-	renderSkybox(&backgroundShader, camera, envCubemap, irradianceMap);
-}
 void Scene::DrawObjs(Camera* camera, unsigned scene_num)
 {
 	// bind pre-computed IBL data
@@ -886,7 +857,7 @@ void Scene::DrawObjs(Camera* camera, unsigned scene_num)
 	}
 	for(unsigned i = 0; i < softbody_obj.size(); ++i)
 	{
-		int buff_offset = ChangePBRTexture(softbody_obj[i]->m_textype, i);
+		int buff_offset = ChangePBRTexture(softbody_obj[i]->m_textype, i, true);
 		glActiveTexture(GL_TEXTURE3 + buff_offset);
 		glBindTexture(GL_TEXTURE_2D, softbody_obj[i]->albedo);
 		glActiveTexture(GL_TEXTURE4 + buff_offset);
@@ -1004,28 +975,29 @@ void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 		ImGui::Begin("Select PBR texture");
 		
 		unsigned sz = static_cast<unsigned>(softbody_obj.size() + 1);
+		bool for_softbody = (curr_scene == 4 ? false : true);
 		if (ImGui::Button("Plastic"))
-			ChangePBRTexture(PLASTIC, sz);
+			ChangePBRTexture(PLASTIC, sz, for_softbody);
 		if (ImGui::Button("Steel"))
-			ChangePBRTexture(STEEL, sz);
+			ChangePBRTexture(STEEL, sz, for_softbody);
 		if (ImGui::Button("Wood"))
-			ChangePBRTexture(WOOD, sz);
+			ChangePBRTexture(WOOD, sz, for_softbody);
 		if (ImGui::Button("Rusted-Iron"))
-			ChangePBRTexture(RUSTED_IRON, sz);
+			ChangePBRTexture(RUSTED_IRON, sz, for_softbody);
 		if (ImGui::Button("Fabric"))
-			ChangePBRTexture(FABRIC, sz);
+			ChangePBRTexture(FABRIC, sz, for_softbody);
 		if (ImGui::Button("TornFabric"))
-			ChangePBRTexture(TORN_FABRIC, sz);
+			ChangePBRTexture(TORN_FABRIC, sz, for_softbody);
 		if (ImGui::Button("Aluminium"))
-			ChangePBRTexture(ALUMINIUM, sz);
+			ChangePBRTexture(ALUMINIUM, sz, for_softbody);
 		if (ImGui::Button("Copper"))
-			ChangePBRTexture(COPPER, sz);
+			ChangePBRTexture(COPPER, sz, for_softbody);
 		if (ImGui::Button("Concrete"))
-			ChangePBRTexture(CONCRETE, sz);
+			ChangePBRTexture(CONCRETE, sz, for_softbody);
 		if (ImGui::Button("Leather"))
-			ChangePBRTexture(LEATHER, sz);
+			ChangePBRTexture(LEATHER, sz, for_softbody);
 		if (ImGui::Button("Gold"))
-			ChangePBRTexture(GOLD, sz);
+			ChangePBRTexture(GOLD, sz, for_softbody);
 		ImGui::End();
 	}
 	if (forth_imgui)
@@ -1037,7 +1009,7 @@ void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 			draw_line = false;
 		ImGui::End();
 	}
-	if (curr_scene == 4)
+	if (curr_scene == 5)
 	{
 		ImGui::Begin("Camera properties");
 		if (fifth_imgui)
@@ -1134,17 +1106,22 @@ void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 		}
 		ImGui::End();
 	}
-	if (curr_scene == 4)
+	if (curr_scene == 5)
 	{
 		third_imgui = false;
 		forth_imgui = false;
 		fifth_imgui = false;
 	}
-	if (curr_scene == 5)
+	if (curr_scene == 4)
 	{
 		third_imgui = true;
 		forth_imgui = false;
 		fifth_imgui = true;
+		ImGui::Begin("Light Properties");
+		temp = light_obj[0]->color / 255.f;
+		ImGui::ColorEdit3("Light Color", (float*)&temp);
+		light_obj[0]->color = temp * 255.f;
+		ImGui::End();
 	}
 	else
 	{
@@ -1319,236 +1296,355 @@ void Scene::InitAllPBRTexture()
 	ao[10] = rigid_plane->loadTexture("models\\pbr\\gold\\ao.png");
 }
 
-int Scene::ChangePBRTexture(TextureType type, unsigned index)
+int Scene::ChangePBRTexture(TextureType type, unsigned index, bool isSoftbodyObj)
 {
 	int to_return = 0;
-	if (index > softbody_obj.size())
+	if (isSoftbodyObj)
 	{
-		// change all text
-		for (auto obj : softbody_obj)
+		if (index > softbody_obj.size())
+		{
+			// change all text
+			for (auto obj : softbody_obj)
+			{
+				if (type == PLASTIC)
+				{
+					(*obj).albedo = albedo[0];
+					(*obj).normal = normal[0];
+					(*obj).metallic = metallic[0];
+					(*obj).roughness = roughness[0];
+					(*obj).ao = ao[0];
+					(*obj).m_textype = PLASTIC;
+				}
+				else if (type == STEEL)
+				{
+					(*obj).albedo = albedo[1];
+					(*obj).normal = normal[1];
+					(*obj).metallic = metallic[1];
+					(*obj).roughness = roughness[1];
+					(*obj).ao = ao[1];
+					(*obj).m_textype = STEEL;
+					to_return = 5;
+				}
+				else if (type == WOOD)
+				{
+					(*obj).albedo = albedo[2];
+					(*obj).normal = normal[2];
+					(*obj).metallic = metallic[2];
+					(*obj).roughness = roughness[2];
+					(*obj).ao = ao[2];
+					(*obj).m_textype = WOOD;
+					to_return = 10;
+				}
+				else if (type == RUSTED_IRON)
+				{
+					(*obj).albedo = albedo[3];
+					(*obj).normal = normal[3];
+					(*obj).metallic = metallic[3];
+					(*obj).roughness = roughness[3];
+					(*obj).ao = ao[3];
+					(*obj).m_textype = RUSTED_IRON;
+					to_return = 15;
+				}
+				else if (type == FABRIC)
+				{
+					(*obj).albedo = albedo[4];
+					(*obj).normal = normal[4];
+					(*obj).metallic = metallic[4];
+					(*obj).roughness = roughness[4];
+					(*obj).ao = ao[4];
+					(*obj).m_textype = FABRIC;
+					to_return = 20;
+				}
+				else if (type == TORN_FABRIC)
+				{
+					(*obj).albedo = albedo[5];
+					(*obj).normal = normal[5];
+					(*obj).metallic = metallic[5];
+					(*obj).roughness = roughness[5];
+					(*obj).ao = ao[5];
+					(*obj).m_textype = TORN_FABRIC;
+					to_return = 25;
+				}
+				else if (type == ALUMINIUM)
+				{
+					(*obj).albedo = albedo[6];
+					(*obj).normal = normal[6];
+					(*obj).metallic = metallic[6];
+					(*obj).roughness = roughness[6];
+					(*obj).ao = ao[6];
+					(*obj).m_textype = ALUMINIUM;
+					to_return = 30;
+				}
+				else if (type == COPPER)
+				{
+					(*obj).albedo = albedo[7];
+					(*obj).normal = normal[7];
+					(*obj).metallic = metallic[7];
+					(*obj).roughness = roughness[7];
+					(*obj).ao = ao[7];
+					(*obj).m_textype = COPPER;
+					to_return = 35;
+				}
+				else if (type == CONCRETE)
+				{
+					(*obj).albedo = albedo[8];
+					(*obj).normal = normal[8];
+					(*obj).metallic = metallic[8];
+					(*obj).roughness = roughness[8];
+					(*obj).ao = ao[8];
+					(*obj).m_textype = CONCRETE;
+					to_return = 40;
+				}
+				else if (type == LEATHER)
+				{
+					(*obj).albedo = albedo[9];
+					(*obj).normal = normal[9];
+					(*obj).metallic = metallic[9];
+					(*obj).roughness = roughness[9];
+					(*obj).ao = ao[9];
+					(*obj).m_textype = LEATHER;
+					to_return = 45;
+				}
+				else if (type == GOLD)
+				{
+					(*obj).albedo = albedo[10];
+					(*obj).normal = normal[10];
+					(*obj).metallic = metallic[10];
+					(*obj).roughness = roughness[10];
+					(*obj).ao = ao[10];
+					(*obj).m_textype = GOLD;
+					to_return = 50;
+				}
+			}
+		}
+		else
 		{
 			if (type == PLASTIC)
 			{
-				(*obj).albedo = albedo[0];
-				(*obj).normal = normal[0];
-				(*obj).metallic = metallic[0];
-				(*obj).roughness = roughness[0];
-				(*obj).ao = ao[0];
-				(*obj).m_textype = PLASTIC;
+				softbody_obj[index]->albedo = albedo[0];
+				softbody_obj[index]->normal = normal[0];
+				softbody_obj[index]->metallic = metallic[0];
+				softbody_obj[index]->roughness = roughness[0];
+				softbody_obj[index]->ao = ao[0];
+				softbody_obj[index]->m_textype = PLASTIC;
 			}
 			else if (type == STEEL)
 			{
-				(*obj).albedo = albedo[1];
-				(*obj).normal = normal[1];
-				(*obj).metallic = metallic[1];
-				(*obj).roughness = roughness[1];
-				(*obj).ao = ao[1];
-				(*obj).m_textype = STEEL;
+				softbody_obj[index]->albedo = albedo[1];
+				softbody_obj[index]->normal = normal[1];
+				softbody_obj[index]->metallic = metallic[1];
+				softbody_obj[index]->roughness = roughness[1];
+				softbody_obj[index]->ao = ao[1];
+				softbody_obj[index]->m_textype = STEEL;
 				to_return = 5;
 			}
 			else if (type == WOOD)
 			{
-				(*obj).albedo = albedo[2];
-				(*obj).normal = normal[2];
-				(*obj).metallic = metallic[2];
-				(*obj).roughness = roughness[2];
-				(*obj).ao = ao[2];
-				(*obj).m_textype = WOOD;
+				softbody_obj[index]->albedo = albedo[2];
+				softbody_obj[index]->normal = normal[2];
+				softbody_obj[index]->metallic = metallic[2];
+				softbody_obj[index]->roughness = roughness[2];
+				softbody_obj[index]->ao = ao[2];
+				softbody_obj[index]->m_textype = WOOD;
 				to_return = 10;
 			}
 			else if (type == RUSTED_IRON)
 			{
-				(*obj).albedo = albedo[3];
-				(*obj).normal = normal[3];
-				(*obj).metallic = metallic[3];
-				(*obj).roughness = roughness[3];
-				(*obj).ao = ao[3];
-				(*obj).m_textype = RUSTED_IRON;
+				softbody_obj[index]->albedo = albedo[3];
+				softbody_obj[index]->normal = normal[3];
+				softbody_obj[index]->metallic = metallic[3];
+				softbody_obj[index]->roughness = roughness[3];
+				softbody_obj[index]->ao = ao[3];
+				softbody_obj[index]->m_textype = RUSTED_IRON;
 				to_return = 15;
 			}
 			else if (type == FABRIC)
 			{
-				(*obj).albedo = albedo[4];
-				(*obj).normal = normal[4];
-				(*obj).metallic = metallic[4];
-				(*obj).roughness = roughness[4];
-				(*obj).ao = ao[4];
-				(*obj).m_textype = FABRIC;
+				softbody_obj[index]->albedo = albedo[4];
+				softbody_obj[index]->normal = normal[4];
+				softbody_obj[index]->metallic = metallic[4];
+				softbody_obj[index]->roughness = roughness[4];
+				softbody_obj[index]->ao = ao[4];
+				softbody_obj[index]->m_textype = FABRIC;
 				to_return = 20;
 			}
 			else if (type == TORN_FABRIC)
 			{
-				(*obj).albedo = albedo[5];
-				(*obj).normal = normal[5];
-				(*obj).metallic = metallic[5];
-				(*obj).roughness = roughness[5];
-				(*obj).ao = ao[5];
-				(*obj).m_textype = TORN_FABRIC;
+				softbody_obj[index]->albedo = albedo[5];
+				softbody_obj[index]->normal = normal[5];
+				softbody_obj[index]->metallic = metallic[5];
+				softbody_obj[index]->roughness = roughness[5];
+				softbody_obj[index]->ao = ao[5];
+				softbody_obj[index]->m_textype = TORN_FABRIC;
 				to_return = 25;
 			}
 			else if (type == ALUMINIUM)
 			{
-				(*obj).albedo = albedo[6];
-				(*obj).normal = normal[6];
-				(*obj).metallic = metallic[6];
-				(*obj).roughness = roughness[6];
-				(*obj).ao = ao[6];
-				(*obj).m_textype = ALUMINIUM;
+				softbody_obj[index]->albedo = albedo[6];
+				softbody_obj[index]->normal = normal[6];
+				softbody_obj[index]->metallic = metallic[6];
+				softbody_obj[index]->roughness = roughness[6];
+				softbody_obj[index]->ao = ao[6];
+				softbody_obj[index]->m_textype = ALUMINIUM;
 				to_return = 30;
 			}
 			else if (type == COPPER)
 			{
-				(*obj).albedo = albedo[7];
-				(*obj).normal = normal[7];
-				(*obj).metallic = metallic[7];
-				(*obj).roughness = roughness[7];
-				(*obj).ao = ao[7];
-				(*obj).m_textype = COPPER;
+				softbody_obj[index]->albedo = albedo[7];
+				softbody_obj[index]->normal = normal[7];
+				softbody_obj[index]->metallic = metallic[7];
+				softbody_obj[index]->roughness = roughness[7];
+				softbody_obj[index]->ao = ao[7];
+				softbody_obj[index]->m_textype = COPPER;
 				to_return = 35;
 			}
 			else if (type == CONCRETE)
 			{
-				(*obj).albedo = albedo[8];
-				(*obj).normal = normal[8];
-				(*obj).metallic = metallic[8];
-				(*obj).roughness = roughness[8];
-				(*obj).ao = ao[8];
-				(*obj).m_textype = CONCRETE;
+				softbody_obj[index]->albedo = albedo[8];
+				softbody_obj[index]->normal = normal[8];
+				softbody_obj[index]->metallic = metallic[8];
+				softbody_obj[index]->roughness = roughness[8];
+				softbody_obj[index]->ao = ao[8];
+				softbody_obj[index]->m_textype = CONCRETE;
 				to_return = 40;
 			}
 			else if (type == LEATHER)
 			{
-				(*obj).albedo = albedo[9];
-				(*obj).normal = normal[9];
-				(*obj).metallic = metallic[9];
-				(*obj).roughness = roughness[9];
-				(*obj).ao = ao[9];
-				(*obj).m_textype = LEATHER;
+				softbody_obj[index]->albedo = albedo[9];
+				softbody_obj[index]->normal = normal[9];
+				softbody_obj[index]->metallic = metallic[9];
+				softbody_obj[index]->roughness = roughness[9];
+				softbody_obj[index]->ao = ao[9];
+				softbody_obj[index]->m_textype = LEATHER;
 				to_return = 45;
 			}
 			else if (type == GOLD)
 			{
-				(*obj).albedo = albedo[10];
-				(*obj).normal = normal[10];
-				(*obj).metallic = metallic[10];
-				(*obj).roughness = roughness[10];
-				(*obj).ao = ao[10];
-				(*obj).m_textype = GOLD;
+				softbody_obj[index]->albedo = albedo[10];
+				softbody_obj[index]->normal = normal[10];
+				softbody_obj[index]->metallic = metallic[10];
+				softbody_obj[index]->roughness = roughness[10];
+				softbody_obj[index]->ao = ao[10];
+				softbody_obj[index]->m_textype = GOLD;
 				to_return = 50;
 			}
 		}
 	}
 	else
 	{
+	// change all text
+	for (auto obj : pbr_obj)
+	{
 		if (type == PLASTIC)
 		{
-			softbody_obj[index]->albedo = albedo[0];
-			softbody_obj[index]->normal = normal[0];
-			softbody_obj[index]->metallic = metallic[0];
-			softbody_obj[index]->roughness = roughness[0];
-			softbody_obj[index]->ao = ao[0];
-			softbody_obj[index]->m_textype = PLASTIC;
+			(*obj).albedo = albedo[0];
+			(*obj).normal = normal[0];
+			(*obj).metallic = metallic[0];
+			(*obj).roughness = roughness[0];
+			(*obj).ao = ao[0];
+			(*obj).m_textype = PLASTIC;
 		}
 		else if (type == STEEL)
 		{
-			softbody_obj[index]->albedo = albedo[1];
-			softbody_obj[index]->normal = normal[1];
-			softbody_obj[index]->metallic = metallic[1];
-			softbody_obj[index]->roughness = roughness[1];
-			softbody_obj[index]->ao = ao[1];
-			softbody_obj[index]->m_textype = STEEL;
+			(*obj).albedo = albedo[1];
+			(*obj).normal = normal[1];
+			(*obj).metallic = metallic[1];
+			(*obj).roughness = roughness[1];
+			(*obj).ao = ao[1];
+			(*obj).m_textype = STEEL;
 			to_return = 5;
 		}
 		else if (type == WOOD)
 		{
-			softbody_obj[index]->albedo = albedo[2];
-			softbody_obj[index]->normal = normal[2];
-			softbody_obj[index]->metallic = metallic[2];
-			softbody_obj[index]->roughness = roughness[2];
-			softbody_obj[index]->ao = ao[2];
-			softbody_obj[index]->m_textype = WOOD;
+			(*obj).albedo = albedo[2];
+			(*obj).normal = normal[2];
+			(*obj).metallic = metallic[2];
+			(*obj).roughness = roughness[2];
+			(*obj).ao = ao[2];
+			(*obj).m_textype = WOOD;
 			to_return = 10;
 		}
 		else if (type == RUSTED_IRON)
 		{
-			softbody_obj[index]->albedo = albedo[3];
-			softbody_obj[index]->normal = normal[3];
-			softbody_obj[index]->metallic = metallic[3];
-			softbody_obj[index]->roughness = roughness[3];
-			softbody_obj[index]->ao = ao[3];
-			softbody_obj[index]->m_textype = RUSTED_IRON;
+			(*obj).albedo = albedo[3];
+			(*obj).normal = normal[3];
+			(*obj).metallic = metallic[3];
+			(*obj).roughness = roughness[3];
+			(*obj).ao = ao[3];
+			(*obj).m_textype = RUSTED_IRON;
 			to_return = 15;
 		}
 		else if (type == FABRIC)
 		{
-			softbody_obj[index]->albedo = albedo[4];
-			softbody_obj[index]->normal = normal[4];
-			softbody_obj[index]->metallic = metallic[4];
-			softbody_obj[index]->roughness = roughness[4];
-			softbody_obj[index]->ao = ao[4];
-			softbody_obj[index]->m_textype = FABRIC;
+			(*obj).albedo = albedo[4];
+			(*obj).normal = normal[4];
+			(*obj).metallic = metallic[4];
+			(*obj).roughness = roughness[4];
+			(*obj).ao = ao[4];
+			(*obj).m_textype = FABRIC;
 			to_return = 20;
 		}
 		else if (type == TORN_FABRIC)
 		{
-			softbody_obj[index]->albedo = albedo[5];
-			softbody_obj[index]->normal = normal[5];
-			softbody_obj[index]->metallic = metallic[5];
-			softbody_obj[index]->roughness = roughness[5];
-			softbody_obj[index]->ao = ao[5];
-			softbody_obj[index]->m_textype = TORN_FABRIC;
+			(*obj).albedo = albedo[5];
+			(*obj).normal = normal[5];
+			(*obj).metallic = metallic[5];
+			(*obj).roughness = roughness[5];
+			(*obj).ao = ao[5];
+			(*obj).m_textype = TORN_FABRIC;
 			to_return = 25;
 		}
 		else if (type == ALUMINIUM)
 		{
-			softbody_obj[index]->albedo = albedo[6];
-			softbody_obj[index]->normal = normal[6];
-			softbody_obj[index]->metallic = metallic[6];
-			softbody_obj[index]->roughness = roughness[6];
-			softbody_obj[index]->ao = ao[6];
-			softbody_obj[index]->m_textype = ALUMINIUM;
+			(*obj).albedo = albedo[6];
+			(*obj).normal = normal[6];
+			(*obj).metallic = metallic[6];
+			(*obj).roughness = roughness[6];
+			(*obj).ao = ao[6];
+			(*obj).m_textype = ALUMINIUM;
 			to_return = 30;
 		}
 		else if (type == COPPER)
 		{
-			softbody_obj[index]->albedo = albedo[7];
-			softbody_obj[index]->normal = normal[7];
-			softbody_obj[index]->metallic = metallic[7];
-			softbody_obj[index]->roughness = roughness[7];
-			softbody_obj[index]->ao = ao[7];
-			softbody_obj[index]->m_textype = COPPER;
+			(*obj).albedo = albedo[7];
+			(*obj).normal = normal[7];
+			(*obj).metallic = metallic[7];
+			(*obj).roughness = roughness[7];
+			(*obj).ao = ao[7];
+			(*obj).m_textype = COPPER;
 			to_return = 35;
 		}
 		else if (type == CONCRETE)
 		{
-			softbody_obj[index]->albedo = albedo[8];
-			softbody_obj[index]->normal = normal[8];
-			softbody_obj[index]->metallic = metallic[8];
-			softbody_obj[index]->roughness = roughness[8];
-			softbody_obj[index]->ao = ao[8];
-			softbody_obj[index]->m_textype = CONCRETE;
+			(*obj).albedo = albedo[8];
+			(*obj).normal = normal[8];
+			(*obj).metallic = metallic[8];
+			(*obj).roughness = roughness[8];
+			(*obj).ao = ao[8];
+			(*obj).m_textype = CONCRETE;
 			to_return = 40;
 		}
 		else if (type == LEATHER)
 		{
-			softbody_obj[index]->albedo = albedo[9];
-			softbody_obj[index]->normal = normal[9];
-			softbody_obj[index]->metallic = metallic[9];
-			softbody_obj[index]->roughness = roughness[9];
-			softbody_obj[index]->ao = ao[9];
-			softbody_obj[index]->m_textype = LEATHER;
+			(*obj).albedo = albedo[9];
+			(*obj).normal = normal[9];
+			(*obj).metallic = metallic[9];
+			(*obj).roughness = roughness[9];
+			(*obj).ao = ao[9];
+			(*obj).m_textype = LEATHER;
 			to_return = 45;
 		}
 		else if (type == GOLD)
 		{
-			softbody_obj[index]->albedo = albedo[10];
-			softbody_obj[index]->normal = normal[10];
-			softbody_obj[index]->metallic = metallic[10];
-			softbody_obj[index]->roughness = roughness[10];
-			softbody_obj[index]->ao = ao[10];
-			softbody_obj[index]->m_textype = GOLD;
+			(*obj).albedo = albedo[10];
+			(*obj).normal = normal[10];
+			(*obj).metallic = metallic[10];
+			(*obj).roughness = roughness[10];
+			(*obj).ao = ao[10];
+			(*obj).m_textype = GOLD;
 			to_return = 50;
 		}
+	}
 	}
 	return to_return;
 }
