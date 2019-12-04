@@ -21,8 +21,8 @@ uniform samplerCube irradianceMap;
 uniform samplerCube prefilterMap;
 uniform sampler2D brdfLUT;
 
-uniform vec3 lightPositions[8];
-uniform vec3 lightColors[8];
+uniform vec3 lightPositions[20];
+uniform vec3 lightColors[20];
 
 uniform vec3 camPos;
 uniform int light_num;

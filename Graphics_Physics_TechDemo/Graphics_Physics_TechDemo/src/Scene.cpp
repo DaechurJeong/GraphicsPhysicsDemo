@@ -396,8 +396,15 @@ void Scene::Scene4Init(Camera* camera)
 	pbr_obj.push_back(pbr_sphere);
 
 	Light m_light;
-	m_light.color = glm::vec3(100.f, 100.f, 100.f);
+	m_light.color = glm::vec3(1.f, 1.f, 1.f);
 	m_light.position = glm::vec3(0.f, 0.f, -3.f);
+	m_light.constant = 1.0f;
+	m_light.linear = 0.09f;
+	m_light.quadratic = 0.032f;
+	m_light.ambientStrength = 0.1f;
+	m_light.diffuseStrength = 0.7f;
+	m_light.specularStrength = 1.f;
+
 	light.push_back(m_light);
 	Object* light_ = new Object(O_SPHERE, m_light.position, glm::vec3(0.3f, 0.3f, 0.3f), 10);
 	light_obj.push_back(light_);
@@ -595,17 +602,23 @@ void Scene::Scene5Init(Camera* camera)
 	{
 		Light m_light;
 		if (i % 4 == 0)
-			m_light.color = glm::vec3(300.f, 300.f, 50.f);
+			m_light.color = glm::vec3(1.f, 1.f, 0.1f);
 		else if (i % 4 == 1)
-			m_light.color = glm::vec3(300.f, 50.f, 300.f);
+			m_light.color = glm::vec3(0.1f, 1.0f, 0.1f);
 		else if (i % 4 == 2)
-			m_light.color = glm::vec3(50.f, 50.f, 300.f);
+			m_light.color = glm::vec3(0.1f, 0.1f, 0.9f);
 		else if (i % 4 == 3)
-			m_light.color = glm::vec3(300.f, 300.f, 300.f);
+			m_light.color = glm::vec3(0.9f, 0.9f, 0.9f);
 		int x_rand = rand() % 10 - 5;
 		int y_rand = rand() % 10 - 5;
 		int z_rand = rand() % 10 - 5;
 		m_light.position = glm::vec3(x_rand, y_rand, z_rand);
+		m_light.constant = 1.0f;
+		m_light.linear = 0.09f;
+		m_light.quadratic = 0.032f;
+		m_light.ambientStrength = 0.1f;
+		m_light.diffuseStrength = 0.7f;
+		m_light.specularStrength = 1.f;
 		light.push_back(m_light);
 	}
 	for (int i = 0; i < light_num; ++i)
@@ -741,17 +754,19 @@ void Scene::Scene4Draw(Camera* camera, float dt)
 
 	// Draw objs
 	DrawObjs(camera, curr_scene);
+	// update Lighting
+	light_obj[0]->color = light[0].color * 300.f;
 	pbr_texture_shader.SetVec3("lightPositions[" + std::to_string(0) + "]", light_obj[0]->position);
 	pbr_texture_shader.SetVec3("lightColors[" + std::to_string(0) + "]", light_obj[0]->color);
-	std::cout << "Light color : " << light_obj[0]->color.x << light_obj[0]->color.y << light_obj[0]->color.z << std::endl;
-	//std::cout << "Light color : " << temp.x << temp.y << temp.z << std::endl;
-	// update Lighting
+
 	lightShader.Use();
 	light_obj[0]->position.x = sinf(angle) * 3.f;
 	light_obj[0]->position.z = cosf(angle) * 3.f;
+	light[0].position = light_obj[0]->position;
+	//light[0].color = light_obj[0]->color * 300.f;
 	angle += dt;
-	lightShader.SetVec3("lightPosition", light_obj[0]->position);
-	lightShader.SetVec3("lightColor", light_obj[0]->color);
+	lightShader.SetVec3("lightPosition", light[0].position);
+	lightShader.SetVec3("lightColor", light[0].color);
 	light_obj[0]->render_lights(camera, &lightShader, light_obj[0]->position, aspect);
 	
 	glActiveTexture(GL_TEXTURE0);
@@ -782,8 +797,9 @@ void Scene::Scene5Draw(Camera* camera, float dt)
 	// lighting
 	for (unsigned int i = 0; i < light_num; ++i)
 	{
-		pbr_texture_shader.SetVec3("lightPositions[" + std::to_string(i) + "]", light[i].position);
-		pbr_texture_shader.SetVec3("lightColors[" + std::to_string(i) + "]", light[i].color);
+		light_obj[i]->color = light[i].color * 300.f;
+		pbr_texture_shader.SetVec3("lightPositions[" + std::to_string(i) + "]", light_obj[i]->position);
+		pbr_texture_shader.SetVec3("lightColors[" + std::to_string(i) + "]", light_obj[i]->color); // 300, 300, 300
 	}
 	// lighting
 	lightShader.Use();
@@ -794,15 +810,15 @@ void Scene::Scene5Draw(Camera* camera, float dt)
 		light_obj[i]->position.y = (4 + sin(i * PI / 25 * angle * 3)) * cos(PI / 4 * (2 + sin(i * 2 * PI / 35 * angle * 3))) * magnitude;
 		light_obj[i]->position.z = (4 + sin(i * PI / 25 * angle * 3)) * sin(PI / (10 + i) * (2 + sin(2 * PI / 35 * angle * 3))) * sin(i * PI * (1 + sin(2 * PI / 35 * angle * 3))) * magnitude;
 
-		light_obj[i]->color = light[i].color / 300.f;
 		angle += (orbit_speed / light_num);
-		lightShader.SetVec3("lightPosition", light_obj[i]->position);
-		lightShader.SetVec3("lightColor", light_obj[i]->color);
+		lightShader.SetVec3("lightPosition", light[i].position);
+		lightShader.SetVec3("lightColor", light[i].color);
 		light[i].position = light_obj[i]->position;
 
 		if (i != cam_num)
 			light_obj[i]->render_lights(camera, &lightShader, light_obj[i]->position, aspect);
 	}
+
 	if (cam_move)
 	{
 		glm::vec3 look_vec = light_obj[cam_num]->position - prev;
@@ -1017,7 +1033,7 @@ void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 		if (cam_move)
 		{
 			ImGui::Text("Current Light Num : %d out of %d", cam_num, light_num);
-			if (ImGui::Button("Ride Next Ball"))
+			if (ImGui::Button("Another travel"))
 			{
 				++cam_num;
 				if (cam_num >= light_num)
@@ -1027,7 +1043,7 @@ void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 		}
 		if (!cam_move)
 		{
-			if (ImGui::Button("Hang the camera on thel light"))
+			if (ImGui::Button("Let's Travel"))
 			{
 				camera->position = light_obj[cam_num]->position;
 				cam_move = true;
@@ -1112,15 +1128,14 @@ void Scene::ImGuiUpdate(GLFWwindow* window, Camera* camera, float dt)
 		forth_imgui = false;
 		fifth_imgui = false;
 	}
-	if (curr_scene == 4)
+	else if (curr_scene == 4)
 	{
 		third_imgui = true;
 		forth_imgui = false;
 		fifth_imgui = true;
 		ImGui::Begin("Light Properties");
-		temp = light_obj[0]->color / 255.f;
-		ImGui::ColorEdit3("Light Color", (float*)&temp);
-		light_obj[0]->color = temp * 255.f;
+		ImGui::ColorEdit3("Light Color", (float*)&light[0].color);
+		light_obj[0]->color = light[0].color;
 		ImGui::End();
 	}
 	else
