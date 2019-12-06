@@ -33,8 +33,6 @@
     <ClCompile Include="src\Physics.cpp" />
     <ClCompile Include="src\Scene.cpp" />
     <ClCompile Include="src\Shader.cpp" />
-    <ClCompile Include="src\Vector2.cpp" />
-    <ClCompile Include="src\Vector3.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\imgui-master\imconfig.h" />
@@ -53,8 +51,6 @@
     <ClInclude Include="src\Physics.h" />
     <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\Shader.h" />
-    <ClInclude Include="src\Vector2.h" />
-    <ClInclude Include="src\Vector3.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

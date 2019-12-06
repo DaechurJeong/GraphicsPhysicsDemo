@@ -80,8 +80,6 @@ public:
 	unsigned int ao = 0;
 
 	unsigned right, left, front, back, up, bottom; // indexes
-	//physics
-	//SoftBodyPhysics& getSoftBody() { return sb; }
 	int nrRows;
 	int nrColumns;
 	float spacing;
@@ -119,7 +117,7 @@ unsigned int loadTexture_Cubemap(std::vector<std::string> faces);
 unsigned int loadTexture_irradianceMap(unsigned int& captureFBO, unsigned int& captureRBO);
 unsigned int loadTexture_prefilterMap();
 unsigned int loadTexture_LUT(Shader* brdfShader, unsigned captureFBO, unsigned captureRBO);
-void simulate_prefilter(Shader* prefilterShader, Shader* pbr_texture_shader, unsigned prefilterMap, unsigned captureFBO, unsigned captureRBO,
+void simulate_prefilter(Shader* prefilterShader, unsigned prefilterMap, unsigned captureFBO, unsigned captureRBO,
 	unsigned envCubemap, glm::mat4* captureViews);
 
 void InitFrameBuffer(Shader* equirectangularToCubmapShader, Shader* irradianceShader, Shader* prefilterShader, Shader* brdfShader,

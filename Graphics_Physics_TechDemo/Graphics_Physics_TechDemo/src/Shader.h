@@ -31,7 +31,6 @@ public:
 	};
 
 	Shader() : m_programId(0), m_vertexId(0), m_fragmentId(0), m_geometryId(0), m_infoLogLength(0), m_result(0){};
-	//Shader(GLboolean geometryUse, ShaderType type);
 	~Shader();
 
 	void CreateShader(const char* vertex_file_path, const char* fragment_file_path,
@@ -51,6 +50,4 @@ private:
 	int m_infoLogLength;
 	GLint m_result;
 
-	//GLboolean UseGeometry;
-	//ShaderType m_type;
 };

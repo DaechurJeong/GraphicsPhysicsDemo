@@ -1,0 +1,16 @@
+Team Name : OffOnOff
+
+This file is describing the work done by Charlie Jung.
+
+* INDIVISUAL GOAL *
+	Implement fully-functional PBR rendering algorithm for realistic visualization
+	Make a simple custom graphics engine
+	Learn more about OpenGL
+	
+* WORK DONE *
+	Creating Window and link all library files for project setting
+	Setup Object class that can load OBJ files and textures with rendering functions.
+	, Shader class for rendering
+	Setup Camera, Input system for debugging
+	Put ImGui tool and design UI for all scene
+	

@@ -23,12 +23,6 @@ void SoftBodyPhysics::Init()
 		m_acceleration = std::vector<glm::vec3>(ver, glm::vec3(0, m_gravity * m_mass, 0));
 		m_velocity = std::vector<glm::vec3>(ver, glm::vec3(0));
 
-		//m_edge.push_back(std::make_pair(0, m_scaled_ver[0]));
-		//m_edge.push_back(std::make_pair(dimension, m_scaled_ver[dimension]));
-		//m_edge.push_back(std::make_pair(ver-dimension, m_scaled_ver[ver - dimension]));
-		//m_edge.push_back(std::make_pair(ver-1, m_scaled_ver[ver - 1]));
-
-
 		for(int i = 0; i <= dimension; ++i)
 			m_edge.push_back(std::make_pair(i, m_scaled_ver[i]));
 
@@ -127,13 +121,10 @@ void SoftBodyPhysics::Init()
 void SoftBodyPhysics::Update(float dt)
 {
 	Acceleration();
-	
-	//Move(dt);
 
 	Verlet(dt);
 
-	//if(!isCollided)
-		KeepConstraint();
+	KeepConstraint();
 
 	position = m_scaled_ver[m_scaled_ver.size() - 1];
 	glm::vec3 center = glm::vec3(0);
@@ -201,9 +192,6 @@ void SoftBodyPhysics::KeepConstraint()
 	for (int i = 0; i < 7; ++i)
 	{
 		//staying edge
-		//for (unsigned j = 0; j < m_edge.size(); ++j)
-		//	m_scaled_ver[j] = m_edge[j];
-
 		for (unsigned j = 0; j < m_edge.size(); ++j)
 			m_scaled_ver[m_edge[j].first] = m_edge[j].second;
 
@@ -221,7 +209,7 @@ void SoftBodyPhysics::KeepConstraint()
 			float len = glm::sqrt(delta.x * delta.x + delta.y * delta.y + delta.z * delta.z);
 			float diff = (len - j.restlen) / len;
 
-			glm::vec3 force = stiffness * delta * diff;// -damping * glm::dot(point2 - old_2, point1 - old_1) * diff;
+			glm::vec3 force = stiffness * delta * diff;
 	
 			point1 += force;
 			point2 -= force;
@@ -245,49 +233,16 @@ void SoftBodyPhysics::KeepConstraint()
 			float len = glm::distance(point2, point1) + glm::distance(point4, point3);
 			float diff = (len - j.first.restlen - j.second.restlen) / len;
 
-			glm::vec3 force1 = stiffness * delta1 * diff * 0.5f;// -0.8f * glm::dot(point2 - old_2, point1 - old_1) * diff;
-
+			glm::vec3 force1 = stiffness * delta1 * diff * 0.5f;
 			point1 += force1;
 			point2 -= force1;
 
-			glm::vec3 force2 = stiffness * delta2 * diff * 0.5f;// -0.8f * glm::dot(point4 - old_4, point3 - old_3) * diff;
-
+			glm::vec3 force2 = stiffness * delta2 * diff * 0.5f;
 			point3 += force2;
 			point4 -= force2;
 
 		}
-
-		//for (unsigned j = 0; j < m_cons.size(); ++j)
-		//{
-		//	constraints& c = m_cons[j];
-		//	glm::vec3& point1 = m_scaled_ver[c.p1];
-		//	glm::vec3& point2 = m_scaled_ver[c.p2];
-		//	glm::vec3& old_1 = m_old_ver[c.p1];
-		//	glm::vec3& old_2 = m_old_ver[c.p2];
-
-		//	glm::vec3 delta = point2 - point1;
-		//	if (delta == glm::vec3(0, 0, 0))
-		//		continue;
-
-		//	float len = glm::sqrt(delta.x * delta.x + delta.y * delta.y + delta.z * delta.z);
-		//	float diff = (len - c.restlen) / len;
-
-		//	glm::vec3 force = stiffness * delta * diff;// -damping * glm::dot(point2 - old_2, point1 - old_1) * diff;
-		//	//m_velocity[c.p1] -= force;
-		//	//m_velocity[c.p2] += force;
-
-		//	//point1 += delta * 0.5f * diff;
-		//	//point2 -= delta * 0.5f * diff;
-		//	
-		//	//m_acceleration[c.p1] -= force;
-		//	//m_acceleration[c.p2] += force;
-		//	
-		//	point1 += force;
-		//	point2 -= force;
-		//}
 	}
-	//unsigned last = m_scaled_ver.size() - 1;
-	//position = (m_scaled_ver[0] + m_scaled_ver[last]) / 2.f;
 }
 
 void SoftBodyPhysics::Acceleration()
@@ -335,7 +290,6 @@ void SoftBodyPhysics::CollisionResponseRigid(Object* _rhs)
 		_rhs->d = -glm::dot(_rhs->normalVec, point0);
 			
 		float radius = 0.f;
-		//float radius_sqr = radius * radius;
 		bool collision = false;
 		for (unsigned i = 0; i < m_scaled_ver.size(); ++i)
 		{
@@ -344,13 +298,11 @@ void SoftBodyPhysics::CollisionResponseRigid(Object* _rhs)
 			glm::vec3 moved = m_scaled_ver[i];
 
 			glm::vec3 l_norm = _rhs->normalVec;
-			//if (glm::dot(m_scaled_ver[i] - m_old_ver[i], _rhs->normalVec) > 0.f)
-			//	l_norm = (-1.f) * l_norm;
 
 			collision = IsCollidedPlane(point, point0, point1, radius, distance, l_norm, _rhs->d, moved);
 			if (collision)
 			{
-				m_scaled_ver[i] = moved;// +(radius - distance) * l_norm;
+				m_scaled_ver[i] = moved;
 				isCollided = true;
 			}
 		}
@@ -362,7 +314,6 @@ void SoftBodyPhysics::CollisionResponseRigid(Object* _rhs)
 void SoftBodyPhysics::CollisionResponseSoft(SoftBodyPhysics* _rhs)
 {
 	float radius = 0.0f;
-	//float radius_sqr = radius * radius;
 	bool collision = false;
 
 	if (glm::distance(position, _rhs->position) > scale[0] + _rhs->scale[0])
@@ -382,13 +333,9 @@ void SoftBodyPhysics::CollisionResponseSoft(SoftBodyPhysics* _rhs)
 		glm::vec3 w = point2 - point0;
 
 		//check distance
-		//_rhs->normalVec = glm::cross(v, w);
-		//_rhs->normalVec = glm::normalize(_rhs->normalVec);
-
 		glm::vec3 normalvec = glm::cross(v, w);
 		normalvec = glm::normalize(normalvec);
 
-		//_rhs->d = -glm::dot(_rhs->normalVec, point0);
 		float d = -glm::dot(normalvec, point0);
 		
 		for (unsigned i = 0; i < m_scaled_ver.size(); ++i)
@@ -401,13 +348,12 @@ void SoftBodyPhysics::CollisionResponseSoft(SoftBodyPhysics* _rhs)
 			float distance = 0;
 			glm::vec3 moved = m_scaled_ver[i];
 
-			//glm::vec3 l_norm = _rhs->normalVec;
 			glm::vec3 l_norm = normalvec;
 
 			collision = IsCollidedPlane(point, point0, point1, radius, distance, l_norm, d, moved);
 			if (collision)
 			{
-				m_scaled_ver[i] = moved;// +0.5f * (radius - distance) * l_norm;
+				m_scaled_ver[i] = moved;
 				isCollided = true;
 			}
 		}
@@ -432,8 +378,6 @@ bool SoftBodyPhysics::IsCollided(glm::vec3& point, glm::vec3& center, float& rad
 bool SoftBodyPhysics::IsCollidedPlane(glm::vec3& point, glm::vec3& p_point0, glm::vec3& p_point1, float& radius, float& distance, glm::vec3& norm, float d
 ,glm::vec3& movedpoint)
 {
-	//distance = std::abs(glm::dot(point, norm) + d);
-	
 	distance = glm::dot(point, norm) + d;
 
 	if (std::abs(distance) < 0.2f && distance < 0.f)

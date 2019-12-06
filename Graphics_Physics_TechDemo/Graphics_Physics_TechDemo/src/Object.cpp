@@ -199,20 +199,6 @@ bool Object::loadOBJ(const char* path, glm::vec3& middlePoint)
 			{
 				textureUV_fromIndices.push_back(textureUV[test_indices[i]]);
 			}
-			/*for (unsigned i = 0; i < obj_vertices.size(); ++i)
-			{
-				obj_vertices[i].x /= (0.5f * abs_max);
-				obj_vertices[i].y /= (0.5f * abs_max);
-				obj_vertices[i].z /= (0.5f * abs_max);
-				obj_vertices[i] -= (2.f * middlePoint);
-
-				glm::vec3 normalized = glm::normalize(obj_vertices[i]);
-
-				float theta = glm::atan(normalized.y / normalized.x);
-				glm::vec2 textUV = glm::vec2(theta / TWOPI, (normalized.z + 1) * 0.5f);
-
-				textureUV.push_back(textUV);
-			}*/
 			break;
 		}
 		if (strcmp(lineHeader, "v") == 0)
@@ -260,21 +246,6 @@ bool Object::loadOBJ(const char* path, glm::vec3& middlePoint)
 				test_indices.push_back(trash[1] - 1);
 				test_indices.push_back(trash[2] - 1);
 				test_indices.push_back(trash[3] - 1);
-				/*obj_indices.push_back(vertexIndex[0] - 1);
-				obj_indices.push_back(vertexIndex[1] - 1);
-				obj_indices.push_back(vertexIndex[2] - 1);
-
-				obj_indices.push_back(vertexIndex[0] - 1);
-				obj_indices.push_back(vertexIndex[1] - 1);
-				obj_indices.push_back(vertexIndex[3] - 1);
-
-				obj_indices.push_back(vertexIndex[0] - 1);
-				obj_indices.push_back(vertexIndex[2] - 1);
-				obj_indices.push_back(vertexIndex[3] - 1);
-
-				obj_indices.push_back(vertexIndex[1] - 1);
-				obj_indices.push_back(vertexIndex[2] - 1);
-				obj_indices.push_back(vertexIndex[3] - 1);*/
 			}
 			else if (matches == 6)
 			{
@@ -291,16 +262,6 @@ bool Object::loadOBJ(const char* path, glm::vec3& middlePoint)
 				printf("File can't be read by our simple parser : ( Try exporting with other options\n");
 				return false;
 			}
-			/*unsigned int vertexIndex[3];
-			int matches = fscanf(file, "%d %d %d\n", &vertexIndex[0], &vertexIndex[1], &vertexIndex[2]);
-			if (matches != 3)
-			{
-				printf("File can't be read by our simple parser : ( Try exporting with other options\n");
-				return false;
-			}
-			obj_indices.push_back(vertexIndex[0] - 1);
-			obj_indices.push_back(vertexIndex[1] - 1);
-			obj_indices.push_back(vertexIndex[2] - 1);*/
 		}
 		if (strcmp(lineHeader, "vt") == 0)
 		{
@@ -787,30 +748,6 @@ void InitFrameBuffer(Shader* equirectangularToCubmapShader, Shader* irradianceSh
 
 	// pbr: load the HDR environment map
 	hdrTexture = loadTexture_Environment("models\\newport_loft.hdr");
-	/*std::vector<std::string> faces
-	{
-		//"models\\skybox\\map_px.jpg",
-		//"models\\skybox\\map_nx.jpg",
-		//"models\\skybox\\map_py.jpg",
-		//"models\\skybox\\map_ny.jpg",
-		//"models\\skybox\\map_pz.jpg",
-		//"models\\skybox\\map_nz.jpg",
-		"models\\skybox\\right.jpg",
-		"models\\skybox\\left.jpg",
-		"models\\skybox\\top.jpg",
-		"models\\skybox\\bottom.jpg",
-		"models\\skybox\\front.jpg",
-		"models\\skybox\\back.jpg",
-
-		//"models\\space_skybox\\space_skyboxesRT.png",
-		//"models\\space_skybox\\space_skyboxesLF.png",
-		//"models\\space_skybox\\space_skyboxesUP.png",
-		//"models\\space_skybox\\space_skyboxesDN.png",
-		//"models\\space_skybox\\space_skyboxesFT.png",
-		//"models\\space_skybox\\space_skyboxesBK.png",
-	};
-	Object skybox(O_CUBE, glm::vec3(0.f,0.f,0.f), glm::vec3(1.f,1.f,1.f), 0);
-	skybox.LoadTGAFile(faces);*/
 
 	envCubemap = loadTexture_Cubemap();
 
@@ -828,19 +765,6 @@ void InitFrameBuffer(Shader* equirectangularToCubmapShader, Shader* irradianceSh
 	equirectangularToCubmapShader->SetInt("equirectangularMap", 0);
 	equirectangularToCubmapShader->SetMat4("projection", captureProjection);
 
-	/*unsigned int textureColorbuffer[6];
-	for (int i = 0; i < 6; ++i)
-	{
-		glGenTextures(1, &textureColorbuffer[i]);
-		glBindTexture(GL_TEXTURE_2D, textureColorbuffer[i]);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, WIDTH, HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, textureColorbuffer[i], 0);
-	}*/
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, hdrTexture);
 
@@ -921,22 +845,6 @@ void UpdateFrameBuffer(Shader* equirectangularToCubmapShader, Shader* irradiance
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	/*glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);
-	// irradiance map
-	for (unsigned int i = 0; i < 6; ++i)
-	{
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, 32, 32, 0, GL_RGB, GL_FLOAT, nullptr);
-	}
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
-	glBindRenderbuffer(GL_RENDERBUFFER, captureRBO);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 32, 32);*/
-
 	irradianceShader->Use();
 	irradianceShader->SetInt("environmentMap", 0);
 	irradianceShader->SetMat4("projection", captureProjection);
@@ -956,44 +864,11 @@ void UpdateFrameBuffer(Shader* equirectangularToCubmapShader, Shader* irradiance
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	/*glBindTexture(GL_TEXTURE_CUBE_MAP, prefilterMap);
-	for (unsigned int i = 0; i < 6; ++i)
-	{
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, 128, 128, 0, GL_RGB, GL_FLOAT, nullptr);
-	}
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // be sure to set minifcation filter to mip_linear 
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	// generate mipmaps for the cubemap so OpenGL automatically allocates the required memory.
-	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);*/
-
 	prefilterShader->Use();
 	prefilterShader->SetInt("environmentMap", 0);
 	prefilterShader->SetMat4("projection", captureProjection);
 
 	simulate_prefilter(prefilterShader, prefilterMap, captureFBO, captureRBO, envCubemap, captureViews);
-
-	// pre-allocate enough memory for the LUT texture.
-	/*glBindTexture(GL_TEXTURE_2D, brdfLUTTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16F, 512, 512, 0, GL_RG, GL_FLOAT, 0);
-	// be sure to set wrapping mode to GL_CLAMP_TO_EDGE
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	// then re-configure capture framebuffer object and render screen-space quad with BRDF shader.
-	glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
-	glBindRenderbuffer(GL_RENDERBUFFER, captureRBO);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 512, 512);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, brdfLUTTexture, 0);
-
-	glViewport(0, 0, 512, 512);
-	brdfShader->Use();
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	renderQuad();*/
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
