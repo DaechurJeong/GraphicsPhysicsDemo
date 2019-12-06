@@ -329,9 +329,9 @@ void Object::makeSphere()
 	const unsigned int X_SEGMENTS = dimension;
 	const unsigned int Y_SEGMENTS = dimension;
 
-	for (unsigned int y = 0; y <= Y_SEGMENTS; ++y)
+	for (unsigned int y = 0; y <= static_cast<int>(Y_SEGMENTS); ++y)
 	{
-		for (unsigned int x = 0; x <= X_SEGMENTS; ++x)
+		for (unsigned int x = 0; x <= static_cast<int>(X_SEGMENTS); ++x)
 		{
 			float xSegment = (float)x / (float)X_SEGMENTS;
 			float ySegment = (float)y / (float)Y_SEGMENTS;
@@ -377,12 +377,12 @@ void Object::makeSphere()
 	}
 
 	int k1, k2 = 0;
-	for (int i = 0; i < X_SEGMENTS; ++i)
+	for (int i = 0; i < static_cast<int>(X_SEGMENTS); ++i)
 	{
 		k1 = i * (Y_SEGMENTS + 1);     // beginning of current stack
 		k2 = k1 + Y_SEGMENTS + 1;      // beginning of next stack
 
-		for (int j = 0; j < Y_SEGMENTS; ++j, ++k1, ++k2)
+		for (int j = 0; j < static_cast<int>(Y_SEGMENTS); ++j, ++k1, ++k2)
 		{
 			// 2 triangles per sector excluding first and last stacks
 			// k1 => k2 => k1+1
@@ -419,9 +419,9 @@ void Object::makePlain()
 	const unsigned int X_SEGMENTS = dimension;
 	const unsigned int Y_SEGMENTS = dimension;
 
-	for (unsigned int y = 0; y <= Y_SEGMENTS; ++y)
+	for (unsigned int y = 0; y <= static_cast<int>(Y_SEGMENTS); ++y)
 	{
-		for (unsigned int x = 0; x <= X_SEGMENTS; ++x)
+		for (unsigned int x = 0; x <= static_cast<int>(X_SEGMENTS); ++x)
 		{
 			float xSegment = (float)x / (float)X_SEGMENTS;
 			float ySegment = (float)y / (float)Y_SEGMENTS;
@@ -435,11 +435,11 @@ void Object::makePlain()
 		}
 	}
 	bool oddRow = false;
-	for (int y = 0; y < Y_SEGMENTS; ++y)
+	for (int y = 0; y < static_cast<int>(Y_SEGMENTS); ++y)
 	{
 		if (!oddRow) // even rows: y == 0, y == 2; and so on
 		{
-			for (int x = 0; x <= X_SEGMENTS; ++x)
+			for (int x = 0; x <= static_cast<int>(X_SEGMENTS); ++x)
 			{
 				obj_indices.push_back(y * (X_SEGMENTS + 1) + x);
 				obj_indices.push_back((y + 1) * (X_SEGMENTS + 1) + x);

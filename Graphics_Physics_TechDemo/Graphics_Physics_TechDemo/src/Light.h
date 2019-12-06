@@ -20,12 +20,5 @@ public:
 	~Light() {};
 
 	glm::vec3 position, color;
-
-	float constant;
-	float linear;
-	float quadratic;
-	float ambientStrength;
-	float diffuseStrength;
-	float specularStrength;
 };
 

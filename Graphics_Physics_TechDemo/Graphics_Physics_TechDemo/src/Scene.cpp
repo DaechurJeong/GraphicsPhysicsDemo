@@ -398,12 +398,6 @@ void Scene::Scene4Init(Camera* camera)
 	Light m_light;
 	m_light.color = glm::vec3(1.f, 1.f, 1.f);
 	m_light.position = glm::vec3(0.f, 0.f, -3.f);
-	m_light.constant = 1.0f;
-	m_light.linear = 0.09f;
-	m_light.quadratic = 0.032f;
-	m_light.ambientStrength = 0.1f;
-	m_light.diffuseStrength = 0.7f;
-	m_light.specularStrength = 1.f;
 
 	light.push_back(m_light);
 	Object* light_ = new Object(O_SPHERE, m_light.position, glm::vec3(0.3f, 0.3f, 0.3f), 10);
@@ -425,10 +419,10 @@ void Scene::Scene5Init(Camera* camera)
 	glm::vec3 init = temp_coord;
 	for (int x = -X_SEGMENT + 2; x < X_SEGMENT; x += 2) // -z, z
 	{
-		temp_coord.x = x;
+		temp_coord.x = static_cast<float>(x);
 		for (int y = -Y_SEGMENT + 2; y < Y_SEGMENT; y += 2)
 		{
-			temp_coord.y = y;
+			temp_coord.y = static_cast<float>(y);
 			int rand_texture = rand() % 11;
 			Object* pbr_back = new Object(O_SPHERE, temp_coord, glm::vec3(1.f, 1.f, 1.f), MID_S_DIMENSION); // (-10, -10, -10) ~ (-10, -10, -10)
 			pbr_back->albedo = albedo[rand_texture];
@@ -448,16 +442,16 @@ void Scene::Scene5Init(Camera* camera)
 			pbr_front->ao = ao[rand_texture];
 			pbr_obj.push_back(pbr_front);
 
-			temp_coord.z = -Z_SEGMENT;
+			temp_coord.z = static_cast<float>(-Z_SEGMENT);
 		}
 	}
 	temp_coord = init;
 	for (int y = -Y_SEGMENT + 2; y < Y_SEGMENT; y += 2) // -y, y
 	{
-		temp_coord.y = y;
+		temp_coord.y = static_cast<float>(y);
 		for (int z = -Z_SEGMENT + 2; z < Z_SEGMENT; z += 2)
 		{
-			temp_coord.z = z;
+			temp_coord.z = static_cast<float>(z);
 			int rand_texture = rand() % 11;
 			Object* pbr_back = new Object(O_SPHERE, temp_coord, glm::vec3(1.f, 1.f, 1.f), MID_S_DIMENSION); // (-10, -10, -10) ~ (-10, -10, -10)
 			pbr_back->albedo = albedo[rand_texture];
@@ -477,16 +471,16 @@ void Scene::Scene5Init(Camera* camera)
 			pbr_front->ao = ao[rand_texture];
 			pbr_obj.push_back(pbr_front);
 
-			temp_coord.x = -X_SEGMENT;
+			temp_coord.x = static_cast<float>(-X_SEGMENT);
 		}
 	}
 	temp_coord = init;
 	for (int x = -X_SEGMENT + 2; x < X_SEGMENT; x += 2) // -x, x
 	{
-		temp_coord.x = x;
+		temp_coord.x = static_cast<float>(x);
 		for (int z = -Z_SEGMENT + 2; z < Z_SEGMENT; z += 2)
 		{
-			temp_coord.z = z;
+			temp_coord.z = static_cast<float>(z);
 			int rand_texture = rand() % 11;
 			Object* pbr_back = new Object(O_SPHERE, temp_coord, glm::vec3(1.f, 1.f, 1.f), MID_S_DIMENSION); // (-10, -10, -10) ~ (-10, -10, -10)
 			pbr_back->albedo = albedo[rand_texture];
@@ -506,17 +500,17 @@ void Scene::Scene5Init(Camera* camera)
 			pbr_front->ao = ao[rand_texture];
 			pbr_obj.push_back(pbr_front);
 
-			temp_coord.y = -Y_SEGMENT;
+			temp_coord.y = static_cast<float>(-Y_SEGMENT);
 		}
 	}
 
 	X_SEGMENT = 10, Y_SEGMENT = 10, Z_SEGMENT = 10;
 	for (int x = -X_SEGMENT + 2; x < X_SEGMENT; x += 2) // -z, z
 	{
-		temp_coord.x = x;
+		temp_coord.x = static_cast<float>(x);
 		for (int y = -Y_SEGMENT + 2; y < Y_SEGMENT; y += 2)
 		{
-			temp_coord.y = y;
+			temp_coord.y = static_cast<float>(y);
 			int rand_texture = rand() % 11;
 			Object* pbr_back = new Object(O_SPHERE, temp_coord, glm::vec3(1.f, 1.f, 1.f), MID_S_DIMENSION); // (-10, -10, -10) ~ (10, -10, -10)
 			pbr_back->albedo = albedo[rand_texture];
@@ -536,16 +530,16 @@ void Scene::Scene5Init(Camera* camera)
 			pbr_front->ao = ao[rand_texture];
 			pbr_obj.push_back(pbr_front);
 
-			temp_coord.z = -Z_SEGMENT;
+			temp_coord.z = static_cast<float>(-Z_SEGMENT);
 		}
 	}
 	temp_coord = init;
 	for (int y = -Y_SEGMENT + 2; y < Y_SEGMENT; y += 2) // -z, z
 	{
-		temp_coord.y = y;
+		temp_coord.y = static_cast<float>(y);
 		for (int z = -Z_SEGMENT + 2; z < Z_SEGMENT; z += 2)
 		{
-			temp_coord.z = z;
+			temp_coord.z = static_cast<float>(z);
 			int rand_texture = rand() % 11;
 			Object* pbr_back = new Object(O_SPHERE, temp_coord, glm::vec3(1.f, 1.f, 1.f), MID_S_DIMENSION); // (-10, -10, -10) ~ (10, -10, -10)
 			pbr_back->albedo = albedo[rand_texture];
@@ -565,16 +559,16 @@ void Scene::Scene5Init(Camera* camera)
 			pbr_front->ao = ao[rand_texture];
 			pbr_obj.push_back(pbr_front);
 
-			temp_coord.x = -X_SEGMENT;
+			temp_coord.x = static_cast<float>(-X_SEGMENT);
 		}
 	}
 	temp_coord = init;
 	for (int x = -X_SEGMENT + 2; x < X_SEGMENT; x += 2) // -z, z
 	{
-		temp_coord.x = x;
+		temp_coord.x = static_cast<float>(x);
 		for (int z = -Z_SEGMENT + 2; z < Z_SEGMENT; z += 2)
 		{
-			temp_coord.z = z;
+			temp_coord.z = static_cast<float>(z);
 			int rand_texture = rand() % 11;
 			Object* pbr_back = new Object(O_SPHERE, temp_coord, glm::vec3(1.f, 1.f, 1.f), MID_S_DIMENSION); // (-10, -10, -10) ~ (10, -10, -10)
 			pbr_back->albedo = albedo[rand_texture];
@@ -594,7 +588,7 @@ void Scene::Scene5Init(Camera* camera)
 			pbr_front->ao = ao[rand_texture];
 			pbr_obj.push_back(pbr_front);
 
-			temp_coord.y = -Y_SEGMENT;
+			temp_coord.y = static_cast<float>(-Y_SEGMENT);
 		}
 	}
 	// light properties
@@ -613,12 +607,7 @@ void Scene::Scene5Init(Camera* camera)
 		int y_rand = rand() % 10 - 5;
 		int z_rand = rand() % 10 - 5;
 		m_light.position = glm::vec3(x_rand, y_rand, z_rand);
-		m_light.constant = 1.0f;
-		m_light.linear = 0.09f;
-		m_light.quadratic = 0.032f;
-		m_light.ambientStrength = 0.1f;
-		m_light.diffuseStrength = 0.7f;
-		m_light.specularStrength = 1.f;
+
 		light.push_back(m_light);
 	}
 	for (int i = 0; i < light_num; ++i)
