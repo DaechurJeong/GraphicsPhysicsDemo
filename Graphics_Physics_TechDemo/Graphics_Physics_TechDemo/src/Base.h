@@ -20,6 +20,7 @@ End Header --------------------------------------------------------*/
 
 #define GRAVITY -9.8f
 
+
 struct constraints {
 	constraints() { p1 = 0; p2 = 0; restlen = 0; }
 	int p1;
@@ -41,7 +42,7 @@ public:
 	}
 	void Init();
 	void Update(float dt);
-	void KeepConstraint();
+	void KeepConstraint(float dt);
 	void CollisionResponseRigid(Object* _rhs);
 	void CollisionResponseSoft(SoftBodyPhysics* _rhs);
 

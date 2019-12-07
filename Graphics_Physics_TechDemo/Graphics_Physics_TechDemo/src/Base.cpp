@@ -13,6 +13,8 @@ End Header --------------------------------------------------------*/
 #include "Base.h"
 #include <iostream>
 
+#define KEEP_CONS_SPEED 35.f
+
 void SoftBodyPhysics::Init()
 {
 	m_gravity = GRAVITY;
@@ -135,7 +137,7 @@ void SoftBodyPhysics::Update(float dt)
 
 	Verlet(dt);
 
-	KeepConstraint();
+	KeepConstraint(dt);
 
 	position = m_scaled_ver[m_scaled_ver.size() - 1];
 	glm::vec3 center = glm::vec3(0);
@@ -198,7 +200,7 @@ void SoftBodyPhysics::Move(float dt)
 	}
 }
 
-void SoftBodyPhysics::KeepConstraint()
+void SoftBodyPhysics::KeepConstraint(float dt)
 {
 	for (int i = 0; i < 7; ++i)
 	{
@@ -220,7 +222,7 @@ void SoftBodyPhysics::KeepConstraint()
 			float len = glm::sqrt(delta.x * delta.x + delta.y * delta.y + delta.z * delta.z);
 			float diff = (len - j.restlen) / len;
 
-			glm::vec3 force = stiffness * delta * diff;
+			glm::vec3 force = stiffness * delta * diff * dt * KEEP_CONS_SPEED;
 	
 			point1 += force;
 			point2 -= force;
@@ -244,11 +246,11 @@ void SoftBodyPhysics::KeepConstraint()
 			float len = glm::distance(point2, point1) + glm::distance(point4, point3);
 			float diff = (len - j.first.restlen - j.second.restlen) / len;
 
-			glm::vec3 force1 = stiffness * delta1 * diff * 0.5f;
+			glm::vec3 force1 = stiffness * delta1 * diff * 0.5f * dt * KEEP_CONS_SPEED;
 			point1 += force1;
 			point2 -= force1;
 
-			glm::vec3 force2 = stiffness * delta2 * diff * 0.5f;
+			glm::vec3 force2 = stiffness * delta2 * diff * 0.5f * dt * KEEP_CONS_SPEED;
 			point3 += force2;
 			point4 -= force2;
 
