@@ -1,3 +1,15 @@
+/* Start Header -------------------------------------------------------
+Copyright (C) 2019 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the prior written
+consent of DigiPen Institute of Technology is prohibited.
+File Name: Base.cpp
+Purpose: Implementation of Softbody Physics
+Language: MSVC C++
+Platform: VS2019, Windows
+Project: Graphics_Physics_TechDemo
+Author: Nahye Park, nahye.park
+Creation date: 9/20/2018
+End Header --------------------------------------------------------*/
 #include "Base.h"
 #include <iostream>
 
@@ -42,7 +54,6 @@ void SoftBodyPhysics::Init()
 				m_const.insert(h_cons);
 			}
 		}
-
 		//vertical
 		for (int i = 0; i <= dimension; ++i)
 		{
@@ -251,7 +262,6 @@ void SoftBodyPhysics::Acceleration()
 		m_acceleration[i] = glm::vec3(0, m_gravity* m_mass, 0);
 }
 
-
 void SoftBodyPhysics::CollisionResponseRigid(Object* _rhs)
 {
 	if (_rhs->m_shape == ObjShape::O_SPHERE)
@@ -396,5 +406,4 @@ bool SoftBodyPhysics::IsCollidedPlane(glm::vec3& point, glm::vec3& p_point0, glm
 	}
 	else
 		return false;
-
 }
