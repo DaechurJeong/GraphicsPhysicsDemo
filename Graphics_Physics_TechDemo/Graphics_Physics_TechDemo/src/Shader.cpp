@@ -65,7 +65,6 @@ void Shader::CreateShader(const char* vertex_file_path, const char* fragment_fil
 	// vertex shader
 	char const* vertexSourcePointer = VertexShaderCode.c_str();
 	int InfoLogLength;
-	printf("Compiling shader : %s\n", vertex_file_path);
 	glShaderSource(m_vertexId, 1, &vertexSourcePointer, NULL);
 
 	glCompileShader(m_vertexId);
@@ -77,7 +76,6 @@ void Shader::CreateShader(const char* vertex_file_path, const char* fragment_fil
 	{
 		std::vector<char> VertexShaderErrorMessage(static_cast<INT64>(InfoLogLength + 1.0));
 		glGetShaderInfoLog(m_vertexId, InfoLogLength, nullptr, &VertexShaderErrorMessage[0]);
-		printf("%s\n", &VertexShaderErrorMessage[0]);
 	}
 
 	// geometry shader
@@ -98,7 +96,6 @@ void Shader::CreateShader(const char* vertex_file_path, const char* fragment_fil
 
 		char const* geometrySourcePointer = GeometryShaderCode.c_str();
 
-		printf("Compiling shader : %s\n", geometry_file_path);
 		glShaderSource(m_geometryId, 1, &geometrySourcePointer, NULL);
 
 		glCompileShader(m_geometryId);
@@ -110,7 +107,6 @@ void Shader::CreateShader(const char* vertex_file_path, const char* fragment_fil
 		{
 			std::vector<char> GeometryShaderErrorMessage(static_cast<INT64>(InfoLogLength + 1.0));
 			glGetShaderInfoLog(m_geometryId, InfoLogLength, nullptr, &GeometryShaderErrorMessage[0]);
-			printf("%s\n", &GeometryShaderErrorMessage[0]);
 		}
 	}
 	// fragment shader
@@ -118,7 +114,6 @@ void Shader::CreateShader(const char* vertex_file_path, const char* fragment_fil
 
 	char const* fragmentSourcePointer = FragmentShaderCode.c_str();
 
-	printf("Compiling shader : %s\n", fragment_file_path);
 	glShaderSource(m_fragmentId, 1, &fragmentSourcePointer, NULL);
 
 	glCompileShader(m_fragmentId);
@@ -129,12 +124,10 @@ void Shader::CreateShader(const char* vertex_file_path, const char* fragment_fil
 	{
 		std::vector<char> FragmentShaderErrorMessage(static_cast<INT64>(InfoLogLength + 1.0));
 		glGetShaderInfoLog(m_fragmentId, InfoLogLength, nullptr, &FragmentShaderErrorMessage[0]);
-		printf("%s\n", &FragmentShaderErrorMessage[0]);
 	}
 
 	// link to program
 	m_programId = glCreateProgram();
-	printf("Linking program\n");
 	if (m_programId == 0)
 	{
 		printf("Shader cannot get program id from the other.\n");
@@ -154,7 +147,6 @@ void Shader::CreateShader(const char* vertex_file_path, const char* fragment_fil
 		if (InfoLogLength > 0) {
 			std::vector<char> ProgramErrorMessage(static_cast<INT64>(InfoLogLength + 1.0));
 			glGetProgramInfoLog(m_programId, InfoLogLength, nullptr, &ProgramErrorMessage[0]);
-			printf("%s\n", &ProgramErrorMessage[0]);
 		}
 	}
 	glDeleteShader(m_vertexId);

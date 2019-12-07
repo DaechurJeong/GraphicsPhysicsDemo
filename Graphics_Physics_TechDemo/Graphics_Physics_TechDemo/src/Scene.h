@@ -24,7 +24,7 @@ const unsigned light_num = 20;
 
 class Scene {
 public:
-	Scene(int sceneNum) : curr_scene(sceneNum), width(1280), height(800), aspect(1280.f/800.f),
+	Scene(int sceneNum) : curr_scene(sceneNum), width(1600), height(1000), aspect(1.6f),
 		roughness_status(false), metallic_status(false), dimension_(S_DIMENSION), met(0.f), rou(0.f),
 		second_imgui(true), third_imgui(true), forth_imgui(true), fifth_imgui(true), deltaTime(0.f), lastFrame(0.f), draw_line(false),
 		textIndex(0), cam_num(1), cam_move(false), move_object(true), temp(glm::vec3(255.f, 255.f, 255.f)){

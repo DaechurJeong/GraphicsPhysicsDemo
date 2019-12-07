@@ -23,8 +23,8 @@ End Header --------------------------------------------------------*/
 #include <vector>
 
 // Global variables
-int width = 1280, height = 800;
-//int width = 1920, height = 1200;
+//int width = 1280, height = 800;
+int width = 1600, height = 1000;
 float deltaTime, lastFrame = 0.f;
 float aspect = float(width) / float(height);
 
