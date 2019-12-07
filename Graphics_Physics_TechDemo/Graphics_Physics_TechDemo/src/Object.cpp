@@ -14,8 +14,8 @@ End Header --------------------------------------------------------*/
 #define PI 3.141592654
 #define TWOPI 6.283185308
 #define STB_IMAGE_IMPLEMENTATION
-#define WIDTH 1280
-#define HEIGHT 800
+#define WIDTH 1600
+#define HEIGHT 1000
 #include "glad/glad.h"
 #include "glm/gtc/matrix_transform.hpp"
 #include "GLFW/glfw3.h"
