@@ -1,9 +1,0 @@
-Team Name : OffOnOff
-Team Member : Charlie Jung, Nahye Park
-
-	Basically, this demo is the first step for realistic visualization from the scratch 
-and it is about PBR and 3D SoftBody physics based on Visual Studio 2019
-There are 12 different pbr textures and lights are applied on last 2 scenes.
-	For Softbody, it's demonstrating the cloth transformation (plane vs sphere in Scene 1)
-and 3D softbody (sphere vs plane in Scene 0, sphere vs sphere in Scene 2 and 3). 
-Scene 3 and 5 is for limit of calculation, so FPS will be drop a little. 
