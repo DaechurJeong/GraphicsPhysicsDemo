@@ -1,3 +1,15 @@
+/* Start Header -------------------------------------------------------
+Copyright (C) 2019 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the prior written
+consent of DigiPen Institute of Technology is prohibited.
+File Name: Physics.h
+Purpose: Physics update function, collision check for every softbody objects
+Language: MSVC C++
+Platform: VS2019, Windows
+Project: Graphics_Physics_TechDemo
+Author: Nahye Park, nahye.park
+Creation date: 9/20/2018
+End Header --------------------------------------------------------*/
 #include "Physics.h"
 #include "Base.h"
 

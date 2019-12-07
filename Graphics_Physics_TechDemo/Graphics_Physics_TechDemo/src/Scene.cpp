@@ -1,3 +1,15 @@
+/* Start Header -------------------------------------------------------
+Copyright (C) 2019 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the prior written
+consent of DigiPen Institute of Technology is prohibited.
+File Name: Scene.cpp
+Purpose: Scene manager to control 6 scenes and UI
+Language: MSVC C++
+Platform: VS2019, Windows
+Project: Graphics_Physics_TechDemo
+Author: Charlie Jung, jungdae.chur
+Creation date: 10/6/2018
+End Header --------------------------------------------------------*/
 #include "Scene.h"
 #include "input.h"
 #include "glm/gtc/matrix_transform.hpp"
@@ -187,7 +199,7 @@ void Scene::Scene1Init(Camera* camera)
 
 	// Generate objects for scene0
 	Object* main_obj_texture = new Object(O_SPHERE, glm::vec3(1.2f,  -2.5f, 4.0f), glm::vec3(1.f, 1.f, 1.f), MID_S_DIMENSION); // mid
-	// plastic
+	// WOOD
 	main_obj_texture->albedo = albedo[2];
 	main_obj_texture->normal = normal[2];
 	main_obj_texture->metallic = metallic[2];
@@ -198,7 +210,7 @@ void Scene::Scene1Init(Camera* camera)
 	pbr_obj.push_back(main_obj_texture);
 
 	Object* main_obj_texture2 = new Object(O_SPHERE, glm::vec3(1.2f, -0.5f, 2.0f), glm::vec3(1.f, 1.f, 1.f), MID_S_DIMENSION); // top
-	// plastic
+	// STEEL
 	main_obj_texture2->albedo = albedo[1];
 	main_obj_texture2->normal = normal[1];
 	main_obj_texture2->metallic = metallic[1];
@@ -209,7 +221,7 @@ void Scene::Scene1Init(Camera* camera)
 	pbr_obj.push_back(main_obj_texture2);
 
 	Object* main_obj_texture3 = new Object(O_SPHERE, glm::vec3(1.2f, -4.5f, 6.0f), glm::vec3(1.f, 1.f, 1.f), MID_S_DIMENSION); // bottom
-	// steel
+	// GOLD
 	main_obj_texture3->albedo = albedo[10];
 	main_obj_texture3->normal = normal[10];
 	main_obj_texture3->metallic = metallic[10];
@@ -1298,6 +1310,8 @@ void Scene::InitAllPBRTexture()
 	metallic[10] = rigid_plane->loadTexture("models\\pbr\\gold\\Sphere3D_1_defaultMat_Metallic.png");
 	roughness[10] = rigid_plane->loadTexture("models\\pbr\\gold\\Sphere3D_1_defaultMat_Roughness.png");
 	ao[10] = rigid_plane->loadTexture("models\\pbr\\gold\\ao.png");
+
+	delete rigid_plane;
 }
 
 int Scene::ChangePBRTexture(TextureType type, unsigned index, bool isSoftbodyObj)

@@ -1,3 +1,15 @@
+/* Start Header -------------------------------------------------------
+Copyright (C) 2019 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the prior written
+consent of DigiPen Institute of Technology is prohibited.
+File Name: Scene.h
+Purpose: Definition of Scene class
+Language: MSVC C++
+Platform: VS2019, Windows
+Project: Graphics_Physics_TechDemo
+Author: Charlie Jung, jungdae.chur
+Creation date: 10/6/2018
+End Header --------------------------------------------------------*/
 #pragma once
 
 #ifndef SCENE_H

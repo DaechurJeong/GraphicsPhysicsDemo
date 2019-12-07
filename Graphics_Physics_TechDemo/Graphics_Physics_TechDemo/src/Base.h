@@ -1,3 +1,15 @@
+/* Start Header -------------------------------------------------------
+Copyright (C) 2019 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the prior written
+consent of DigiPen Institute of Technology is prohibited.
+File Name: Base.h
+Purpose: Prototype of Softbody class and constraint
+Language: MSVC C++
+Platform: VS2019, Windows
+Project: Graphics_Physics_TechDemo
+Author: Nahye Park, nahye.park
+Creation date: 9/20/2018
+End Header --------------------------------------------------------*/
 #pragma once
 
 #ifndef BASE_H
@@ -5,7 +17,6 @@
 
 #include "Object.h"
 #include <set>
-//#include <vector>
 
 #define GRAVITY -9.8f
 
@@ -21,8 +32,6 @@ struct constraints {
 	}
 };
 
-
-
 class SoftBodyPhysics : public Object
 {
 
@@ -36,10 +45,8 @@ public:
 	void CollisionResponseRigid(Object* _rhs);
 	void CollisionResponseSoft(SoftBodyPhysics* _rhs);
 
-
 	void SetInitConstraints() { m_cons = m_init_cons; }
 	bool colliding() { return isCollided; }
-
 
 	std::vector<glm::vec3> m_scaled_ver;
 	glm::vec3 m_min;
@@ -54,19 +61,14 @@ private:
 	
 	void Acceleration();
 
-
 	bool IsCollided(glm::vec3& point, glm::vec3& center, float& radius);
 	bool IsCollidedPlane(glm::vec3& point, glm::vec3& p_point0, glm::vec3& p_point1, float& radius, float& distance, glm::vec3& norm, float d
 	, glm::vec3& movedpoint);
 
-
 	std::vector<glm::vec3> m_old_ver;
-
-
 	std::vector<constraints> m_init_cons;
 	std::vector<constraints> m_cons;
 	std::vector<constraints> m_in_cons;
-
 	std::set<constraints> m_const;
 	std::set<std::pair<constraints, constraints>> m_volume_cons;
 
@@ -75,11 +77,7 @@ private:
 	std::vector<glm::vec3> m_velocity;
 	bool isCollided;
 
-
-	//temp
 	std::vector <std::pair<unsigned, glm::vec3>> m_edge;
-
-
 };
 
 #endif
